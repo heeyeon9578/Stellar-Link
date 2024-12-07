@@ -12,30 +12,20 @@ export default function Home() {
     <div >
      <main className="flex-1"> 
        {/* 섹션1 */}
-        <section className="h-screen bg-transparent flex items-center justify-center relative">
-          <div >
-          <Lottie
-          animationData={Earth}
-          loop
-          className="w-[500px] h-[500px]"
-        />
+        <section className="h-screen w-full bg-transparent flex items-center justify-center">
 
-
-          </div>
           
           {/* GltfViewer: 절대 위치 */}
-          <div className="absolute flex items-center justify-center top-0" style={{'left': '25%'}}>
-            <GltfViewer />
+          <div className="w-full h-full">
+            <GltfViewer/>
           </div>
-          <div className="absolute flex items-center justify-center top-[75%] left-[25%]">
-            <GltfViewer2 />
-          </div>
+
         </section>
 
         <section className="h-screen bg-gray-200 flex items-center justify-center ">
           <h1 className="text-4xl font-bold">Section 2</h1>
         </section>
-        <section className="h-screen bg-gray-300 flex items-center justify-center ">
+        <section className="h-screen bg-gray-300 flex items-center justify-center "> 
           <h1 className="text-4xl font-bold">Section 3</h1>
         </section>
         <section className="h-screen bg-gray-400 flex items-center justify-center ">
