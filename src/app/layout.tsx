@@ -5,7 +5,7 @@ import Footer from './components/Footer';
 
 export const metadata = {
   title: 'Stellar Link',
-  description: 'A connection that shines like a star',
+  description: 'A connection as brilliant as a star',
 };
 
 export default function RootLayout({
