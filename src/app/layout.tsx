@@ -2,9 +2,10 @@ import './globals.css'; // 전역 스타일
 import Header from './components/Header';
 import Footer from './components/Footer';
 
+
 export const metadata = {
-  title: 'My Website',
-  description: 'Welcome to my website',
+  title: 'Stellar Link',
+  description: 'A connection that shines like a star',
 };
 
 export default function RootLayout({
@@ -23,9 +24,11 @@ export default function RootLayout({
       </head>
 
       <body className='text-white'>
-        <Header />
-        <main className="container mx-auto py-4">{children}</main>
-        <Footer />
+       
+          <Header />
+          <main className="container mx-auto py-4">{children}</main>
+          <Footer />
+       
       </body>
     </html>
   );
