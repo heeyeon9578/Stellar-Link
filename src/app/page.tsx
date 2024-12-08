@@ -14,11 +14,18 @@ export default function Home() {
        {/* 섹션1 */}
         <section className="h-screen w-full bg-transparent flex items-center justify-center">
 
-          
-          {/* GltfViewer: 절대 위치 */}
-          <div className="w-full h-full">
-            <GltfViewer/>
-          </div>
+        {/* GltfViewer */}
+        <div
+          className="
+            w-[100%] h-[300px]             /* 기본값: sm 이하 */
+            sm:w-[60%] sm:h-[60%]       /* 작은 화면 */
+            md:w-[80%] md:h-[80%]       /* 중간 화면 */
+            lg:w-[100%] lg:h-[100%]     /* 큰 화면 */
+          "
+        >
+          <GltfViewer />
+        </div>
+
 
         </section>
 

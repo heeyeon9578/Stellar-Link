@@ -85,8 +85,21 @@ const GltfViewer: React.FC<GltfViewerProps> = ({
   size = { width: '100%', height: '100%' },
 }) => {
   return (
-    <div style={{ width: size.width, height: size.height }}>
-      <Canvas>
+    <div
+      style={{
+        width: size.width,
+        height: size.height,
+       
+        overflow: 'visible', // 오버플로우된 부분을 보이도록 설정
+      }}
+    >
+      <Canvas
+        style={{
+          width: '100%',
+          height: '100%',
+          overflow: 'visible', // Canvas 자체에도 visible 설정
+        }}
+      >
         {/* 조명 설정 */}
         <ambientLight intensity={0.8} /> {/* 주변 조명 */}
         <directionalLight position={[5, 5, 5]} intensity={0.5} /> {/* 방향 조명 */}
@@ -98,7 +111,7 @@ const GltfViewer: React.FC<GltfViewerProps> = ({
         <Star3 orbitRadius={3} speed={1} />
 
         {/* 카메라 컨트롤 */}
-        <OrbitControls />
+        <OrbitControls enableZoom={false} />
       </Canvas>
     </div>
   );
