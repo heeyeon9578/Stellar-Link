@@ -4,5 +4,26 @@
     "Skills": "기술",
     "Login": "로그인",
     "intro1": "별처럼 빛나는 연결",
-    "intro2": "실시간 채팅: 개인 및 그룹"
+    "intro2": "실시간 채팅: 개인 및 그룹",
+    "Email": "이메일",
+    "Password": "비밀번호",
+    "ForgetPassword": "비밀번호를 잊으셨나요?",
+    "Signin": "로그인",
+    "orcontinuewith": "또는 계속하기",
+    "Donthaveanaccountyet": "아직 계정이 없으신가요?",
+    "Registerforfree": "무료로 가입하기",
+    "Hide":"숨기기",
+    "Show":"보이기",
+    "Signup":"회원가입",
+    "InvalidEmail": "올바른 이메일 형식을 입력해주세요.",
+    "EnterEmail": "이메일을 입력해주세요.",
+    "EnterPassword": "비밀번호를 입력해주세요.",
+    "PasswordTooShort": "비밀번호는 최소 6자 이상이어야 합니다.",
+    "InvalidEmailOrPassword": "이메일 또는 비밀번호가 잘못되었습니다."
 }
+
+
+
+
+
+

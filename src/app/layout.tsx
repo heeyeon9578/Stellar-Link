@@ -1,7 +1,8 @@
+
 import './globals.css'; // 전역 스타일
 import Header from './components/Header';
 import Footer from './components/Footer';
-
+import ClientProvider from './components/ClientProvider'
 
 export const metadata = {
   title: 'Stellar Link',
@@ -26,7 +27,7 @@ export default function RootLayout({
       <body className='text-white'>
        
           <Header />
-          <main className="container mx-auto py-4">{children}</main>
+          <main className="container mx-auto py-4"><ClientProvider>{children}</ClientProvider></main>
           <Footer />
        
       </body>

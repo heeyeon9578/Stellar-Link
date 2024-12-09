@@ -36,6 +36,9 @@ const Header: React.FC = () => {
       }
     }
   };
+  const goToLogin = () => {
+    router.push('/login'); // '/login' 페이지로 이동
+  };
 
   return (
     <header className="bg-transparent text-white py-2 sticky top-0 z-50">
@@ -53,7 +56,7 @@ const Header: React.FC = () => {
 
         {/* 네비게이션 바 */}
         <nav className="hidden md:flex space-x-5">
-          <Button variant="main" className="animate__animated animate__zoomIn">
+          <Button variant="main" className="animate__animated animate__zoomIn" >
             {t('AboutMe')}
           </Button>
           <Button variant="main" className="animate__animated animate__zoomIn">
@@ -62,7 +65,7 @@ const Header: React.FC = () => {
           <Button variant="main" className="animate__animated animate__zoomIn">
           {t('Skills')}
           </Button>
-          <Button variant="primary" className="animate__animated animate__zoomIn">
+          <Button variant="primary" className="animate__animated animate__zoomIn" onClick={goToLogin}>
           {t('Login')}
           </Button>
         </nav>
@@ -70,7 +73,7 @@ const Header: React.FC = () => {
         <div className='md:hidden flex'>
           {/* 로그인 버튼 (모바일 전용) */}
           <div className="md:hidden mr-4 ">
-            <Button size="sm" variant="primary">{t('Login')}</Button>
+            <Button size="sm" variant="primary" onClick={goToLogin}>{t('Login')}</Button>
           </div>
 
           {/* 모바일 메뉴 버튼 */}

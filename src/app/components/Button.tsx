@@ -7,6 +7,7 @@ interface ButtonProps {
   onClick?: () => void;
   type?: 'button' | 'submit' | 'reset';
   disabled?: boolean;
+  loading?: boolean; // 로딩 상태 추가
   className?: string;
 }
 
@@ -17,12 +18,14 @@ const Button: React.FC<ButtonProps> = ({
   onClick,
   type = 'button',
   disabled = false,
+  loading = false, // 기본값 false
   className = '',
 }) => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const baseStyles = `relative inline-flex items-center justify-center font-medium rounded focus:outline-none 
-                      disabled:opacity-50 disabled:cursor-not-allowed font-sans overflow-hidden`;
+  const baseStyles = `relative inline-flex items-center justify-center font-medium rounded focus:outline-none focus:ring-customLightPurple
+                    disabled:opacity-50 disabled:cursor-not-allowed font-sans overflow-hidden`;
+
 
   const variantStyles = {
     primary: `
@@ -48,22 +51,24 @@ const Button: React.FC<ButtonProps> = ({
   };
 
   const sizeStyles = {
-    sm: 'px-3 py-1 text-sm',
+    sm: 'px-3 py-2 text-sm',
     md: 'px-5 py-2 text-base',
-    lg: 'px-7 py-3 text-lg',
+    lg: 'px-5 py-2 text-lg',
   };
 
   const classes = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (loading || disabled) return; // 로딩 중일 때는 마우스 효과 차단
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = Math.max(((e.clientX - rect.left) / rect.width - 0.5) * 10, -5); // -5 ~ 5로 제한
-    const y = Math.max(((e.clientY - rect.top) / rect.height - 0.5) * 10, -5); // -5 ~ 5로 제한
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
     setPosition({ x, y });
   };
   
 
   const handleMouseLeave = () => {
+    if (loading || disabled) return; // 로딩 중일 때는 원래 위치로 복구 차단
     setPosition({ x: 0, y: 0 }); // 원래 위치로 복구
   };
 
@@ -71,20 +76,27 @@ const Button: React.FC<ButtonProps> = ({
     <button
       type={type}
       onClick={onClick}
-      disabled={disabled}
+      disabled={disabled || loading} // 로딩 중일 때 비활성화
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       className={classes}
     >
-        <span
+        {loading ? (
+          <div className="relative z-10 flex items-center justify-center">
+            <span className="loader border-t-transparent border-2 border-white w-4 h-4 rounded-full animate-spin"></span>
+          </div>
+        ):(
+          <span
           className="relative z-10 hover:text-transparent  hover:!bg-gradient-to-r hover:!from-customPurple hover:!to-customLightPurple hover:bg-clip-text  bg-clip-text"
           style={{
             transform: `translate(${position.x}px, ${position.y}px)`, // 텍스트 이동
-            transition: 'transform 0.2s ease-out',
+            transition: 'transform 0.1s ease-out',
+            animationDuration: '4s' 
           }}
         >
           {children}
         </span>
+        )}
       
     </button>
   );

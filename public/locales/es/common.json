@@ -4,5 +4,20 @@
     "Skills": "Habilidades",
     "Login": "Iniciar sesión",
     "intro1": "Una conexión tan brillante como una estrella",
-    "intro2": "Chat en tiempo real: personal y grupal"
+    "intro2": "Chat en tiempo real: personal y grupal",
+    "Email": "Correo electrónico",
+    "Password": "Contraseña",
+    "ForgetPassword": "¿Olvidaste tu contraseña?",
+    "Signin": "Iniciar sesión",
+    "orcontinuewith": "o continuar con",
+    "Donthaveanaccountyet": "¿Aún no tienes una cuenta?",
+    "Registerforfree": "Regístrate gratis",
+    "Hide": "Ocultar",
+    "Show": "Mostrar",
+    "Signup":"Sign up",
+    "InvalidEmail": "Formato de correo electrónico inválido.",
+    "EnterEmail": "Por favor ingresa tu correo electrónico.",
+    "EnterPassword": "Por favor ingresa tu contraseña.",
+    "PasswordTooShort": "La contraseña debe tener al menos 6 caracteres.",
+    "InvalidEmailOrPassword": "Correo electrónico o contraseña no válidos."
 }

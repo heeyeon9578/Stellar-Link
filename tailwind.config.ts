@@ -13,6 +13,7 @@ export default {
         foreground: "var(--foreground)",
         customPurple: '#7158E2', // 원하는 색상 추가
         customLightPurple: '#CD84F1', // 추가 색상
+        customRectangle:"#F4F4F7"
       },
       borderRadius: {
         'custom': '20px', // 20px의 사용자 정의 라운드 값

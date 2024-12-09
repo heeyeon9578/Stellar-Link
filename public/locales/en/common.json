@@ -4,5 +4,20 @@
     "Skills":"Skills",
     "Login":"Login",
     "intro1":"A connection as brilliant as a star",
-    "intro2":"Real-Time Chatting: Personal and Group"
+    "intro2":"Real-Time Chatting: Personal and Group",
+    "Email":"Email",
+    "Password":"Password",
+    "ForgetPassword":"Forget Password?",
+    "Signin":"Sign in",
+    "orcontinuewith":"or continue with",
+    "Donthaveanaccountyet":"Don't have an account yet?",
+    "Registerforfree":"Register for free",
+    "Hide":"Hide",
+    "Show":"Show",
+    "Signup":"Sign up",
+    "InvalidEmail": "Invalid email format.",
+    "EnterEmail": "Please enter your email.",
+    "EnterPassword": "Please enter your password.",
+    "PasswordTooShort": "Password must be at least 6 characters long.",
+    "InvalidEmailOrPassword": "Invalid email or password."
 }
