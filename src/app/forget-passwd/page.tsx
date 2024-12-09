@@ -9,7 +9,7 @@ import Rectangle from '../components/Rectangle';
 import { signIn } from 'next-auth/react'; // next-auth signIn 함수
 import Button from '../components/Button';
 
-export default function LoginPage() {
+export default function ForgetPasswordPage() {
   const { t, i18n } = useTranslation('common');
   const [isInitialized, setIsInitialized] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -108,7 +108,7 @@ export default function LoginPage() {
 
   return (
     <div 
-    className="h-screen flex items-center justify-center animate__animated animate__fadeIn"
+    className="h-screen flex items-center justify-center animate__animated animate__fadeInUp"
     style={{ animationDuration: '2s' }}
     >
       <Rectangle 
@@ -178,7 +178,7 @@ export default function LoginPage() {
               transition-all duration-300
               "
             
-              onClick={() =>{router.push('/forget-passwd')}}
+              onClick={() => alert('Password recovery process')}
             >
               {t('ForgetPassword')}
             </button>
