@@ -15,7 +15,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const client = await connectDB;
       const db = client.db('StellarLink');
       const collection = db.collection('verificationCodes');
+      const user = await db.collection('user_cred').findOne({ email });
 
+      if (user) {
+        return res.status(404).json({ message: 'Email is already registered.' });
+      }
       // 기존 인증번호 삭제 후 새로 저장
       await collection.deleteOne({ email });
       await collection.insertOne({ email, code, expiresAt });

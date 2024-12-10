@@ -13,55 +13,131 @@ export default function ForgetPasswordPage() {
   const { t, i18n } = useTranslation('common');
   const [isInitialized, setIsInitialized] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [passwordConfirmVisible, setPasswordConfirmVisible] = useState(false);
   const [email, setEmail] = useState('');
+  const [name, setName]  = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isFormValid, setIsFormValid] = useState(false); // 폼 유효성 상태
   const [emailError, setEmailError] = useState<string | null>(null); // 이메일 에러 상태
   const [passwordError, setPasswordError] = useState<string | null>(null); // 비밀번호 에러 상태
+  const [passwordConfirmError, setPasswordConfirmError] = useState<string | null>(null); // 비밀번호 에러 상태
   const [touchedEmail, setTouchedEmail] = useState<boolean>(false);
   const [touchedPasswd, setTouchedPasswd] = useState<boolean>(false);
+  const [touchedPasswdCf, setTouchedPasswdCf] = useState<boolean>(false);
+  const [isEmailConfirmed , setIsEmailConfirmed] = useState<boolean>(false);
+  const [isCodeSend,setIsCodeSend] = useState(false);
+  const [code, setCode] = useState('');
   const router = useRouter();
 
   const validateForm = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // 이메일 정규식
     const isEmailValid = emailRegex.test(email);
-    const isPasswordValid = password.length >= 6; // 비밀번호 최소 6자리
-    setIsFormValid(isEmailValid && isPasswordValid);
+    const isPasswordValid = validatePassword(password); // 비밀번호 규칙 검사
+    const isPasswordConfirmValid = (password === passwordConfirm) && validatePassword(passwordConfirm); // 비밀번호 일치 검사
+    setIsFormValid(isEmailValid && isPasswordValid && isPasswordConfirmValid);
   };
 
+  const validatePassword = (password: string): boolean => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^])[A-Za-z\d@$!%*?&#^]{8,}$/;
+    return passwordRegex.test(password);
+  };
+  
+  
   useEffect(() => {
     validateForm();
-  }, [email, password]);
+  }, [email, password, passwordConfirm]);
 
-  const handleLogin = async () => {
+  const handleFindPw = async () => {
     setLoading(true);
     setError(null);
     setEmailError(null);
     setPasswordError(null);
+    setPasswordConfirmError(null);
   
     try {
-      const result = await signIn('credentials', {
-        redirect: false,
-        email,
-        password,
+      // 서버로 사용자 데이터 전송
+      const response = await fetch('/api/auth/find-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          passwordConfirm, // 비밀번호 확인 필드 추가
+        }),
       });
   
-      if (!result?.ok) {
-        alert(t('InvalidEmailOrPassword')); // 에러 메시지 알림으로 표시
-
-        return;
+      if (!response.ok) {
+        // 서버에서 에러 메시지 반환 시 처리
+        const data = await response.json();
+        alert(data.message || 'Change password failed');
       }
   
-      // 성공 시 페이지 이동
-      router.push('/chat');
+      // 회원가입 성공 처리
+      alert('Change password successful!');
+      router.push('/login'); // 로그인 페이지로 이동
     } catch (err: any) {
-      setError(err.message || 'An error occurred');
+      // 에러 처리
+      console.error(err);
+      setError(err.message || 'An unexpected error occurred');
+    } finally {
+      // 로딩 상태 종료
+      setLoading(false);
+    }
+  };
+  
+  
+
+  const handleSendAuthNum = async () => {
+    setLoading(true);
+    setError(null);
+  
+    try {
+      const response = await fetch('/api/send-code-find-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+  
+      if (!response.ok) {
+        const data = await response.json();
+        alert(data.message || 'Failed to send verification code');
+      }else{
+        alert(t('vcs')); // Verification code sent
+        setIsCodeSend(true);
+      }
+  
+      
+    } catch (err: any) {
+      if (err.message === 'Email is not registered') {
+        alert(t('EmailNotRegistered')); // 가입되지 않은 이메일
+      } else {
+        alert(t('ftsvc')); // Failed to send verification code
+      }
+      setIsCodeSend(false);
     } finally {
       setLoading(false);
     }
   };
+
+  const verifyCode = async () => {
+    const response = await fetch('/api/verify-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, code }),
+    });
+
+    if (response.ok) {
+      setIsEmailConfirmed(true);
+      alert(t('vs'));
+    } else {
+      alert(t('ic'));
+    }
+  };
+
+
   useEffect(()=>{
     if(!touchedEmail ){
       setTouchedEmail(true)
@@ -77,20 +153,42 @@ export default function ForgetPasswordPage() {
    
   },[email])
 
-  useEffect(()=>{
-    if(!touchedPasswd){
+  useEffect(() => {
+    if (!touchedPasswd) {
       setTouchedPasswd(true);
-    }else{
+    } else {
       if (password === '') {
         setPasswordError(t('EnterPassword')); // 번역 메시지 사용
-      } else if (password.length < 6) {
-        setPasswordError(t('PasswordTooShort'));
-      }else {
+      } else if (!validatePassword(password)) {
+        setPasswordError(t('PasswordInvalid')); // 새로운 비밀번호 규칙 에러 메시지
+      } else {
         setPasswordError(null);
       }
     }
+  }, [password]);
+
+  useEffect(() => {
+    if (passwordConfirm !== password) {
+      setPasswordConfirmError(t('PasswordNotMatch'));
+    } else {
+      setPasswordConfirmError(null);
+    }
+  }, [password, passwordConfirm]);
+
+  useEffect(()=>{
+    if(!touchedPasswdCf){
+      setTouchedPasswdCf(true);
+    }else{
+      if (passwordConfirm === '') {
+        setPasswordConfirmError(t('EnterPassword')); // 번역 메시지 사용
+      } else if (!validatePassword(passwordConfirm)) {
+        setPasswordConfirmError(t('PasswordInvalid')); // 새로운 비밀번호 규칙 에러 메시지
+      }else {
+        setPasswordConfirmError(null);
+      }
+    }
     
-  },[password])
+  },[passwordConfirm])
 
   useEffect(() => {
     if (i18n.isInitialized) {
@@ -108,7 +206,7 @@ export default function ForgetPasswordPage() {
 
   return (
     <div 
-    className="h-screen flex items-center justify-center animate__animated animate__fadeInUp"
+    className="h-screen flex items-center justify-center animate__animated animate__fadeIn"
     style={{ animationDuration: '2s' }}
     >
       <Rectangle 
@@ -121,44 +219,240 @@ export default function ForgetPasswordPage() {
           
           <h2 className="text-2xl md:text-4xl font-bold mb-6 text-white mb-12">{t('FindPassword')}</h2>
 
-          {/* 이메일 입력란 */}
+          {/* 이메일 입력란 */} 
           <div className='w-full mb-4'>
             <div className='text-sm mb-1'>{t('Email')}</div>
             
+            <div className='flex space-x-4'>
             <input
+              disabled={isCodeSend}
               type="email"
               placeholder=""
               value={email}
               onChange={(e) => setEmail(e.target.value)} // 상태 업데이트
-              className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple "
+              className="w-[80%] md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 
+              rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple  
+              disabled:bg-gray-300 disabled:cursor-not-allowed
+              "
             />
+
+            {/* 인증 번호 전송 */}
+          <Button
+            onClick={handleSendAuthNum}
+            loading={loading}
+            disabled={!(!emailError )|| loading} // 폼이 유효하지 않거나 로딩 중일 때 비활성화
+            size='sm'
+            className={`justify-center`}
+          >
+            {loading ? <div></div> : <div>{t('Send')}</div>}
+          </Button>
+            </div>
             {/* 이메일 입력란 아래 에러 메시지 */}
             {emailError && <div className="text-xs text-red-500 mt-1">{emailError}</div>} 
           </div>
+
           
-         
-           {/* 로그인 버튼 */}
-           <Button
-            onClick={handleLogin}
-            loading={loading}
-            disabled={!isFormValid || loading} // 폼이 유효하지 않거나 로딩 중일 때 비활성화
-            size='md'
-            className={`w-full justify-center hidden md:flex`}
-          >
-            {loading ? <div>{t('Signin')}</div> : <div>{t('Signin')}</div>}
-          </Button>
 
-          {/* 로그인 버튼 - 모바일*/}
-          <Button
-            onClick={handleLogin}
-            loading={loading}
-            disabled={!isFormValid || loading} // 폼이 유효하지 않거나 로딩 중일 때 비활성화
-            size='sm'
-            className={`w-full justify-center md:hidden`}
-          >
-            {loading ? <div>{t('Signin')}</div> : <div>{t('Signin')}</div>}
-          </Button>
+          {/* 코드 전송 후 입력 칸 */}      
+          {isCodeSend &&(
+            <div>
+              <div className='w-full mb-4'>
+                <div className='text-sm mb-1'>{t('Code')}</div>
 
+                <div className='flex space-x-4'>
+                  <input
+                    type="default"
+                    placeholder=""
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)} // 상태 업데이트
+                    className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple "
+                  />
+
+                  {/* 인증 번호 확인 */}
+                  <Button
+                    onClick={verifyCode}
+                    loading={loading}
+                    disabled={ !code || loading} // 폼이 유효하지 않거나 로딩 중일 때 비활성화
+                    size='sm'
+                    className={`w-full justify-center`}
+                  >
+                    {loading ? <div></div> : <div>{t('Confirm')}</div>}
+                  </Button>
+
+                </div>
+                {/* 이메일 입력란 아래 에러 메시지 */}
+                {emailError && <div className="text-xs text-red-500 mt-1">{emailError}</div>} 
+              </div>
+
+              
+            </div>
+          )}
+
+          {/* 이메일 인증 후 비밀번호, 비밀번호 확인 */}
+          {isEmailConfirmed && (
+              <>
+              {/* 이름 입력란 */} 
+                <div className='w-full mb-4'>
+                  <div className='text-sm mb-1'>{t('Name')}</div>
+                  <div className='flex space-x-4'>
+                  <input
+                    type="default"
+                    placeholder=""
+                    value={name}
+                    onChange={(e) => setName(e.target.value)} // 상태 업데이트
+                    className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 
+                    rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple  
+                    disabled:bg-gray-300 disabled:cursor-not-allowed
+                    "
+                  />
+                  </div>
+                </div>
+
+                {/* 비밀번호 입력란 */}
+                <div className='w-full'>
+                <div className='text-sm mb-1'>{t('Password')}</div>
+                <div className="w-full relative mb-1">
+                  <input
+                    type={passwordVisible ? 'text' : 'password'}
+                    placeholder=""
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)} // 상태 업데이트
+                    className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+                  />
+
+
+                  <button
+                    onClick={() => setPasswordVisible(!passwordVisible)}
+                    className={`absolute inset-y-0 right-4 flex items-center text-customPurple
+                  text-xs md:text-sm
+                  bg-transparent 
+                  hover:decoration-customPurple
+                  hover:text-underline-offset-4
+                  hover:!bg-gradient-to-r hover:!from-customPurple hover:!to-customLightPurple hover:bg-clip-text  bg-clip-text hover:text-transparent
+                  transition-all duration-300
+                    
+                `}
+                  >
+                    {passwordVisible ? <div>{t('Hide')}</div> : <div>{t('Show')}</div>}
+                    
+                  </button>
+                    
+                </div>
+                  {/* 비밀번호 입력란 아래 에러 메시지 */}
+                  {passwordError && <div className="text-xs text-red-500 mt-1">{passwordError}</div>}
+           
+                    
+              </div>
+
+               {/* 비밀번호 확인 입력란 */}
+               <div className='w-full'>
+                <div className='text-sm mb-1'>{t('PasswordConfirm')}</div>
+                <div className="w-full relative mb-1">
+                  <input
+                    type={passwordConfirmVisible ? 'text' : 'password'}
+                    placeholder=""
+                    value={passwordConfirm}
+                    onChange={(e) => setPasswordConfirm(e.target.value)} // 상태 업데이트
+                    className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+                  />
+
+
+                  <button
+                    onClick={() => setPasswordConfirmVisible(!passwordConfirmVisible)}
+                    className={`absolute inset-y-0 right-4 flex items-center text-customPurple
+                  text-xs md:text-sm
+                  bg-transparent 
+                  hover:decoration-customPurple
+                  hover:text-underline-offset-4
+                  hover:!bg-gradient-to-r hover:!from-customPurple hover:!to-customLightPurple hover:bg-clip-text  bg-clip-text hover:text-transparent
+                  transition-all duration-300
+                    
+                `}
+                  >
+                    {passwordConfirmVisible ? <div>{t('Hide')}</div> : <div>{t('Show')}</div>}
+                    
+                  </button>
+                    
+                </div>
+                  {/* 비밀번호 입력란 아래 에러 메시지 */}
+                  {passwordConfirmError && <div className="text-xs text-red-500 mt-1">{passwordConfirmError}</div>}
+           
+                    
+              </div>     
+                    
+               {/* 로그인 버튼 */}
+               <Button
+                onClick={handleFindPw}
+                loading={loading}
+                disabled={!isFormValid || loading} // 모든 폼 유효성 검사에 통과해야만 활성화
+                size='md'
+                className={`w-full justify-center hidden md:flex mt-4`}
+              >
+                {loading ? <div></div> : <div>{t('Confirm')}</div>}
+              </Button>
+                    
+              {/* 로그인 버튼 - 모바일*/}
+              <Button
+                onClick={handleFindPw}
+                loading={loading}
+                disabled={!isFormValid || loading} // 모든 폼 유효성 검사에 통과해야만 활성화
+                size='sm'
+                className={`w-full justify-center md:hidden mt-2`}
+              >
+                {loading ? <div></div> : <div>{t('Confirm')}</div>}
+              </Button></>
+          )}
+
+          <div className='md:m-8 m-4  text-xs'>{t('orcontinuewith')}</div>
+
+          {/* 소셜 로그인 버튼 */}
+          <div className="w-full flex flex-row space-x-4">
+            <button
+              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+              onClick={() => signIn('google', { callbackUrl: '/chat' })}
+            >
+             <Image
+                src="/SVG/google.svg"
+                alt="Logo"
+                width={24}
+                height={24}
+                priority
+                className="cursor-pointer"
+              />
+
+            </button>
+            <button
+              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+              onClick={() => signIn('github', { callbackUrl: '/chat' })}
+            >
+              <Image
+                src="/SVG/github.svg"
+                alt="Logo"
+                width={24}
+                height={24}
+                priority
+                className="cursor-pointer"
+              />
+            </button>
+            <button
+              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+              onClick={() => signIn('discord', { callbackUrl: '/chat' })}
+            >
+              <div className='w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center'>
+                <Image
+                  src="/SVG/DiscordMark.svg"
+                  alt="Logo"
+                  width={16}
+                  height={16}
+                  priority
+                  className="cursor-pointer"
+                />
+              </div>
+            </button>
+          </div>
+
+
+          
         </div>
       </Rectangle>
     </div>
