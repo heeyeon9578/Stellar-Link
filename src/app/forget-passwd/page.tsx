@@ -112,14 +112,14 @@ export default function ForgetPasswordPage() {
     style={{ animationDuration: '2s' }}
     >
       <Rectangle 
-        className="md:w-[620px] md:h-[90%] w-[80%] h-[70vh] md:rounded-[40px] rounded-[20px] bg-transparent border border-white border-2 md:border-4 opacity-100 flex flex-col"
+        className="md:w-[620px]  w-[80%]  md:rounded-[40px] rounded-[20px] bg-transparent border border-white border-2 md:border-4 opacity-100 flex flex-col"
         classNameBg="md:rounded-[40px] rounded-[30px] opacity-0"
       >
 
        
         <div className="flex-1 flex flex-col justify-center items-center md:m-16 m-4">
           
-          <h2 className="text-2xl md:text-4xl font-bold mb-6 text-white mb-12">{t('Login')}</h2>
+          <h2 className="text-2xl md:text-4xl font-bold mb-6 text-white mb-12">{t('FindPassword')}</h2>
 
           {/* 이메일 입력란 */}
           <div className='w-full mb-4'>
@@ -136,55 +136,7 @@ export default function ForgetPasswordPage() {
             {emailError && <div className="text-xs text-red-500 mt-1">{emailError}</div>} 
           </div>
           
-          {/* 비밀번호 입력란 */}
-          <div className='w-full'>
-            <div className='text-sm mb-1'>{t('Password')}</div>
-            <div className="w-full relative mb-1">
-              <input
-                type={passwordVisible ? 'text' : 'password'}
-                placeholder=""
-                value={password}
-                onChange={(e) => setPassword(e.target.value)} // 상태 업데이트
-                className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple"
-              />
-             
-
-              <button
-                onClick={() => setPasswordVisible(!passwordVisible)}
-                className={`absolute inset-y-0 right-4 flex items-center text-customPurple
-              text-xs md:text-sm
-              bg-transparent 
-              hover:decoration-customPurple
-              hover:text-underline-offset-4
-              hover:!bg-gradient-to-r hover:!from-customPurple hover:!to-customLightPurple hover:bg-clip-text  bg-clip-text hover:text-transparent
-              transition-all duration-300
-              
-            `}
-              >
-                {passwordVisible ? <div>{t('Hide')}</div> : <div>{t('Show')}</div>}
-
-              </button>
-               
-            </div>
-              {/* 비밀번호 입력란 아래 에러 메시지 */}
-              {passwordError && <div className="text-xs text-red-500 mt-1">{passwordError}</div>}
-              {/* 비밀번호를 잃어버렸나요 버튼 */}
-            <button
-              className="
-              mb-8 text-xs justify-start items-start text-white
-              bg-transparent text-white
-              hover:decoration-customPurple
-              hover:!bg-gradient-to-r hover:!from-customPurple hover:!to-customLightPurple hover:bg-clip-text  bg-clip-text hover:text-transparent
-              transition-all duration-300
-              "
-            
-              onClick={() => alert('Password recovery process')}
-            >
-              {t('ForgetPassword')}
-            </button>
-          </div>
-
-       
+         
            {/* 로그인 버튼 */}
            <Button
             onClick={handleLogin}
@@ -207,68 +159,6 @@ export default function ForgetPasswordPage() {
             {loading ? <div>{t('Signin')}</div> : <div>{t('Signin')}</div>}
           </Button>
 
-          <div className='md:m-8 m-4  text-xs'>{t('orcontinuewith')}</div>
-
-          {/* 소셜 로그인 버튼 */}
-          <div className="w-full flex flex-row space-x-4">
-            <button
-              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-customLightPurple"
-              onClick={() => signIn('google', { callbackUrl: '/chat' })}
-            >
-             <Image
-                src="/SVG/google.svg"
-                alt="Logo"
-                width={24}
-                height={24}
-                priority
-                className="cursor-pointer"
-              />
-
-            </button>
-            <button
-              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-customLightPurple"
-              onClick={() => signIn('github', { callbackUrl: '/chat' })}
-            >
-              <Image
-                src="/SVG/github.svg"
-                alt="Logo"
-                width={24}
-                height={24}
-                priority
-                className="cursor-pointer"
-              />
-            </button>
-            <button
-              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-customLightPurple"
-              onClick={() => signIn('discord', { callbackUrl: '/chat' })}
-            >
-              <div className='w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center'>
-                <Image
-                  src="/SVG/DiscordMark.svg"
-                  alt="Logo"
-                  width={16}
-                  height={16}
-                  priority
-                  className="cursor-pointer"
-                />
-              </div>
-            </button>
-          </div>
-
-
-          <div className='md:m-8 m-4 text-xs flex items-center justify-center flex-wrap'>
-            <div>{t('Donthaveanaccountyet')}</div>
-
-            <div className='cursor-pointer font-bold ml-2 text-xs text-white
-              bg-transparent text-white
-              hover:decoration-customPurple
-              hover:!bg-gradient-to-r hover:!from-customPurple hover:!to-customLightPurple hover:bg-clip-text  bg-clip-text hover:text-transparent
-              transition-all duration-300'
-             onClick={()=>{// 로그인 성공 시 리디렉트
-              router.push('/signup');
-            }}
-              >{t('Registerforfree')}</div>
-          </div>
         </div>
       </Rectangle>
     </div>

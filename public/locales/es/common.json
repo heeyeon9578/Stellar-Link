@@ -19,5 +19,11 @@
     "EnterEmail": "Por favor ingresa tu correo electrónico.",
     "EnterPassword": "Por favor ingresa tu contraseña.",
     "PasswordTooShort": "La contraseña debe tener al menos 6 caracteres.",
-    "InvalidEmailOrPassword": "Correo electrónico o contraseña no válidos."
+    "InvalidEmailOrPassword": "Correo electrónico o contraseña no válidos.",
+    "FindPassword": "Recuperar contraseña",
+    "Send": "Enviar",
+    "vcs": "¡El código de verificación ha sido enviado!",
+    "ftsvc": "Error al enviar el código de verificación.",
+    "Code": "Código de verificación"
+
 }

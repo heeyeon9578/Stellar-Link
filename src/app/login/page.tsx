@@ -27,10 +27,13 @@ export default function LoginPage() {
   const validateForm = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // 이메일 정규식
     const isEmailValid = emailRegex.test(email);
-    const isPasswordValid = password.length >= 6; // 비밀번호 최소 6자리
+    const isPasswordValid = validatePassword(password); // 비밀번호 최소 6자리
     setIsFormValid(isEmailValid && isPasswordValid);
   };
-
+  const validatePassword = (password: string): boolean => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^])[A-Za-z\d@$!%*?&#^]{8,}$/;
+    return passwordRegex.test(password);
+  };
   useEffect(() => {
     validateForm();
   }, [email, password]);
@@ -83,8 +86,8 @@ export default function LoginPage() {
     }else{
       if (password === '') {
         setPasswordError(t('EnterPassword')); // 번역 메시지 사용
-      } else if (password.length < 6) {
-        setPasswordError(t('PasswordTooShort'));
+      } else if (!validatePassword(password)) {
+        setPasswordError(t('PasswordInvalid')); // 새로운 비밀번호 규칙 에러 메시지
       }else {
         setPasswordError(null);
       }
@@ -112,7 +115,7 @@ export default function LoginPage() {
     style={{ animationDuration: '2s' }}
     >
       <Rectangle 
-        className="md:w-[620px] md:h-[90%] w-[80%] h-[70vh] md:rounded-[40px] rounded-[20px] bg-transparent border border-white border-2 md:border-4 opacity-100 flex flex-col"
+        className="md:w-[620px] md:h-[90%] w-[80%]  md:rounded-[40px] rounded-[20px] bg-transparent border border-white border-2 md:border-4 opacity-100 flex flex-col"
         classNameBg="md:rounded-[40px] rounded-[30px] opacity-0"
       >
 
@@ -212,7 +215,10 @@ export default function LoginPage() {
           {/* 소셜 로그인 버튼 */}
           <div className="w-full flex flex-row space-x-4">
             <button
-              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+              className="
+              w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-customLightPurple
+              disable:
+              "
               onClick={() => signIn('google', { callbackUrl: '/chat' })}
             >
              <Image

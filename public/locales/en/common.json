@@ -19,5 +19,17 @@
     "EnterEmail": "Please enter your email.",
     "EnterPassword": "Please enter your password.",
     "PasswordTooShort": "Password must be at least 6 characters long.",
-    "InvalidEmailOrPassword": "Invalid email or password."
+    "InvalidEmailOrPassword": "Invalid email or password.",
+    "FindPassword":"Find Password",
+    "Send":"Send",
+    "vcs":"Verification code sent!",
+    "ftsvc":"Failed to send verification code.",
+    "Code":"Code",
+    "Confirm":"Confirm",
+    "vs":"Verification successful!",
+    "ic":"Invalid code!",
+    "PasswordConfirm":"Password Confirm",
+    "PasswordInvalid": "The password must be at least 8 characters long and include at least one number, one uppercase letter, one lowercase letter, and one special character.",
+    "PasswordNotMatch": "Passwords do not match.",
+    "Name":"Name"
 }
