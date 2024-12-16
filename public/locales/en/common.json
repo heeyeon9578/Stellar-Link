@@ -32,6 +32,11 @@
     "PasswordInvalid": "The password must be at least 8 characters long and include at least one number, one uppercase letter, one lowercase letter, and one special character.",
     "PasswordNotMatch": "Passwords do not match.",
     "Name":"Name",
-    "EmailNotRegistered": "This email is not registered."
+    "EmailNotRegistered": "This email is not registered.",
+    "Profile":"Profile",
+    "Friends":"Friends",
+    "Chat":"Chat",
+    "Color":"Color",
+    "Logout":"Logout"
 
 }

@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 공통 스타일 정의 */
+.profile{
+  @apply flex flex-col w-full gap-1 items-center relative cursor-pointer;
+}
+
+.profile-circle {
+  @apply bg-white/15 w-[10vw] h-[10vw] between-lg-md:w-16 between-lg-md:h-16 max-w-20 max-h-20 rounded-full flex items-center justify-center;
+}

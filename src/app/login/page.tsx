@@ -115,7 +115,7 @@ export default function LoginPage() {
     style={{ animationDuration: '2s' }}
     >
       <Rectangle 
-        className="md:w-[620px] md:h-[90%] w-[80%]  md:rounded-[40px] rounded-[20px] bg-transparent border border-white border-2 md:border-4 opacity-100 flex flex-col"
+        className="md:w-[620px] w-[80%]  md:rounded-[40px] rounded-[20px] bg-transparent border border-white border-2 md:border-4 opacity-100 flex flex-col"
         classNameBg="md:rounded-[40px] rounded-[30px] opacity-0"
       >
 
