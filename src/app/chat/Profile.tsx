@@ -48,8 +48,8 @@ export default function Profile() {
           <Image
             src="/SVG/select.svg"
             alt="select"
-            width={7}
-            height={70}
+            width={6}
+            height={60}
             priority
             className="cursor-pointer absolute top-0 left-0"
           />
@@ -72,7 +72,7 @@ export default function Profile() {
  if (!session) {
   return (
     <div className="w-full h-full flex justify-center items-center">
-      <p>{t('Please log in to access your profile.')}</p>
+      <p>{t('accessprofile')}</p>
     </div>
   );
 }

@@ -13,6 +13,28 @@
     --foreground: #ededed;
   }
 }
+@font-face {
+  font-family: 'Gyeonggi_Batang_Regular';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2410-3@1.0/Batang_Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Ownglyph_ParkDaHyun';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2411-3@1.0/Ownglyph_ParkDaHyun.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+html:lang(en),
+p:lang(en) {
+  font-family: 'Kaisei Decol',  sans-serif; /* 기본 영어 글꼴 */
+}
+
+html:lang(ko),
+p:lang(ko) , input:lang(ko){
+  font-family: 'Gyeonggi_Batang_Regular' !important; /* 한글 글꼴 */
+  font-weight: bold;
+}
 
 body {
   background-image: 

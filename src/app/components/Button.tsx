@@ -23,7 +23,7 @@ const Button: React.FC<ButtonProps> = ({
 }) => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const baseStyles = `relative inline-flex items-center justify-center font-medium rounded focus:outline-none focus:ring-customLightPurple
+  const baseStyles = `relative inline-flex items-center justify-center font-medium rounded focusDefault
                     disabled:opacity-50 disabled:cursor-not-allowed font-sans overflow-hidden`;
 
 

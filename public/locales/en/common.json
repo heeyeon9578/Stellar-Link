@@ -37,6 +37,8 @@
     "Friends":"Friends",
     "Chat":"Chat",
     "Color":"Color",
-    "Logout":"Logout"
+    "Logout":"Logout",
+    "accessprofile.":"Please log in to access your profile.",
+    "Save": "Save"
 
 }

@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 export default {
+  
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -20,7 +21,8 @@ export default {
         customPurple: '#7158E2', // 원하는 색상 추가
         customLightPurple: '#CD84F1', // 추가 색상
         customRectangle:"#F4F4F7",
-        customGray:"#BEBFD3"
+        customGray:"#BEBFD3",
+        customBlue:"#030391"
       },
       borderRadius: {
         'custom': '20px', // 20px의 사용자 정의 라운드 값
@@ -29,7 +31,9 @@ export default {
         custom: '0px 4px 4px rgba(0, 0, 0, 0.25)', // 사용자 정의 그림자
       },
       fontFamily: {
-        sans: ['Kaisei Decol', 'sans-serif'], // 기본 Sans-serif 폰트 설정
+        english: ['Kaisei Decol', 'sans-serif'], // 기본 영어 폰트 설정
+        korean: ['Gyeonggi_Batang_Regular', 'Malgun Gothic', 'sans-serif'], // 한글 폰트 설정
+        spanish: ['Kaisei Decol', 'sans-serif'],
       },
       backdropFilter: {
         none: 'none',

@@ -58,6 +58,7 @@ export const authOptions: AuthOptions = {
           id: user._id.toString(),
           name: user.name,
           email: user.email,
+          profileImage: user.profileImage || "/default-profile.png", // 기본 프로필 이미지 설정
         };
       },
     }),
@@ -67,11 +68,13 @@ export const authOptions: AuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30일
   },
   callbacks: {
-    jwt: async ({ token, user }) => {
-      if (user) {
+    jwt: async ({ token, user, account }) => {
+      if (user && account) {
         token.user = {
           name: user.name,
           email: user.email,
+          profileImage: user.profileImage,
+          provider: account.provider, // provider 정보 추가
         };
       }
       return token;
@@ -81,7 +84,8 @@ export const authOptions: AuthOptions = {
         session.user = token.user as {
           name: string;
           email: string;
-          image: string; // image가 항상 string이어야 하므로 null 대신 빈 문자열 처리
+          profileImage: string;
+          provider: string; // provider 정보 추가
         };
       }
       return session;

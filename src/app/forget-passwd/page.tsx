@@ -231,7 +231,7 @@ export default function ForgetPasswordPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)} // 상태 업데이트
               className="w-[80%] md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 
-              rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple  
+              rounded-lg text-customPurple focusDefault
               disabled:bg-gray-300 disabled:cursor-not-allowed
               "
             />
@@ -265,7 +265,7 @@ export default function ForgetPasswordPage() {
                     placeholder=""
                     value={code}
                     onChange={(e) => setCode(e.target.value)} // 상태 업데이트
-                    className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple "
+                    className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focusDefault "
                   />
 
                   {/* 인증 번호 확인 */}
@@ -301,7 +301,7 @@ export default function ForgetPasswordPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)} // 상태 업데이트
                     className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 
-                    rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple  
+                    rounded-lg text-customPurple focusDefault
                     disabled:bg-gray-300 disabled:cursor-not-allowed
                     "
                   />
@@ -317,7 +317,7 @@ export default function ForgetPasswordPage() {
                     placeholder=""
                     value={password}
                     onChange={(e) => setPassword(e.target.value)} // 상태 업데이트
-                    className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+                    className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focusDefault"
                   />
 
 
@@ -353,7 +353,7 @@ export default function ForgetPasswordPage() {
                     placeholder=""
                     value={passwordConfirm}
                     onChange={(e) => setPasswordConfirm(e.target.value)} // 상태 업데이트
-                    className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+                    className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focusDefault"
                   />
 
 
@@ -408,7 +408,7 @@ export default function ForgetPasswordPage() {
           {/* 소셜 로그인 버튼 */}
           <div className="w-full flex flex-row space-x-4">
             <button
-              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focusDefault"
               onClick={() => signIn('google', { callbackUrl: '/chat' })}
             >
              <Image

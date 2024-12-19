@@ -133,7 +133,7 @@ export default function LoginPage() {
               placeholder=""
               value={email}
               onChange={(e) => setEmail(e.target.value)} // 상태 업데이트
-              className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple "
+              className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focusDefault "
             />
             {/* 이메일 입력란 아래 에러 메시지 */}
             {emailError && <div className="text-xs text-red-500 mt-1">{emailError}</div>} 
@@ -148,7 +148,7 @@ export default function LoginPage() {
                 placeholder=""
                 value={password}
                 onChange={(e) => setPassword(e.target.value)} // 상태 업데이트
-                className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+                className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focusDefault"
               />
              
 
@@ -216,7 +216,7 @@ export default function LoginPage() {
           <div className="w-full flex flex-row space-x-4">
             <button
               className="
-              w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-customLightPurple
+              w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focusDefault
               disable:
               "
               onClick={() => signIn('google', { callbackUrl: '/chat' })}
@@ -232,7 +232,7 @@ export default function LoginPage() {
 
             </button>
             <button
-              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focusDefault "
               onClick={() => signIn('github', { callbackUrl: '/chat' })}
             >
               <Image
@@ -245,7 +245,7 @@ export default function LoginPage() {
               />
             </button>
             <button
-              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focusDefault"
               onClick={() => signIn('discord', { callbackUrl: '/chat' })}
             >
               <div className='w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center'>
