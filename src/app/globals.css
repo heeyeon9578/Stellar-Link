@@ -25,13 +25,19 @@
   font-weight: normal;
   font-style: normal;
 }
+@font-face {
+  font-family: 'Ownglyph_kimkonghae';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408@1.0/Ownglyph_kimkonghae.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
 html:lang(en),
 p:lang(en) {
   font-family: 'Kaisei Decol',  sans-serif; /* 기본 영어 글꼴 */
 }
 
 html:lang(ko),
-p:lang(ko) , input:lang(ko){
+p:lang(ko) , input:lang(ko), div:lang(ko){
   font-family: 'Gyeonggi_Batang_Regular' !important; /* 한글 글꼴 */
   font-weight: bold;
 }

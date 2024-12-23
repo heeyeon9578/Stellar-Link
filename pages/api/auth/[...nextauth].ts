@@ -7,6 +7,13 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { connectDB } from "@/util/database";
 import { compare } from "bcryptjs";
 
+interface UserToken {
+  name: string;
+  email: string;
+  profileImage: string;
+  provider: string;
+}
+
 export const authOptions: AuthOptions = {
   providers: [
     // GitHub 로그인
@@ -74,24 +81,29 @@ export const authOptions: AuthOptions = {
           name: user.name,
           email: user.email,
           profileImage: user.profileImage,
-          provider: account.provider, // provider 정보 추가
-        };
+          provider: account.provider,
+        } as UserToken; // 타입 캐스팅
       }
       return token;
     },
     session: async ({ session, token }) => {
       if (token.user) {
-        session.user = token.user as {
-          name: string;
-          email: string;
-          profileImage: string;
-          provider: string; // provider 정보 추가
-        };
+        const db = (await connectDB).db("StellarLink");
+        const user = await db.collection("user_cred").findOne({ email: (token.user as UserToken).email });
+  
+        if (user) {
+          session.user = {
+            name: user.name,
+            email: user.email,
+            profileImage: user.profileImage || "/default-profile.png", // 기본 프로필 이미지 설정
+            provider: (token.user as UserToken).provider, // 기존 provider 유지
+          };
+        }
       }
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET, //CSRF 공격 방지
+  secret: process.env.NEXTAUTH_SECRET, // CSRF 공격 방지
   adapter: MongoDBAdapter(connectDB),
 };
 

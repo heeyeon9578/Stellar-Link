@@ -39,6 +39,7 @@
     "Color":"Color",
     "Logout":"Logout",
     "accessprofile.":"Please log in to access your profile.",
-    "Save": "Save"
+    "Save": "Save",
+    "ChangePassword":"Do you want to change password?"
 
 }

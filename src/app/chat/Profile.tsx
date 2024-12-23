@@ -11,7 +11,7 @@ export default function Profile() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [selectedSection, setSelectedSection] = useState<string | null>(null); // 선택된 섹션 관리
   const { data: session, status } = useSession();
-
+  const profileImage = session?.user?.profileImage || '';
   useEffect(()=>{
     setSelectedSection('chat')
   },[])
@@ -55,7 +55,8 @@ export default function Profile() {
           />
         )}
         <div className="profile-circle" onClick={() => router.push(navigateTo)}>
-          <Image
+          { key !== 'profile'? (
+            <Image
             src={svgSrc}
             alt={label}
             width={22.5}
@@ -63,8 +64,16 @@ export default function Profile() {
             priority
             className="cursor-pointer"
           />
+          ):
+          (
+            <img
+            src={profileImage || '/default-profile.png'}
+            alt="Profile"
+            className="w-full h-full rounded-full object-cover"
+          />
+          )}
         </div>
-        <div>{t(label)}</div>
+        <div lang="ko">{t(label)}</div>
       </div>
     );
   };
@@ -92,7 +101,7 @@ export default function Profile() {
         />
 
         {/* 프로필 섹션 */}
-        {renderProfileSection('profile', '/SVG/Friends.svg',session.user?.name || t('Profile'), '/chat/profile')}
+        {renderProfileSection('profile', profileImage||'/SVG/Friends.svg',session.user?.name || t('Profile'), '/chat/profile')}
         {renderProfileSection('friends', '/SVG/Friends.svg', 'Friends', '/chat/friends')}
         {renderProfileSection('chat', '/SVG/Chat.svg', 'Chat', '/chat')}
         {renderProfileSection('color', '/SVG/Color.svg', 'Color', '/chat/color')}
