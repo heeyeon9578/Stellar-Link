@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import '../../../i18n';
@@ -12,9 +13,26 @@ export default function Profile() {
   const [selectedSection, setSelectedSection] = useState<string | null>(null); // 선택된 섹션 관리
   const { data: session, status } = useSession();
   const profileImage = session?.user?.profileImage || '';
-  useEffect(()=>{
-    setSelectedSection('chat')
-  },[])
+  const pathname = usePathname();
+
+  const isProfilePage = pathname?.startsWith('/chat/profile');
+  const isFriendPage = pathname?.startsWith('/chat/friends');
+  const isChatPage = pathname===('/chat')
+  const isColorPage = pathname?.startsWith('/chat/color')
+
+  useEffect(() => {
+    if (pathname?.startsWith('/chat/profile')) {
+      setSelectedSection('profile');
+    } else if (pathname?.startsWith('/chat/friends')) {
+      setSelectedSection('friends');
+    } else if (pathname === '/chat') {
+      setSelectedSection('chat');
+    } else if (pathname?.startsWith('/chat/color')) {
+      setSelectedSection('color');
+    } else {
+      setSelectedSection(null); // 기본값 설정 (선택 없음)
+    }
+  }, [pathname]);
 
   useEffect(() => {
     if (i18n.isInitialized) {

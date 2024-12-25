@@ -214,35 +214,36 @@ export default function ProfileContent() {
       </h2>
 
       <div className="mb-4 text-center relative">
-        <div className='relative'>
+        <div className="relative">
           <img
             src={profileImage || '/default-profile.png'}
             alt="Profile"
             className="w-28 h-28 rounded-full mx-auto"
           />
 
-          <div className='absolute bg-white w-[20px] h-[20px] rounded-full flex justify-center items-center bottom-0 right-48'>
+          <div className="absolute bg-white w-[20px] h-[20px] rounded-full flex justify-center items-center bottom-0 right-48">
             <Image
               src="/SVG/imageChange.svg"
               alt="Logo"
               width={13}
               height={13}
               priority
-              onClick={() => alert('')} // 로고 클릭 시 홈으로 이동
               className="cursor-pointer"
+              onClick={() => document.getElementById('fileInput')?.click()} // 클릭 시 파일 입력 클릭
             />
-          </div>  
+          </div>
         </div>
-     
+
+        {/* 숨겨진 파일 입력 */}
         <input
+          id="fileInput" // ID를 부여하여 참조 가능
           type="file"
           accept="image/*"
           onChange={handleImageUpload}
-          className="mt-2 text-sm"
+          className="hidden" // 숨기기
         />
-        
-
       </div>
+
 
       <div className="mb-4" lang="ko">
         <label className="block text-sm font-bold mb-2">
@@ -269,19 +270,22 @@ export default function ProfileContent() {
         />
       </div> */}
 
-      <button
-              className="
-              mb-8 text-xs justify-start items-start text-white
-              bg-transparent text-white
-              hover:decoration-customPurple
-              hover:!bg-gradient-to-r hover:!from-customPurple hover:!to-customLightPurple hover:bg-clip-text  bg-clip-text hover:text-transparent
-              transition-all duration-300
-              "
-            
-              onClick={() =>{setWantPasswordChange(!wantPasswordChange)}}
-            >
-              <DynamicText text={t('ChangePassword')}></DynamicText>
-            </button>
+     {!isSocialLogin &&(
+       <button
+       className="
+       mb-8 text-xs justify-start items-start text-white
+       bg-transparent text-white
+       hover:decoration-customPurple
+       hover:!bg-gradient-to-r hover:!from-customPurple hover:!to-customLightPurple hover:bg-clip-text  bg-clip-text hover:text-transparent
+       transition-all duration-300
+       "
+     
+       onClick={() =>{setWantPasswordChange(!wantPasswordChange)}}
+     >
+       <DynamicText text={t('ChangePassword')}></DynamicText>
+     </button>
+     
+     )}
       {!isSocialLogin && wantPasswordChange && (
         <>
           <div className="mb-4 relative">

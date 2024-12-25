@@ -77,6 +77,22 @@ export const authOptions: AuthOptions = {
   callbacks: {
     jwt: async ({ token, user, account }) => {
       if (user && account) {
+        const db = (await connectDB).db("StellarLink");
+        const existingUser = await db.collection("user_cred").findOne({ email: user.email });
+
+        if (!existingUser) {
+          // 새로운 사용자라면 DB에 저장
+          const newUser = {
+            name: user.name || account.provider, // 이름이 없으면 provider 이름 사용
+            email: user.email,
+            profileImage: user.image || "/default-profile.png",
+            provider: account.provider,
+            createdAt: new Date(),
+          };
+          await db.collection("user_cred").insertOne(newUser);
+          console.log("소셜 로그인 사용자 저장 완료:", newUser);
+        }
+        
         token.user = {
           name: user.name,
           email: user.email,
