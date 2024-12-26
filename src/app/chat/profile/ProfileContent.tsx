@@ -213,7 +213,7 @@ export default function ProfileContent() {
         <DynamicText text={t('Profile')} />
       </h2>
 
-      <div className="mb-4 text-center relative">
+      <div className="mb-4 text-center relative  flex justify-center">
         <div className="relative">
           <img
             src={profileImage || '/default-profile.png'}
@@ -221,7 +221,7 @@ export default function ProfileContent() {
             className="w-28 h-28 rounded-full mx-auto"
           />
 
-          <div className="absolute bg-white w-[20px] h-[20px] rounded-full flex justify-center items-center bottom-0 right-48">
+          <div className="absolute bg-white w-[20px] h-[20px] rounded-full flex justify-center items-center bottom-0 right-0">
             <Image
               src="/SVG/imageChange.svg"
               alt="Logo"
