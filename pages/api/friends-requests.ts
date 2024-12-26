@@ -24,7 +24,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(404).json({ message: "Requester not found" });
   }
 
-  const userId = requester._id;
+  // 항상 ObjectId로 변환해서 사용
+  const userId = new ObjectId(requester._id);
 
   switch (req.method) {
     case "GET": {
@@ -76,7 +77,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               {
                 $push: {
                   friends: {
-                    friendId: request.fromUserId,
+                    friendId: new ObjectId(request.fromUserId) ,
                     name: request.fromUserName,
                     email: request.fromUserEmail,
                     profileImage: request.fromUserProfileImage,
@@ -88,7 +89,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             );
           
             await db.collection("friends").updateOne(
-              { userId: request.fromUserId },
+              { userId:  new ObjectId(request.fromUserId) },
               {
                 $push: {
                   friends: {

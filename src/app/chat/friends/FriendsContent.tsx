@@ -1,79 +1,44 @@
+// FriendsContent.tsx
+
 import { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import '../../../../i18n';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { fetchFriends, fetchReceivedRequests, fetchSentRequests } from '../../../../store/friendsSlice';
+import { RootState } from '../../../../store/store';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import Button from '@/app/components/Button';
 import DynamicText from '../../../app/components/DynamicText';
-import Image from 'next/image';
-interface Friend {
-  friendId: string;
-  email: string;
-  name: string;
-  profileImage?: string;
-  status: string;
-  addedAt?: string; // 선택적 필드
-}
 
-interface FriendRequest {
-  _id: string;
-  fromUserEmail: string;
-  fromUserName: string;
-  fromUserProfileImage: string;
-  toUserEmail: string;
-  toUserName: string;
-  toUserProfileImage: string;
-  status: string;
-}
+
 
 export default function FriendsContent() {
-  const [friends, setFriends] = useState<Friend[]>([]); // 친구 목록
-  const { t, i18n } = useTranslation('common');
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [receivedRequests, setReceivedRequests] = useState<FriendRequest[]>([]); // 내게 온 친구 요청
-  const [sentRequests, setSentRequests] = useState<FriendRequest[]>([]); // 내가 보낸 친구 요청
-  const [newFriendEmail, setNewFriendEmail] = useState<string>(""); // 친구 추가 이메일
-  const [loading, setLoading] = useState<boolean>(true); // 로딩 상태
-  const [error, setError] = useState<string | null>(null); // 에러 상태
+  const dispatch = useAppDispatch();
+  const { t } = useTranslation('common');
 
-  // 데이터 가져오기
+  // Redux store에서 필요한 상태를 꺼내옵니다.
+  const {
+    list: friends,
+    receivedRequests,
+    sentRequests,
+    loading,
+    error,
+  } = useSelector((state: RootState) => state.friends);
+
+  // 로컬 상태 (새로운 친구 추가용)
+  const [newFriendEmail, setNewFriendEmail] = useState<string>("");
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
+    console.log("friends changed:", friends);
+  }, [friends]);
+  useEffect(() => {
+    // 컴포넌트가 마운트될 때, Thunk 액션을 디스패치해서 데이터 로드
+    dispatch(fetchFriends());
+    dispatch(fetchReceivedRequests());
+    dispatch(fetchSentRequests());
 
-        // 친구 목록 가져오기
-        const friendsResponse = await fetch("/api/friends");
-        if (!friendsResponse.ok) throw new Error("Failed to fetch friends");
-        const friendsData: Friend[] = await friendsResponse.json();
-        setFriends(friendsData);
-
-        // 받은 친구 요청 가져오기
-        const receivedResponse = await fetch("/api/friends-requests");
-        if (!receivedResponse.ok) throw new Error("Failed to fetch received requests");
-        const receivedData: FriendRequest[] = await receivedResponse.json();
-        setReceivedRequests(receivedData);
-        console.log(`
-            
-            
-            receivedData
-            
-            
-            
-            `,receivedData)
-
-        // 보낸 친구 요청 가져오기
-        const sentResponse = await fetch("/api/sent-friend-requests");
-        if (!sentResponse.ok) throw new Error("Failed to fetch sent requests");
-        const sentData: FriendRequest[] = await sentResponse.json();
-        setSentRequests(sentData);
-      } catch (err) {
-        setError((err as Error).message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+    console.log(`friends`,friends)
+  }, [dispatch]);
 
   // 친구 추가 요청
   const handleAddFriend = async () => {
@@ -83,6 +48,8 @@ export default function FriendsContent() {
     }
 
     try {
+      // 이 부분도 Thunk로 만들 수 있지만,
+      // 예시는 그대로 로컬 fetch 예시를 유지
       const response = await fetch(`/api/friends`, {
         method: "POST",
         headers: {
@@ -98,16 +65,19 @@ export default function FriendsContent() {
 
       setNewFriendEmail(""); // 입력 필드 초기화
       alert("Friend request sent successfully!");
+
+      // 친구 요청을 보냈으니, 혹시 리스트가 업데이트되었을 수 있어 재조회
+      dispatch(fetchSentRequests());
     } catch (err) {
       alert((err as Error).message);
     }
   };
 
-  // 친구 요청 수락/거절
-const handleRequestAction = async (fromUserEmail: string, action: "accepted" | "rejected") => {
+  // 친구 요청 수락/거절 (이것도 필요하다면 Slice에 Thunk로 옮길 수 있음)
+  const handleRequestAction = async (fromUserEmail: string, action: "accepted" | "rejected") => {
     try {
       console.log(`Handling request action: ${action} for email: ${fromUserEmail}`);
-  
+
       const response = await fetch("/api/friends-requests", {
         method: "PATCH",
         headers: {
@@ -115,36 +85,25 @@ const handleRequestAction = async (fromUserEmail: string, action: "accepted" | "
         },
         body: JSON.stringify({ fromUserEmail, action }),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || `Failed to ${action} friend request.`);
       }
-  
+
       const successMessage =
         action === "accepted"
           ? "Friend request accepted successfully!"
           : "Friend request rejected successfully!";
       alert(successMessage);
-  
-      // 요청 목록에서 해당 요청 제거
-      setReceivedRequests((prev) =>
-        prev.filter((req) => req.fromUserEmail !== fromUserEmail)
-      );
-  
-      // 친구 목록 갱신 (수락된 경우)
-      if (action === "accepted") {
-        const friendsResponse = await fetch("/api/friends");
-        if (friendsResponse.ok) {
-          const updatedFriends: Friend[] = await friendsResponse.json();
-          setFriends(updatedFriends);
-        }
-      }
+
+      // 요청 목록이 바뀌었으니 다시 요청을 디스패치해서 데이터 갱신
+      dispatch(fetchReceivedRequests());
+      dispatch(fetchFriends());
     } catch (err) {
       alert((err as Error).message);
     }
   };
-  
 
   if (loading) {
     return <p>Loading...</p>;

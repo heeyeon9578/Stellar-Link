@@ -26,9 +26,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!requester) {
           return res.status(404).json({ message: "Requester not found." });
         }
-
+       
         const friends = await db.collection("friends").findOne({ userId: requester._id });
+        
         res.status(200).json(friends ? friends.friends : []);
+
+        console.log(`
+          
+          
+          
+          requester:
+          requester._id: ${requester._id}
+          
+          
+          
+          `,requester)
+          
+        console.log(`
+          
+          
+          
+          
+          friends:
+
+
+
+          
+          `,friends)
+
       } catch (error) {
         res.status(500).json({ message: "Error fetching friends", error });
       }
