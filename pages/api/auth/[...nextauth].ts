@@ -65,7 +65,7 @@ export const authOptions: AuthOptions = {
           id: user._id.toString(),
           name: user.name,
           email: user.email,
-          profileImage: user.profileImage || "/default-profile.png", // 기본 프로필 이미지 설정
+          profileImage: user.profileImage || "/SVG/default-profile.svg", // 기본 프로필 이미지 설정
         };
       },
     }),
@@ -85,7 +85,7 @@ export const authOptions: AuthOptions = {
           const newUser = {
             name: user.name || account.provider, // 이름이 없으면 provider 이름 사용
             email: user.email,
-            profileImage: user.image || "/default-profile.png",
+            profileImage: user.image || "/SVG/default-profile.svg",
             provider: account.provider,
             createdAt: new Date(),
           };
@@ -111,7 +111,7 @@ export const authOptions: AuthOptions = {
           session.user = {
             name: user.name,
             email: user.email,
-            profileImage: user.profileImage || "/default-profile.png", // 기본 프로필 이미지 설정
+            profileImage: user.profileImage || "/SVG/default-profile.svg", // 기본 프로필 이미지 설정
             provider: (token.user as UserToken).provider, // 기존 provider 유지
           };
         }

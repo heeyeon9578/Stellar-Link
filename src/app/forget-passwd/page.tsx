@@ -72,11 +72,11 @@ export default function ForgetPasswordPage() {
       if (!response.ok) {
         // 서버에서 에러 메시지 반환 시 처리
         const data = await response.json();
-        alert(data.message || 'Change password failed');
+        alert(t('Cpf'));
       }
   
       // 회원가입 성공 처리
-      alert('Change password successful!');
+      alert(t('Cps'));
       router.push('/login'); // 로그인 페이지로 이동
     } catch (err: any) {
       // 에러 처리
@@ -103,7 +103,7 @@ export default function ForgetPasswordPage() {
   
       if (!response.ok) {
         const data = await response.json();
-        alert(data.message || 'Failed to send verification code');
+        alert(t('Ftsvc') );
       }else{
         alert(t('vcs')); // Verification code sent
         setIsCodeSend(true);

@@ -188,7 +188,7 @@ export default function ProfileContent() {
       const result = await response.json();
 
       if (response.ok) {
-        alert(t('Profile updated successfully'));
+        alert(t('Pus'));
         
         // **세션 정보 업데이트**
         await update({
@@ -196,18 +196,18 @@ export default function ProfileContent() {
           profileImage: uploadedUrl,
         });
       } else {
-        alert(result.message || t('Failed to update profile'));
+        alert(t('Ftup'));
       }
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert(t('An error occurred while updating profile.'));
+      alert(t('Aeowup'));
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="mx-auto p-4 rounded-lg h-full text-customBlue relative ">
+    <div className="mx-auto p-8 rounded-lg h-full text-customBlue relative ">
 
       <h2 className="text-2xl font-bold mb-4">
         <DynamicText text={t('Profile')} />
@@ -216,7 +216,7 @@ export default function ProfileContent() {
       <div className="mb-4 text-center relative  flex justify-center">
         <div className="relative">
           <img
-            src={profileImage || '/default-profile.png'}
+            src={profileImage || '/SVG/default-profile.svg'}
             alt="Profile"
             className="w-28 h-28 rounded-full mx-auto"
           />

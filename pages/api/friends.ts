@@ -109,11 +109,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             fromUserId: requester._id.toString(),
             fromUserEmail: requester.email,
             fromUserName: requester.name,
-            fromUserProfileImage: requester.profileImage || "/default-profile.png",
+            fromUserProfileImage: requester.profileImage || "/SVG/default-profile.svg",
             toUserId: friend._id.toString(),
             toUserEmail: friend.email,
             toUserName: friend.name,
-            toUserProfileImage: friend.profileImage || "/default-profile.png",
+            toUserProfileImage: friend.profileImage || "/SVG/default-profile.svg",
             status: "pending",
             requestedAt: new Date(),
           });

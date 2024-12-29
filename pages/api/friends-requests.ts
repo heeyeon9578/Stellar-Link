@@ -96,7 +96,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     friendId: userId,
                     name: requester.name,
                     email: requesterEmail,
-                    profileImage: requester.profileImage || "/default-profile.png",
+                    profileImage: requester.profileImage || "/SVG/default-profile.svg",
                     addedAt: new Date(),
                   },
                 },

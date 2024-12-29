@@ -73,11 +73,11 @@ export default function SignupPage() {
       if (!response.ok) {
         // 서버에서 에러 메시지 반환 시 처리
         const data = await response.json();
-        alert(data.message || 'Signup failed');
+        alert(t('Sf') );
       }
   
       // 회원가입 성공 처리
-      alert('Signup successful!');
+      alert(t('Ss'));
       router.push('/login'); // 로그인 페이지로 이동
     } catch (err: any) {
       // 에러 처리

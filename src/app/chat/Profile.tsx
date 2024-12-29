@@ -85,7 +85,7 @@ export default function Profile() {
           ):
           (
             <img
-            src={profileImage || '/default-profile.png'}
+            src={profileImage || '/SVG/default-profile.svg'}
             alt="Profile"
             className="w-full h-full rounded-full object-cover"
           />
