@@ -17,6 +17,9 @@ export default function FriendsContent() {
   const { t } = useTranslation('common');
   const [isClicked, setIsClicked] = useState<'All'|'Request'|'Pending'|'Blocked'>('All');
   const [isMoreClicked,setIsMoreClicked] = useState<Record<string, boolean>>({});
+  const [isCancelClicked,setIsCancelClicked] = useState<Record<string, boolean>>({});
+  const [isAcceptClicked,setIsAcceptClicked] = useState<Record<string, boolean>>({});
+
   // Redux store에서 필요한 상태를 꺼내옵니다.
   const {
     list: friends,
@@ -28,7 +31,46 @@ export default function FriendsContent() {
 
   // 로컬 상태 (새로운 친구 추가용)
   const [newFriendEmail, setNewFriendEmail] = useState<string>("");
+  const [search, setSearch] = useState<string>("");
+  // 디바운싱된 검색어 (일정 시간 지연 후 최종 반영)
+  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
 
+  // 0.3초(300ms) 디바운스: search 값이 변경될 때마다 타이머를 재설정
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim()); 
+      // trim()은 앞뒤 공백 제거 용도로, 필요 없으면 제거해도 됩니다.
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // =========================
+  // 검색을 위한 필터 로직 추가
+  // =========================
+  // 1) All/Blocked일 때 사용할 친구 목록 필터
+  //    (blocked 상태도 함께 필터링 하거나, 탭 별로 로직이 달라질 수 있으니
+  //     상황에 맞게 필터링 조건을 다르게 적용 가능합니다.)
+  const filteredFriends = friends.filter((friend) => {
+    // 상태가 'block'인지 여부는 탭에서 구분 처리
+    const nameMatch = friend.name?.toLowerCase().includes(debouncedSearch.toLowerCase());
+    const emailMatch = friend.email?.toLowerCase().includes(debouncedSearch.toLowerCase());
+    return nameMatch || emailMatch;
+  });
+
+  // 2) Request 탭(보낸 요청)에서 사용할 필터
+  const filteredSentRequests = sentRequests.filter((request) => {
+    const nameMatch = request.toUserName?.toLowerCase().includes(debouncedSearch.toLowerCase());
+    const emailMatch = request.toUserEmail?.toLowerCase().includes(debouncedSearch.toLowerCase());
+    return nameMatch || emailMatch;
+  });
+
+  // 3) Pending 탭(받은 요청)에서 사용할 필터
+  const filteredReceivedRequests = receivedRequests.filter((request) => {
+    const nameMatch = request.fromUserName?.toLowerCase().includes(debouncedSearch.toLowerCase());
+    const emailMatch = request.fromUserEmail?.toLowerCase().includes(debouncedSearch.toLowerCase());
+    return nameMatch || emailMatch;
+  });
   const menus =[
     {name: t('All'), onClick:() =>setIsClicked('All')},
     {name: t('Request'), onClick:() =>setIsClicked('Request')},
@@ -40,6 +82,20 @@ export default function FriendsContent() {
     setIsMoreClicked((prev) => ({
       ...prev,
       [friendId]: !prev[friendId], // 현재 값의 반대로
+    }));
+  };
+
+  const toggleCancelMenu = (requestId: string) => {
+    setIsCancelClicked((prev) => ({
+      ...prev,
+      [requestId]: !prev[requestId], // 현재 값의 반대로
+    }));
+  };
+
+  const toggleAcceptMenu = (requestId: string) => {
+    setIsAcceptClicked((prev) => ({
+      ...prev,
+      [requestId]: !prev[requestId], // 현재 값의 반대로
     }));
   };
 
@@ -124,17 +180,24 @@ export default function FriendsContent() {
 // 친구 차단
 const handleBlockFriend = async (friendEmail: string) => {
   try {
-    const response = await fetch("/api/block", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ targetEmail: friendEmail }),
+    // PATCH /api/friends (action: "block")
+    const response = await fetch("/api/friends", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: friendEmail, action: "block" }),
     });
+
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || t('Ftbf'));
+      throw new Error(errorData.message || "Failed to block friend request.");
     }
+
     alert(t('Fbs'));
+    dispatch(fetchFriends());
   } catch (err) {
+    console.error("Error blocking friend request:", err);
     alert(t('Ftbf'));
   }
 };
@@ -142,17 +205,24 @@ const handleBlockFriend = async (friendEmail: string) => {
 //친구 차단 해제
 const handleUnblockFriend = async (friendEmail: string) => {
   try {
-    const response = await fetch("/api/block", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ targetEmail: friendEmail }),
+    // PATCH /api/friends (action: "block")
+    const response = await fetch("/api/friends", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: friendEmail, action: "unblock" }),
     });
+
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || t('Ftuf'));
+      throw new Error(errorData.message || "Failed to unblock friend request.");
     }
+
     alert(t('Fus'));
+    dispatch(fetchFriends());
   } catch (err) {
+    console.error("Error unblocking friend request:", err);
     alert(t('Ftuf'));
   }
 };
@@ -180,13 +250,40 @@ const handleDeleteFriend = async (friendEmail: string) => {
     alert("Error removing friend");
   }
 };
-  if (loading) {
-    return <p>Loading...</p>;
-  }
 
-  if (error) {
-    return <p>Error: {error}</p>;
+// 보낸 친구 요청 취소
+const handleCancelRequest = async (requestEmail: string) => {
+  try {
+    // PATCH /api/friends (action: "cancel")
+    const response = await fetch("/api/friends", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: requestEmail, action: "cancel" }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to cancel friend request.");
+    }
+
+    alert(t('Frcs'));
+    // 보낸 요청 목록 새로고침
+    dispatch(fetchSentRequests());
+  } catch (err) {
+    console.error("Error canceling friend request:", err);
+    alert(t('Ecfr'));
   }
+};
+
+  // if (loading) {
+  //   return <p>Loading...</p>;
+  // }
+
+  // if (error) {
+  //   return <p>Error: {error}</p>;
+  // }
 
   return (
     <div className="mx-auto p-8 rounded-lg h-full text-customBlue relative">
@@ -196,21 +293,26 @@ const handleDeleteFriend = async (friendEmail: string) => {
         <DynamicText text={t('Friends')} />
       </h2>
 
-      {/** 검색 창 */}
+     {/** 검색 창 (디바운스 적용) */}
       <div className="w-full h-10 bg-customGray rounded-xl flex">
         <div className="p-2 flex items-center">
           <Image
-                  src="/SVG/search.svg"
-                  alt="search"
-                  width={11}
-                  height={11}
-                  priority
-                  className="cursor-pointer"
-
-                />
+            src="/SVG/search.svg"
+            alt="search"
+            width={11}
+            height={11}
+            priority
+            className="cursor-pointer"
+          />
         </div>
-        <div className="flex items-center text-sm">
-          <DynamicText text={t('Search')} className="text-black/45"/>
+        <div className="flex items-center text-sm w-full">
+          <input
+            type="text"
+            value={search}
+            placeholder={t('Search')}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-[100%] text-black/45 border-customGray rounded-xl text-sm bg-transparent focus:outline-none focus:ring-0 focus:border-transparent"
+          />
         </div>
       </div>
 
@@ -255,28 +357,96 @@ const handleDeleteFriend = async (friendEmail: string) => {
       {
         isClicked==='All' && 
         (
-          <>
-            {friends.length === 0 ? (
+          <div className="mt-4">
+            {filteredFriends.filter(friend => friend.status !== 'block').length === 0 ? (
               <p>{t('Yhnfy')}</p>
             ) : (
               <ul>
-                {friends.map((friend) => (
-                  <li key={friend.friendId} className="flex mt-4 justify-between">
+                {filteredFriends
+                .filter(friend => friend.status !== 'block')
+                .map((friend)  => (
+                 <>
+                 {friend.status !== 'block' &&(
+                   <li key={friend.friendId} className="flex mb-4 justify-between">
 
-                    <div className="flex">
+                   <div className="flex">
+                     <img
+                       src={friend.profileImage || "/SVG/default-profile.svg"}
+                       alt={`${friend.name}'s profile`}
+                       className="w-[50px] h-[50px] rounded-full mr-2" 
+                     />
+
+                     <div>
+                       <div className="text-black font-bold">
+                         {friend.name}
+                       </div>
+
+                       <div className="text-customGray text-sm">
+                         {friend.email}
+                       </div>
+                     </div>
+                   </div>
+
+                   <div className="relative ">
+                     <Image
+                       src="/SVG/more.svg"
+                       alt="more"
+                       width={25}
+                       height={25}
+                       priority
+                       className="cursor-pointer"
+                      onClick={() => toggleMoreMenu(friend.friendId)}
+                     />
+                     {/* 차단, 차단 해제 버튼 추가 */}
+                     {isMoreClicked[friend.friendId]&&(
+                       <div className=" z-50 absolute top-8 w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm">
+                         <button onClick={() => handleBlockFriend(friend.email)} className="text-red-500">
+                         {t('Block')}
+                         </button>
+                         <button onClick={() => handleDeleteFriend(friend.email)} >
+                           {t('Delete')}
+                         </button>
+                         {/* <button onClick={() => handleUnblockFriend(friend.email)}>
+                            {t('Unblock')}
+                         </button> */}
+                       </div>
+                     )}
+                   
+                   </div>
+                 </li>
+                 )}
+                 </>
+                ))}
+              </ul>
+            )}
+
+          </div>
+        )
+      }
+    
+      {isClicked==='Request'&&(
+        <div className="mt-4"> 
+          {filteredSentRequests.length === 0 ? (
+            <p>{t('Nsfr')}</p>
+          ) : (
+            <ul>
+              {filteredSentRequests.map((request) => (
+                <li key={request._id} className="flex mb-4 justify-between">
+                 
+                  <div className="flex">
                       <img
-                        src={friend.profileImage || "/SVG/default-profile.svg"}
-                        alt={`${friend.name}'s profile`}
+                        src={request.toUserProfileImage || "/SVG/default-profile.svg"}
+                        alt={`${request.toUserName}'s profile`}
                         className="w-[50px] h-[50px] rounded-full mr-2" 
                       />
 
                       <div>
                         <div className="text-black font-bold">
-                          {friend.name}
+                          {request.toUserName}
                         </div>
 
                         <div className="text-customGray text-sm">
-                          {friend.email}
+                          {request.toUserEmail}
                         </div>
                       </div>
                     </div>
@@ -289,16 +459,75 @@ const handleDeleteFriend = async (friendEmail: string) => {
                         height={25}
                         priority
                         className="cursor-pointer"
-                       onClick={() => toggleMoreMenu(friend.friendId)}
+                       onClick={() => toggleCancelMenu(request._id)}
                       />
                       {/* 차단, 차단 해제 버튼 추가 */}
-                      {isMoreClicked[friend.friendId]&&(
+                      {isCancelClicked[request._id]&&(
                         <div className=" z-50 absolute top-8 w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm">
-                          <button onClick={() => handleBlockFriend(friend.email)} className="text-red-500">
-                          {t('Block')}
+                          <button onClick={() => handleCancelRequest(request.toUserEmail)} className="text-red-500">
+                          {t('Cancel')}
                           </button>
-                          <button onClick={() => handleDeleteFriend(friend.email)} >
-                            {t('Delete')}
+                        </div>
+                      )}
+                    
+                    </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ) }
+
+      {
+        isClicked==='Pending' &&
+        (
+
+          <div className="mt-4">
+        
+            {filteredReceivedRequests.length === 0 ? (
+              <p>No friend requests received.</p>
+            ) : (
+              <ul>
+                {filteredReceivedRequests.map((request) => (
+                  <li key={request._id} className="flex mb-4 justify-between">
+              
+
+                    <div className="flex">
+                      <img
+                        src={request.fromUserProfileImage || "/SVG/default-profile.svg"}
+                        alt={`${request.fromUserName}'s profile`}
+                        className="w-[50px] h-[50px] rounded-full mr-2" 
+                      />
+
+                      <div>
+                        <div className="text-black font-bold">
+                          {request.fromUserName}
+                        </div>
+
+                        <div className="text-customGray text-sm">
+                          {request.fromUserEmail}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="relative ">
+                      <Image
+                        src="/SVG/more.svg"
+                        alt="more"
+                        width={25}
+                        height={25}
+                        priority
+                        className="cursor-pointer"
+                       onClick={() => toggleAcceptMenu(request._id)}
+                      />
+                      {/* 차단, 차단 해제 버튼 추가 */}
+                      {isAcceptClicked[request._id]&&(
+                        <div className=" z-50 absolute top-8 w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm">
+                          <button onClick={() => handleRequestAction(request.fromUserEmail, "accepted")} className="text-red-500">
+                          {t('Accept')}
+                          </button>
+                          <button onClick={() => handleRequestAction(request.fromUserEmail, "rejected")}>
+                            {t('Reject')}
                           </button>
                           {/* <button onClick={() => handleUnblockFriend(friend.email)}>
                              {t('Unblock')}
@@ -312,64 +541,78 @@ const handleDeleteFriend = async (friendEmail: string) => {
               </ul>
             )}
 
-          </>
-        )
-      }
-    
-      {isClicked==='Request'&&(
-        <>
-          
-          {sentRequests.length === 0 ? (
-            <p>No sent friend requests.</p>
-          ) : (
-            <ul>
-              {sentRequests.map((request) => (
-                <li key={request._id}>
-                  <p>
-                    <strong>To:</strong> {request.toUserName} ({request.toUserEmail})
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </>
-      ) }
-
-      {
-        isClicked==='Pending' &&
-        (
-
-          <>
-        
-            {receivedRequests.length === 0 ? (
-              <p>No friend requests received.</p>
-            ) : (
-              <ul>
-                {receivedRequests.map((request) => (
-                  <li key={request._id}>
-                    <img
-                      src={request.fromUserProfileImage || "/SVG/default-profile.svg"}
-                      alt={`${request.fromUserName}'s profile`}
-                      style={{ width: "50px", height: "50px", borderRadius: "50%" }}
-                    />
-                    <p>
-                      <strong>From:</strong> {request.fromUserName} ({request.fromUserEmail})
-                    </p>
-                    <button onClick={() => handleRequestAction(request.fromUserEmail, "accepted")}>
-                      Accept
-                    </button>
-                    <button onClick={() => handleRequestAction(request.fromUserEmail, "rejected")}>
-                      Reject
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-
-          </>
+          </div>
         )
       }
       
+      {
+        isClicked==='Blocked' &&
+        (
+
+          <div className="mt-4">
+          {filteredFriends.filter(friend => friend.status === 'block').length === 0 ? (
+            <p>{t('Yhnfy')}</p>
+          ) : (
+            <ul>
+              {filteredFriends.map((friend) => (
+               <>
+                {friend.status === 'block' &&(
+                  <li key={friend.friendId} className="flex mb-4 justify-between">
+
+                  <div className="flex">
+                    <img
+                      src={friend.profileImage || "/SVG/default-profile.svg"}
+                      alt={`${friend.name}'s profile`}
+                      className="w-[50px] h-[50px] rounded-full mr-2" 
+                    />
+
+                    <div>
+                      <div className="text-black font-bold">
+                        {friend.name}
+                      </div>
+
+                      <div className="text-customGray text-sm">
+                        {friend.email}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="relative ">
+                    <Image
+                      src="/SVG/more.svg"
+                      alt="more"
+                      width={25}
+                      height={25}
+                      priority
+                      className="cursor-pointer"
+                     onClick={() => toggleMoreMenu(friend.friendId)}
+                    />
+                    {/* 차단, 차단 해제 버튼 추가 */}
+                    {isMoreClicked[friend.friendId]&&(
+                      <div className=" z-50 absolute top-8 w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm">
+                        <button onClick={() => handleBlockFriend(friend.email)} className="text-red-500">
+                        {t('Block')}
+                        </button>
+                        <button onClick={() => handleDeleteFriend(friend.email)} >
+                          {t('Delete')}
+                        </button>
+                        {/* <button onClick={() => handleUnblockFriend(friend.email)}>
+                           {t('Unblock')}
+                        </button> */}
+                      </div>
+                    )}
+                  
+                  </div>
+                </li>
+                )}
+               </>
+              ))}
+            </ul>
+          )}
+
+        </div>
+        )
+      }
       
 
       

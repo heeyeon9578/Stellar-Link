@@ -3,7 +3,12 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../pages/api/auth/[...nextauth]';
 import { ObjectId } from 'mongodb';
-
+/**
+ * 친구 요청 목록 가져오기 및 친구 요청 수락 또는 거절하기
+ * @param req 
+ * @param res 
+ * @returns 
+ */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const client = await connectDB;
   const db = client.db("StellarLink");
@@ -43,6 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       break;
     }
 
+    //친구요청 수락 또는 거절하기
     case "PATCH": {
         try {
           const { fromUserEmail, action } = req.body;
@@ -82,6 +88,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     email: request.fromUserEmail,
                     profileImage: request.fromUserProfileImage,
                     addedAt: new Date(),
+                    status: "active",
                   },
                 },
               },
@@ -98,6 +105,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     email: requesterEmail,
                     profileImage: requester.profileImage || "/SVG/default-profile.svg",
                     addedAt: new Date(),
+                    status: "active",
                   },
                 },
               },

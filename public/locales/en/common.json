@@ -69,6 +69,10 @@
     "Pus":"Profile updated successfully",
     "Block":"Block",
     "Unblock":"Unblock",
-    "Delete":"Delete"
+    "Delete":"Delete",
+    "Nsfr":"No sent friend requests.",
+    "Cancel":"Cancel",
+    "Frcs":"Friend request canceled successfully!",
+    "Ecfr":"Error canceling friend request"
 
 }

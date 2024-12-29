@@ -7,12 +7,12 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
  * 내부에서 fetchFriends.pending, fetchFriends.fulfilled, fetchFriends.rejected 형태의 액션이 자동으로 생성됩니다.
  */
 interface Friend {
-    friendId: string;
-    email: string;
-    name: string;
-    profileImage?: string;
-    status: string;
-    addedAt?: string;
+  friendId: string;
+  email: string;
+  name: string;
+  profileImage?: string;
+  status: string;
+  addedAt?: string;
 }
 
 interface FriendRequest {
