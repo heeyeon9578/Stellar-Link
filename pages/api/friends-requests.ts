@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // 사용자 정보 가져오기
   const requester = await db.collection("user_cred").findOne({ email: requesterEmail });
-
+  const requesterId = new ObjectId(requester?._id);
   if (!requester) {
     return res.status(404).json({ message: "Requester not found" });
   }
@@ -35,13 +35,44 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   switch (req.method) {
     case "GET": {
       try {
-        // 친구 요청 목록 가져오기
-        const incomingRequests = await db
-          .collection("friend_requests")
-          .find({ toUserId: userId.toString(), status: "pending" })
-          .toArray();
+       // 내가 보낸 친구 요청 목록 가져오기 // Request
+       const sentRequests = await db
+       .collection("friend_requests")
+       .find({ toUserId: userId, status: "pending" })
+       .toArray();
 
-        res.status(200).json(incomingRequests);
+     // `toUserId`로 `user_cred`에서 상세 정보 가져오기
+     const toUserIds = sentRequests.map((req) => new ObjectId(req.toUserId));
+     const fromUserIds = sentRequests.map((req) => new ObjectId(req.fromUserId));
+     
+     const toUserDetails = await db
+       .collection("user_cred")
+       .find({ _id: { $in: toUserIds } })
+       .toArray();
+
+     const fromUserDetails = await db
+       .collection("user_cred")
+       .find({ _id: { $in: fromUserIds } })
+       .toArray();
+
+     // `sentRequests`에 상세 정보를 매핑
+     const enrichedRequests = sentRequests.map((request) => {
+       const userDetail = toUserDetails.find(
+         (user) => user._id.toString() === request.toUserId.toString()
+       );
+
+       const senderDetail = fromUserDetails.find(
+         (user) => user._id.toString() === request.fromUserId.toString()
+       );
+
+       return {
+         ...request,
+         toUserDetails: userDetail, // 추가된 상세 정보
+         fromUserDetails: senderDetail
+       };
+     });
+
+     res.status(200).json(enrichedRequests);
       } catch (error) {
         res.status(500).json({ message: "Error fetching friend requests", error });
       }
@@ -51,19 +82,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     //친구요청 수락 또는 거절하기
     case "PATCH": {
         try {
-          const { fromUserEmail, action } = req.body;
+          const { fromUserId, action } = req.body;
       
           // 요청 유효성 검증
-          if (!fromUserEmail || !["accepted", "rejected"].includes(action)) {
+          if (!fromUserId || !["accepted", "rejected"].includes(action)) {
             return res.status(400).json({ message: "Invalid request or action" });
           }
       
-          console.log("Action:", action, "From User Email:", fromUserEmail, "toUserEmail:",requesterEmail);
-      
+
           // 친구 요청 확인
           const request = await db.collection("friend_requests").findOne({
-            fromUserEmail,
-            toUserEmail: requesterEmail,
+            fromUserId: new ObjectId(fromUserId),
+            toUserId: requesterId,
             status: "pending",
           });
       
@@ -73,7 +103,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       
           // 상태 업데이트
           await db.collection("friend_requests").updateOne(
-            { fromUserEmail, toUserEmail: requesterEmail, status: "pending" },
+            { fromUserId: new ObjectId(fromUserId), toUserId: requesterId, status: "pending" },
             { $set: { status: action } }
           );
       
@@ -84,9 +114,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 $push: {
                   friends: {
                     friendId: new ObjectId(request.fromUserId) ,
-                    name: request.fromUserName,
-                    email: request.fromUserEmail,
-                    profileImage: request.fromUserProfileImage,
+                    // name: request.fromUserName,
+                    // email: request.fromUserEmail,
+                    // profileImage: request.fromUserProfileImage,
                     addedAt: new Date(),
                     status: "active",
                   },
@@ -100,10 +130,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               {
                 $push: {
                   friends: {
-                    friendId: userId,
-                    name: requester.name,
-                    email: requesterEmail,
-                    profileImage: requester.profileImage || "/SVG/default-profile.svg",
+                    friendId: requesterId,
+                    // name: requester.name,
+                    // email: requesterEmail,
+                    // profileImage: requester.profileImage || "/SVG/default-profile.svg",
                     addedAt: new Date(),
                     status: "active",
                   },

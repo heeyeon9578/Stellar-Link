@@ -21,28 +21,47 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // 세션에 있는 사용자 이메일
   const requesterEmail = session.user?.email;
-
+  const requester = await db.collection("user_cred").findOne({ email: requesterEmail });
+  const requesterId = new ObjectId(requester?._id) ;
   switch (req.method) {
     case "GET": {
       try {
         // 요청자의 이메일로 사용자 ID 가져오기
-        const requester = await db.collection("user_cred").findOne({ email: requesterEmail });
+        
 
         if (!requester) {
           return res.status(404).json({ message: "Requester not found." });
         }
        
-        const friends = await db.collection("friends").findOne({ userId: requester._id });
+        const friendship = await db.collection("friends").findOne({ userId: requesterId });
         
-        res.status(200).json(friends ? friends.friends : []);
+        if (!friendship || !friendship.friends) {
+          return res.status(200).json([]);
+        }
+
+        const friendDetails = await Promise.all(
+          friendship.friends.map(async (friend: any) => {
+            const userDetail = await db.collection('user_cred').findOne({ _id: new ObjectId(friend.friendId) });
+        
+            // 친구의 상세 정보와 status, addedAt 조합
+            return {
+              ...userDetail,
+              status: friend.status,
+              addedAt: friend.addedAt,
+            };
+          })
+        );
+        return res.status(200).json(friendDetails);
+       
 
 
       } catch (error) {
+        console.log(error)
         res.status(500).json({ message: "Error fetching friends", error });
       }
       break;
     }
-    //친구요청하기
+    //친구 요청하기
     case "POST": {
         try {
           const { email: friendEmail } = req.body;
@@ -58,8 +77,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           console.log("Normalized friendEmail:", normalizedFriendEmail);
           const allUsers = await db.collection("user_cred").find().toArray();
           console.log("All Users in Database:", allUsers);
-          // 요청자의 정보 가져오기
-          const requester = await db.collection("user_cred").findOne({ email: requesterEmail });
+          
   
           if (!requester) {
             console.log("Requester not found with email:", requesterEmail);
@@ -82,21 +100,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             toUserEmail: friend.email,
             status: "pending",
           });
-  
+          
           if (existingRequest) {
             return res.status(400).json({ message: "Friend request already sent." });
           }
-  
+          
+          // 중복 요청 방지 - friends 컬렉션에서 이미 존재할 경우
+          const existingFriend = await db.collection("friends").findOne({
+            userId: requesterId,
+            "friends.friendId": new ObjectId(friend._id),
+          });
+        
+          if (existingFriend) {
+            return res.status(400).json({ message: "User is already your friend." });
+          }
+
           // 친구 요청 추가
           await db.collection("friend_requests").insertOne({
-            fromUserId: requester._id.toString(),
-            fromUserEmail: requester.email,
-            fromUserName: requester.name,
-            fromUserProfileImage: requester.profileImage || "/SVG/default-profile.svg",
-            toUserId: friend._id.toString(),
-            toUserEmail: friend.email,
-            toUserName: friend.name,
-            toUserProfileImage: friend.profileImage || "/SVG/default-profile.svg",
+            fromUserId: new ObjectId(requester._id),
+            // fromUserEmail: requester.email,
+            // fromUserName: requester.name,
+            // fromUserProfileImage: requester.profileImage || "/SVG/default-profile.svg",
+            toUserId:new ObjectId(friend._id) ,
+            // toUserEmail: friend.email,
+            // toUserName: friend.name,
+            // toUserProfileImage: friend.profileImage || "/SVG/default-profile.svg",
             status: "pending",
             requestedAt: new Date(),
           });
@@ -111,15 +139,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
    //보낸 친구 요청 취소 / 친구 차단하기 / 친구 차단 해제하기
    case "PATCH": {
     try {
-      const { email, action } = req.body;
+      const {toUserId , action } = req.body;
       // email: 상대방 이메일, action: "cancel"
 
-      if (!email || !action ) {
+      if (!toUserId || !action ) {
         return res.status(400).json({ message: "Invalid request data." });
       }
 
-      // user_cred에서 현재 사용자(요청자) 정보 가져오기
-      const requester = await db.collection("user_cred").findOne({ email: requesterEmail });
+     
       if (!requester) {
         return res.status(404).json({ message: "Requester not found." });
       }
@@ -129,10 +156,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
          * 3-1) 보낸 친구 요청 취소
          */
         case "cancel": {
+
           // friend_requests에서 'pending' 상태인 요청을 삭제
           const deleteResult = await db.collection("friend_requests").deleteOne({
-            fromUserEmail: requesterEmail,
-            toUserEmail: email,
+            fromUserId: requesterId,
+            toUserId: new ObjectId(toUserId),
             status: "pending",
           });
 
@@ -149,28 +177,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         case "block": {
           // friends 컬렉션에서 해당 친구의 status 를 "block" 으로 설정
           const blockResult = await db.collection("friends").updateOne(
-            { userId: requester._id, "friends.email": email },
+            { userId: requesterId, "friends.friendId": new ObjectId(toUserId) },
             { $set: { "friends.$.status": "block" } }
           );
 
           // 만약 해당 친구가 friends 배열에 없을 수도 있으니, 추가 로직을 통해
           // 아예 친구 목록이 없거나, entry가 없다면 새로 push 할 수도 있습니다.
           // (유저마다 구현이 다를 수 있으므로, 필요하다면 아래와 같은 로직 추가)
-          if (blockResult.matchedCount === 0) {
-            // 만약 friends 배열에 이 사용자가 없다면 새로 추가
-            await db.collection("friends").updateOne(
-              { userId: requester._id },
-              {
-                $push: {
-                  friends: {
-                    email,
-                    status: "block",
-                  },
-                },
-              },
-              { upsert: true }
-            );
-          }
+          // if (blockResult.matchedCount === 0) {
+          //   // 만약 friends 배열에 이 사용자가 없다면 새로 추가
+          //   await db.collection("friends").updateOne(
+          //     { userId: requester._id },
+          //     {
+          //       $push: {
+          //         friends: {
+          //           toUserId,
+          //           status: "block",
+          //         },
+          //       },
+          //     },
+          //     { upsert: true }
+          //   );
+          // }
 
           return res.status(200).json({ message: "Friend blocked successfully." });
         }
@@ -182,7 +210,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           // friends 컬렉션에서 해당 친구의 status 가 "block" 이라면 "accepted" 혹은 다른 상태로 되돌린다.
           // (어떤 상태로 되돌릴지는 앱 로직에 따라 다릅니다. 여기서는 단순히 "accepted" 라고 가정)
           const unblockResult = await db.collection("friends").updateOne(
-            { userId: requester._id, "friends.email": email },
+            { userId: requesterId, "friends.friendId": new ObjectId(toUserId) },
             { $set: { "friends.$.status": "active" } }
           );
 
@@ -206,14 +234,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       //친구 삭제 하기
     case "DELETE": {
       try {
-        const { email: friendEmail } = req.body;
+        const { friendId } = req.body;
 
-        if (!friendEmail) {
+        if (!friendId) {
           return res.status(400).json({ message: "Friend's email to delete is required." });
         }
-
-        // 요청자의 정보 가져오기
-        const requester = await db.collection("user_cred").findOne({ email: requesterEmail });
 
         if (!requester) {
           return res.status(404).json({ message: "Requester information not found." });
@@ -221,8 +246,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         // 친구 삭제
         await db.collection("friends").updateOne(
-          { userId: requester._id },
-          { $pull: { friends: { email: friendEmail } } }
+          { userId: requesterId },
+          { $pull: { friends: { friendId: new ObjectId(friendId) } } }
         );
 
         res.status(200).json({ message: "Friend removed successfully." });

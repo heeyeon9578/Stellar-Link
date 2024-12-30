@@ -29,7 +29,7 @@ const Button: React.FC<ButtonProps> = ({
 
   const variantStyles = {
     primary: `
-              bg-gradient-to-r from-customLightPurple to-customPurple text-white 
+              bg-gradient-to-r from-customLightPurple to-customPurple text-white
               rounded-custom shadow-custom 
               hover:from-white hover:to-white 
               
@@ -38,7 +38,7 @@ const Button: React.FC<ButtonProps> = ({
               transition-all duration-300 delay-100
             `,
     main: `
-            bg-transparent text-white
+            bg-transparent 
             hover:underline hover:decoration-customPurple
              hover:text-underline-offset-4
            

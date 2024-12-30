@@ -73,6 +73,8 @@
     "Nsfr":"No sent friend requests.",
     "Cancel":"Cancel",
     "Frcs":"Friend request canceled successfully!",
-    "Ecfr":"Error canceling friend request"
+    "Ecfr":"Error canceling friend request",
+    "Personal":"Personal",
+    "Teams":"Teams"
 
 }
