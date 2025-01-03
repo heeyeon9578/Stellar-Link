@@ -78,19 +78,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
       const requester = await db.collection("user_cred").findOne({ email: data.senderEmail });
 
       if (!requester) {
-        console.log("User not found in database");
-        socket.disconnect();
+        console.error("User not found in database");
+        socket.emit("error", { message: "User not found in database" }); // 클라이언트로 에러 전송
         return;
       }
-
-      const requesterId = requester._id.toString(); // 사용자 ID를 문자열로 저장
-      const requesterName = requester.name.toString();
-      const requesterImage = requester.profileImage.toString();
-      const requesterEmail = requester.email.toString();
+      console.log(`
+        
+        requester
+        
+        
+        `,requester)
+      const requesterId = requester._id?.toString() || "Unknown";
+      const requesterName = requester.name?.toString() || "Unknown User";
+      const requesterImage = requester.profileImage?.toString() || "/SVG/default-profile.svg";
+      const requesterEmail = requester.email?.toString() || "Unknown Email";
         
       const messageData = {
         ...data,
-        requesterId:requesterId,
+        requesterId,
         // requesterName:requesterName,
         // requesterImage:requesterImage,
         createdAt: new Date(),
@@ -109,12 +114,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
 
         const message = {
           ...data,
-          requesterId:requesterId,
-          requesterName:requesterName,
-          requesterEmail: requesterEmail,
-          requesterImage:requesterImage,
+          requesterId,
+          requesterName,
+          requesterEmail,
+          requesterImage,
           createdAt: new Date(),
         };
+    
         console.log("Message received:", message);
           // 메시지 브로드캐스트
         io?.to(data.chatRoomId).emit("receive_message", message);

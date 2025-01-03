@@ -1,5 +1,5 @@
 import NextAuth, { DefaultSession, DefaultUser } from "next-auth";
-
+import { ObjectId } from 'mongodb';
 declare module "next-auth" {
   // User 타입 확장
   interface User extends DefaultUser {
@@ -10,6 +10,7 @@ declare module "next-auth" {
   // Session 타입 확장
   interface Session {
     user: {
+      id:ObjectId;
       name?: string;
       email?: string;
       profileImage?: string;
@@ -20,6 +21,8 @@ declare module "next-auth" {
   // JWT 타입 확장
   interface JWT {
     user?: {
+
+      id:ObjectId;
       name?: string;
       email?: string;
       profileImage?: string;

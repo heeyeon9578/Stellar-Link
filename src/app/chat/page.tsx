@@ -12,6 +12,7 @@ import {
   addMessage,
   setInput,
 } from "../../../store/chatSlice";
+
 export default function Detail() {
   const searchParams = useSearchParams();
   const dispatch = useDispatch<AppDispatch>();
@@ -99,6 +100,9 @@ export default function Detail() {
     }
   }, [chatRoomId, socket.connected]);
 
+  /**
+   * 메시지 전송
+   */
   const handleSendMessage = () => {
     if (input.trim()) {
       const message = {

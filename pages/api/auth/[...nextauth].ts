@@ -94,6 +94,7 @@ export const authOptions: AuthOptions = {
         }
         
         token.user = {
+          
           name: user.name,
           email: user.email,
           profileImage: user.profileImage,
@@ -109,6 +110,7 @@ export const authOptions: AuthOptions = {
   
         if (user) {
           session.user = {
+            id: user._id,
             name: user.name,
             email: user.email,
             profileImage: user.profileImage || "/SVG/default-profile.svg", // 기본 프로필 이미지 설정
