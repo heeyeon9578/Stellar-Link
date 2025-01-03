@@ -57,7 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const allParticipants = [new ObjectId(currentUser._id), ...participants.map((id: string) => new ObjectId(id))];
     
     // 참여자 기준으로 기존 채팅방 검색
-    const existingRoom = await db.collection("chat_rooms").findOne({
+    const existingRoom = await db.collection("messages").findOne({
       type,
       participants: { $all: allParticipants, $size: allParticipants.length },
     });
@@ -68,7 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // 채팅 방 생성
-    const newRoom = await db.collection("chat_rooms").insertOne({
+    const newRoom = await db.collection("messages").insertOne({
       participants: allParticipants,
       type,
       createdAt: new Date(),

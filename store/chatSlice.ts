@@ -1,103 +1,55 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+// 메시지 데이터 타입 정의
 interface Message {
-  id: string;
-  sender: string;
-  content: string;
-  timestamp: string;
+  requesterName: string;
+  requesterImage:string;
+  requesterEmail:string;
+  text: string;
+  createdAt: Date;
+  chatRoomId: string;
 }
 
-interface ChatRoom {
-  id: string;
-  name: string;
-  messages: Message[];
-}
-
+// 초기 상태 타입 정의
 interface ChatState {
-  rooms: Record<string, ChatRoom>; // 채팅방 ID를 키로 사용
-  currentRoomId: string | null; // 현재 선택된 채팅방 ID
-  loading: boolean;
-  error: string | null;
+  chatRoomId: string | null;
+  messages: Message[];
+  input: string;
 }
 
+// 초기 상태 설정
 const initialState: ChatState = {
-  rooms: {},
-  currentRoomId: null,
-  loading: false,
-  error: null,
+  chatRoomId: null,
+  messages: [],
+  input: "",
 };
 
-// Async action to fetch messages for a chat room
-export const fetchMessages = createAsyncThunk(
-  "chat/fetchMessages",
-  async (roomId: string) => {
-    const response = await fetch(`/api/chat/${roomId}/messages`);
-    if (!response.ok) throw new Error("Failed to fetch messages");
-    const messages: Message[] = await response.json();
-    return { roomId, messages };
-  }
-);
-
-// Async action to send a message
-export const sendMessage = createAsyncThunk(
-  "chat/sendMessage",
-  async ({ roomId, message }: { roomId: string; message: string }) => {
-    const response = await fetch(`/api/chat/${roomId}/messages`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ content: message }),
-    });
-    if (!response.ok) throw new Error("Failed to send message");
-    const newMessage: Message = await response.json();
-    return { roomId, newMessage };
-  }
-);
-
+// Slice 생성
 const chatSlice = createSlice({
   name: "chat",
   initialState,
   reducers: {
-    // Select a chat room
-    selectRoom(state, action: PayloadAction<string>) {
-      state.currentRoomId = action.payload;
+    setChatRoomId(state, action: PayloadAction<string | null>) {
+      state.chatRoomId = action.payload;
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      // Fetch messages
-      .addCase(fetchMessages.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchMessages.fulfilled, (state, action) => {
-        const { roomId, messages } = action.payload;
-        state.rooms[roomId] = {
-          ...state.rooms[roomId],
-          id: roomId,
-          messages,
-        };
-        state.loading = false;
-      })
-      .addCase(fetchMessages.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || "Failed to fetch messages";
-      })
-
-      // Send message
-      .addCase(sendMessage.fulfilled, (state, action) => {
-        const { roomId, newMessage } = action.payload;
-        if (state.rooms[roomId]) {
-          state.rooms[roomId].messages.push(newMessage);
-        }
-      })
-      .addCase(sendMessage.rejected, (state, action) => {
-        state.error = action.error.message || "Failed to send message";
-      });
+    setMessages(state, action: PayloadAction<Message[]>) {
+      state.messages = action.payload;
+    },
+    addMessage(state, action: PayloadAction<Message>) {
+      state.messages.push(action.payload);
+    },
+    setInput(state, action: PayloadAction<string>) {
+      state.input = action.payload;
+    },
+    clearChat(state) {
+      state.chatRoomId = null;
+      state.messages = [];
+      state.input = "";
+    },
   },
 });
 
-export const { selectRoom } = chatSlice.actions;
-
+// 액션 및 리듀서 내보내기
+export const { setChatRoomId, setMessages, addMessage, setInput, clearChat } =
+  chatSlice.actions;
 export default chatSlice.reducer;

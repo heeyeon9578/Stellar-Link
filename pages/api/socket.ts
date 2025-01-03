@@ -85,28 +85,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
 
       const requesterId = requester._id.toString(); // 사용자 ID를 문자열로 저장
       const requesterName = requester.name.toString();
-
+      const requesterImage = requester.profileImage.toString();
+      const requesterEmail = requester.email.toString();
         
+      const messageData = {
+        ...data,
+        requesterId:requesterId,
+        // requesterName:requesterName,
+        // requesterImage:requesterImage,
+        createdAt: new Date(),
+      };
+        
+    
+        // 메시지 추가 또는 새 채팅방 생성
+        await db.collection("messages").updateOne(
+          { _id: new ObjectId(data.chatRoomId)}, // 검색 조건
+          {
+            $push: { messages: messageData }, // messages 배열에 새 메시지 추가
+            // $setOnInsert: { chatRoomId: data.chatRoomId }, // 채팅방이 없을 경우 생성
+          },
+          // { upsert: true } // 채팅방이 없을 경우 새로 생성
+        );
+
         const message = {
           ...data,
           requesterId:requesterId,
           requesterName:requesterName,
+          requesterEmail: requesterEmail,
+          requesterImage:requesterImage,
           createdAt: new Date(),
         };
         console.log("Message received:", message);
-       
-    
-        // 메시지 추가 또는 새 채팅방 생성
-        await db.collection("messages").updateOne(
-          { chatRoomId: data.chatRoomId }, // 검색 조건
-          {
-            $push: { messages: message }, // messages 배열에 새 메시지 추가
-            $setOnInsert: { chatRoomId: data.chatRoomId }, // 채팅방이 없을 경우 생성
-          },
-          { upsert: true } // 채팅방이 없을 경우 새로 생성
-        );
-
-
           // 메시지 브로드캐스트
         io?.to(data.chatRoomId).emit("receive_message", message);
       });

@@ -3,13 +3,21 @@ import { usePathname,useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { useEffect,useState } from 'react';
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "../../../store/store";
 import socket from "@/socketIns"; // 위에서 만든 socket.ts 경로
-
+import {
+  setChatRoomId,
+  setMessages,
+  addMessage,
+  setInput,
+} from "../../../store/chatSlice";
 export default function Detail() {
   const searchParams = useSearchParams();
-  const [chatRoomId, setChatRoomId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<{ requesterName: string; text: string; createdAt:Date }[]>([]);
-  const [input, setInput] = useState<string>("");
+  const dispatch = useDispatch<AppDispatch>();
+  const chatRoomId = useSelector((state: RootState) => state.chat.chatRoomId);
+  const messages = useSelector((state: RootState) => state.chat.messages);
+  const input = useSelector((state: RootState) => state.chat.input);
   const { data: session, status } = useSession();
 
   useEffect(() => {
@@ -23,13 +31,11 @@ export default function Detail() {
   // URL 파라미터에서 chatRoomId 가져오기
   useEffect(() => {
     const id = searchParams?.get("chatRoomId");
-    console.log(`
-      id
-      `,id)
     if (id) {
-      setChatRoomId(id);
+      dispatch(setChatRoomId(id));
     }
-  }, [searchParams]);
+  }, [searchParams, dispatch]);
+
   useEffect(() => {
     console.log("Socket instance:", socket);
     console.log("Socket connected:", socket.connected);
@@ -52,8 +58,9 @@ export default function Detail() {
       socket.off("disconnect");
     };
   }, []);
-  // 처음에 메시지 가져오기
-  useEffect(() => {
+  
+   // 처음에 메시지 가져오기
+   useEffect(() => {
     if (chatRoomId) {
       fetch(`/api/chat/getMessages?chatRoomId=${chatRoomId}`)
         .then((response) => {
@@ -64,11 +71,12 @@ export default function Detail() {
         })
         .then((data) => {
           console.log("Fetched messages:", data);
-          setMessages(data);
+          dispatch(setMessages(data));
         })
         .catch((error) => console.error("Error fetching messages:", error));
     }
-  }, [chatRoomId]);
+  }, [chatRoomId, dispatch]);
+
 
   useEffect(() => {
     if (chatRoomId && socket.connected) {
@@ -79,7 +87,7 @@ export default function Detail() {
       socket.on("receive_message", (message) => {
         if (message.chatRoomId === chatRoomId) {
           console.log("New message received for this chat room:", message);
-          setMessages((prev) => [...prev, message]);
+          dispatch(addMessage(message));
         } else {
           console.log("Message received for another chat room. Ignoring.");
         }
@@ -101,8 +109,7 @@ export default function Detail() {
 
       console.log("Sending message:", message);
       socket?.emit("send_message", message);
-      // setMessages((prev) => [...prev, { sender: "Me", text: input }]); // UI 업데이트
-      setInput("");
+      dispatch(setInput("")); // 입력 필드 초기화
     }
   };
 
@@ -115,7 +122,12 @@ export default function Detail() {
             <h1>Chat Room {chatRoomId}</h1>
             <div>
               {messages.map((msg, index) => (
-                <div key={index}>
+                <div key={index} className='flex'>
+                  <img
+                    src={msg.requesterImage || '/SVG/default-profile.svg'}
+                    alt="Profile"
+                    className="w-[30px] h-[30px] rounded-full object-cover"
+                  />
                   <strong>{msg.requesterName}</strong>: {msg.text || "No message"}
                   <div>
                     {msg.createdAt.toString()}
@@ -126,7 +138,7 @@ export default function Detail() {
             <input
               type="text"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => dispatch(setInput(e.target.value))}
               onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
             />
             <button onClick={handleSendMessage}>Send</button>
