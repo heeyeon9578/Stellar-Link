@@ -96,13 +96,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
         console.log("Message received:", message);
        
     
-        // 메시지 저장
-        await db.collection("messages").insertOne({
-          chatRoomId: data.chatRoomId,
-          senderId: requesterId,
-          text: data.text,
-          createdAt: new Date(),
-        });
+        // 메시지 추가 또는 새 채팅방 생성
+        await db.collection("messages").updateOne(
+          { chatRoomId: data.chatRoomId }, // 검색 조건
+          {
+            $push: { messages: message }, // messages 배열에 새 메시지 추가
+            $setOnInsert: { chatRoomId: data.chatRoomId }, // 채팅방이 없을 경우 생성
+          },
+          { upsert: true } // 채팅방이 없을 경우 새로 생성
+        );
+
 
           // 메시지 브로드캐스트
         io?.to(data.chatRoomId).emit("receive_message", message);
