@@ -30,17 +30,17 @@ export default function ChatContent(){
     const [input, setInput] = useState('');
 
     useEffect(() => {
-        const ws = new WebSocket('ws://localhost:3000/api/websocket');
-        setSocket(ws);
+        // const ws = new WebSocket('ws://localhost:3000/api/websocket');
+        // setSocket(ws);
     
-        ws.onmessage = (event) => {
-          const message = JSON.parse(event.data);
-          setMessages((prev) => [...prev, message]);
-        };
+        // ws.onmessage = (event) => {
+        //   const message = JSON.parse(event.data);
+        //   setMessages((prev) => [...prev, message]);
+        // };
     
-        return () => {
-          ws.close();
-        };
+        // return () => {
+        //   ws.close();
+        // };
       }, []);
 
     // 0.3초(300ms) 디바운스: search 값이 변경될 때마다 타이머를 재설정
@@ -94,7 +94,7 @@ export default function ChatContent(){
             <div className="w-full h-10 bg-customRectangle rounded-xl flex mt-4 text-customGray text-sm flex items-center justify-around p-2">
 
                 {menus.map((menu)=>(
-                  <Button
+                  <Button key={menu.name}
                   variant={isClicked===menu.name ? 'primary':"main"}
                   size="sm"
                   className={isClicked===menu.name? "text-white w-full h-8" :"text-customGray w-full h-8"}
@@ -105,22 +105,7 @@ export default function ChatContent(){
                 ))}
             </div>
 
-            <div>
-              <div>
-                {messages.map((msg, index) => (
-                  <div key={index}>
-                    <strong>{msg.sender}</strong>: {msg.text}
-                  </div>
-                ))}
-              </div>
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-              />
-              <button onClick={sendMessage}>Send</button>
-            </div>
+           
         </div>
     )
 }

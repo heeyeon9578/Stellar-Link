@@ -10,9 +10,10 @@ import { RootState } from '../../../../store/store';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import Button from '@/app/components/Button';
 import DynamicText from '../../../app/components/DynamicText';
-
+import { useRouter } from 'next/navigation';
 
 export default function FriendsContent() {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const { t,i18n } = useTranslation('common');
   const [isClicked, setIsClicked] = useState<'All'|'Request'|'Pending'|'Blocked'>('All');
@@ -263,6 +264,19 @@ const handleDeleteFriend = async (toUserId: string) => {
   }
 };
 
+function startChat(friendId: string) {
+  fetch('/api/chat/create-room', {
+    method: 'POST',
+    body: JSON.stringify({ participants: [ friendId], type: 'personal' }),
+    headers: { 'Content-Type': 'application/json' },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      // 채팅 방 ID로 이동
+      router.push(`/chat?chatRoomId=${data.chatRoomId}`);
+    });
+}
+
 // 보낸 친구 요청 취소
 const handleCancelRequest = async (toUserId: string) => {
   try {
@@ -355,6 +369,7 @@ const handleCancelRequest = async (toUserId: string) => {
 
         {menus.map((menu)=>(
           <Button
+          key={menu.name}
           variant={isClicked===menu.name ? 'primary':"main"}
           size="sm"
           className={isClicked===menu.name? "text-white w-full h-8" :"text-customGray w-full h-8"}
@@ -382,7 +397,7 @@ const handleCancelRequest = async (toUserId: string) => {
                  {friend.status !== 'block' &&(
                    <li key={friend._id} className="flex mb-4 justify-between">
 
-                   <div className="flex">
+                   <div className="flex cursor-pointer" onClick={()=>{startChat(friend._id)}}>
                      <img
                        src={friend.profileImage || "/SVG/default-profile.svg"}
                        alt={`${friend.name}'s profile`}
