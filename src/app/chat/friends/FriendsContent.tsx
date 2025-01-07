@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import Button from '@/app/components/Button';
 import DynamicText from '../../../app/components/DynamicText';
 import { useRouter } from 'next/navigation';
+import 'animate.css';
 
 export default function FriendsContent() {
   const router = useRouter();
@@ -21,7 +22,9 @@ export default function FriendsContent() {
   const [isCancelClicked,setIsCancelClicked] = useState<Record<string, boolean>>({});
   const [isAcceptClicked,setIsAcceptClicked] = useState<Record<string, boolean>>({});
   const [isInitialized, setIsInitialized] = useState(false);
-
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ x: 0, y: 0 });
+  
   // Redux store에서 필요한 상태를 꺼내옵니다.
   const {
     list: friends,
@@ -30,7 +33,7 @@ export default function FriendsContent() {
     loading,
     error,
   } = useSelector((state: RootState) => state.friends);
-
+  
   // 로컬 상태 (새로운 친구 추가용)
   const [newFriendEmail, setNewFriendEmail] = useState<string>("");
   const [search, setSearch] = useState<string>("");
@@ -80,21 +83,37 @@ export default function FriendsContent() {
     {name: t('Blocked'), onClick:() =>setIsClicked('Blocked')}
   ]
 
-  const toggleMoreMenu = (friendId: string) => {
-    setIsMoreClicked((prev) => ({
-      ...prev,
-      [friendId]: !prev[friendId], // 현재 값의 반대로
-    }));
+  const toggleMoreMenu = (friendId: string, event: React.MouseEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect(); // 버튼의 위치 계산
+  setDropdownPosition({
+    x: rect.left-125, // 버튼의 왼쪽 좌표
+    y: rect.bottom + window.scrollY-20, // 버튼의 아래쪽 좌표 (스크롤 고려)
+  });
+
+  setIsMoreClicked((prev) => ({
+    ...prev,
+    [friendId]: !prev[friendId], // 현재 값의 반대로
+  }));
   };
 
-  const toggleCancelMenu = (requestId: string) => {
+  const toggleCancelMenu = (requestId: string, event: React.MouseEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect(); // 버튼의 위치 계산
+  setDropdownPosition({
+    x: rect.left-125, // 버튼의 왼쪽 좌표
+    y: rect.bottom + window.scrollY-20, // 버튼의 아래쪽 좌표 (스크롤 고려)
+  });
     setIsCancelClicked((prev) => ({
       ...prev,
       [requestId]: !prev[requestId], // 현재 값의 반대로
     }));
   };
 
-  const toggleAcceptMenu = (requestId: string) => {
+  const toggleAcceptMenu = (requestId: string, event: React.MouseEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect(); // 버튼의 위치 계산
+  setDropdownPosition({
+    x: rect.left-125, // 버튼의 왼쪽 좌표
+    y: rect.bottom + window.scrollY-20, // 버튼의 아래쪽 좌표 (스크롤 고려)
+  });
     setIsAcceptClicked((prev) => ({
       ...prev,
       [requestId]: !prev[requestId], // 현재 값의 반대로
@@ -156,7 +175,21 @@ export default function FriendsContent() {
       alert(t('failAddFriend'));
     }
   };
+  // const acceptAllRequests = async () => {
+  //   try {
+  //     // 모든 친구 요청을 수락
+  //     for (const request of tempData) {
+  //       await handleRequestAction(request._id.$oid.toString(), "accepted");
+  //     }
 
+  //     // 친구 리스트 갱신
+  //     dispatch(fetchFriends());
+  //   } catch (error) {
+  //     console.error("Error accepting all requests:", error);
+
+  //   }
+  // };
+  
   // 친구 요청 수락/거절 (이것도 필요하다면 Slice에 Thunk로 옮길 수 있음)
   const handleRequestAction = async (fromUserId: string, action: "accepted" | "rejected") => {
     try {
@@ -179,14 +212,14 @@ export default function FriendsContent() {
         action === "accepted"
           ? t('Fras')
           : t('Frrs');
-      alert(successMessage);
+      //alert(successMessage);
 
       // 요청 목록이 바뀌었으니 다시 요청을 디스패치해서 데이터 갱신
       dispatch(fetchReceivedRequests());
       // dispatch(fetchFriends());
     } catch (err) {
       console.log(err)
-      alert(t('Fraorf'));
+      //alert(t('Fraorf'));
     }
   };
 
@@ -303,6 +336,16 @@ const handleCancelRequest = async (toUserId: string) => {
     alert(t('Ecfr'));
   }
 };
+const generateChatRoom = () => {
+  // 애니메이션 트리거
+  setIsAnimating(true);
+  // 애니메이션이 끝난 후 상태를 초기화
+  setTimeout(() => {
+    setIsAnimating(false);
+    // 실제 채팅방 생성 로직을 여기에 추가하세요
+    console.log("채팅방 생성");
+  }, 1000); // 애니메이션 지속 시간에 맞게 설정 (예: 1초)
+}
 
   // if (loading) {
   //   return <p>Loading...</p>;
@@ -359,7 +402,8 @@ const handleCancelRequest = async (toUserId: string) => {
             width={25}
             height={25}
             priority
-            className="cursor-pointer"
+            className={`cursor-pointer ${isAnimating ? 'animate__animated animate__flip' : ''}`} // 애니메이션 클래스 추가
+              onClick={generateChatRoom}
           />
         </div>
       </div>
@@ -385,7 +429,7 @@ const handleCancelRequest = async (toUserId: string) => {
       {
         isClicked==='All' && 
         (
-          <div className="mt-4">
+          <div className="mt-4 max-h-[400px] overflow-y-auto">
             {filteredFriends.filter(friend => friend.status !== 'block').length === 0 ? (
               <p>{t('Yhnfy')}</p>
             ) : (
@@ -393,9 +437,7 @@ const handleCancelRequest = async (toUserId: string) => {
                 {filteredFriends
                 .filter(friend => friend.status !== 'block')
                 .map((friend)  => (
-                 <>
-                 {friend.status !== 'block' &&(
-                   <li key={friend._id} className="flex mb-4 justify-between">
+                  <li key={friend._id} className="flex mb-4 justify-between">
 
                    <div className="flex cursor-pointer" onClick={()=>{startChat(friend._id)}}>
                      <img
@@ -423,11 +465,16 @@ const handleCancelRequest = async (toUserId: string) => {
                        height={25}
                        priority
                        className="cursor-pointer"
-                      onClick={() => toggleMoreMenu(friend._id)}
+                      onClick={(event) => toggleMoreMenu(friend._id, event)}
                      />
                      {/* 차단, 차단 해제 버튼 추가 */}
                      {isMoreClicked[friend._id]&&(
-                       <div className=" z-50 absolute top-8 w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm">
+                       <div className=" z-50 absolute w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm"
+                       style={{
+                        top: 5, // 드롭다운의 Y축 위치
+                        right: 30, // 드롭다운의 X축 위치
+                      }}
+                       >
                          <button onClick={() => handleBlockFriend(friend._id)} className="text-red-500">
                          {t('Block')}
                          </button>
@@ -442,8 +489,6 @@ const handleCancelRequest = async (toUserId: string) => {
                    
                    </div>
                  </li>
-                 )}
-                 </>
                 ))}
               </ul>
             )}
@@ -453,7 +498,7 @@ const handleCancelRequest = async (toUserId: string) => {
       }
     
       {isClicked==='Request'&&(
-        <div className="mt-4"> 
+        <div className="mt-4 max-h-[400px] overflow-y-auto"> 
           {filteredSentRequests.length === 0 ? (
             <p>{t('Nsfr')}</p>
           ) : (
@@ -488,11 +533,16 @@ const handleCancelRequest = async (toUserId: string) => {
                         height={25}
                         priority
                         className="cursor-pointer"
-                       onClick={() => toggleCancelMenu(request._id)}
+                       onClick={(event) => toggleCancelMenu(request._id,event)}
                       />
-                      {/* 차단, 차단 해제 버튼 추가 */}
+                      {/* Cancel */}
                       {isCancelClicked[request._id]&&(
-                        <div className=" z-50 absolute top-8 w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm">
+                        <div className=" z-50 absolute w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm"
+                        style={{
+                         top: 5, // 드롭다운의 Y축 위치
+                         right: 30, // 드롭다운의 X축 위치
+                       }}
+                        >
                           <button onClick={() => handleCancelRequest(request.toUserDetails._id)} className="text-red-500">
                           {t('Cancel')}
                           </button>
@@ -511,7 +561,7 @@ const handleCancelRequest = async (toUserId: string) => {
         isClicked==='Pending' &&
         (
 
-          <div className="mt-4">
+          <div className="mt-4 max-h-[400px] overflow-y-auto">
         
             {filteredReceivedRequests.length === 0 ? (
               <p>No friend requests received.</p>
@@ -547,11 +597,16 @@ const handleCancelRequest = async (toUserId: string) => {
                         height={25}
                         priority
                         className="cursor-pointer"
-                       onClick={() => toggleAcceptMenu(request._id)}
+                       onClick={(event) => toggleAcceptMenu(request._id,event)}
                       />
-                      {/* 차단, 차단 해제 버튼 추가 */}
+                      {/* 수락 거절 추가 */}
                       {isAcceptClicked[request._id]&&(
-                        <div className=" z-50 absolute top-8 w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm">
+                         <div className=" z-50 absolute w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm"
+                         style={{
+                          top: 5, // 드롭다운의 Y축 위치
+                          right: 30, // 드롭다운의 X축 위치
+                        }}
+                         >
                           <button onClick={() => handleRequestAction(request.fromUserDetails._id, "accepted")} className="text-red-500">
                           {t('Accept')}
                           </button>
@@ -578,61 +633,62 @@ const handleCancelRequest = async (toUserId: string) => {
         isClicked==='Blocked' &&
         (
 
-          <div className="mt-4">
+          <div className="mt-4 max-h-[400px] overflow-y-auto">
           {filteredFriends.filter(friend => friend.status === 'block').length === 0 ? (
             <p>{t('Yhnfy')}</p>
           ) : (
             <ul>
-              {filteredFriends.map((friend) => (
-               <>
-                {friend.status === 'block' &&(
-                  <li key={friend._id} className="flex mb-4 justify-between">
+              {filteredFriends.filter(friend => friend.status === 'block').map((friend) => (
+                 <li key={friend._id} className="flex mb-4 justify-between">
 
-                  <div className="flex">
-                    <img
-                      src={friend.profileImage || "/SVG/default-profile.svg"}
-                      alt={`${friend.name}'s profile`}
-                      className="w-[50px] h-[50px] rounded-full mr-2" 
-                    />
+                 <div className="flex">
+                   <img
+                     src={friend.profileImage || "/SVG/default-profile.svg"}
+                     alt={`${friend.name}'s profile`}
+                     className="w-[50px] h-[50px] rounded-full mr-2" 
+                   />
 
-                    <div>
-                      <div className="text-black font-bold">
-                        {friend.name}
-                      </div>
+                   <div>
+                     <div className="text-black font-bold">
+                       {friend.name}
+                     </div>
 
-                      <div className="text-customGray text-sm">
-                        {friend.email}
-                      </div>
-                    </div>
-                  </div>
+                     <div className="text-customGray text-sm">
+                       {friend.email}
+                     </div>
+                   </div>
+                 </div>
 
-                  <div className="relative ">
-                    <Image
-                      src="/SVG/more.svg"
-                      alt="more"
-                      width={25}
-                      height={25}
-                      priority
-                      className="cursor-pointer"
-                     onClick={() => toggleMoreMenu(friend._id)}
-                    />
-                    {/* 차단, 차단 해제 버튼 추가 */}
-                    {isMoreClicked[friend._id]&&(
-                      <div className=" z-50 absolute top-8 w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm">
-                        <button onClick={() => handleUnblockFriend(friend._id)} className="text-red-500">
-                        {t('Unblock')}
-                        </button>
-                        <button onClick={() => handleDeleteFriend(friend._id)} >
-                          {t('Delete')}
-                        </button>
-                    
-                      </div>
-                    )}
-                  
-                  </div>
-                </li>
-                )}
-               </>
+                 <div className="relative ">
+                   <Image
+                     src="/SVG/more.svg"
+                     alt="more"
+                     width={25}
+                     height={25}
+                     priority
+                     className="cursor-pointer"
+                    onClick={(event) => toggleMoreMenu(friend._id, event)}
+                   />
+                   {/* 삭제, 차단 해제 버튼 추가 */}
+                   {isMoreClicked[friend._id]&&(
+                     <div className=" z-50 absolute w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm"
+                     style={{
+                      top: 5, // 드롭다운의 Y축 위치
+                      right: 30, // 드롭다운의 X축 위치
+                    }}
+                     >
+                       <button onClick={() => handleUnblockFriend(friend._id)} className="text-red-500">
+                       {t('Unblock')}
+                       </button>
+                       <button onClick={() => handleDeleteFriend(friend._id)} >
+                         {t('Delete')}
+                       </button>
+                   
+                     </div>
+                   )}
+                 
+                 </div>
+               </li>
               ))}
             </ul>
           )}

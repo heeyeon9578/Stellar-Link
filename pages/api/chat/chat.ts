@@ -57,9 +57,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const chats = await collection.find(filter).toArray();
 
-    if (!chats || chats.length === 0) {
-      return res.status(404).json({ message: "No chats found" });
-    }
+    // if (!chats || chats.length === 0) {
+    //   return res.status(404).json({ message: "No chats found" });
+    // }
 
     // 모든 참여자 ID와 메시지 보낸 사람 ID 수집
     const allParticipantIds = new Set<string>();
@@ -114,10 +114,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (error: unknown) {
     console.error("Error fetching chats:", error);
 
-    if (error instanceof Error) {
-      res.status(500).json({ message: "Error fetching chats", error: error.message });
-    } else {
-      res.status(500).json({ message: "Unknown error occurred" });
-    }
+    // if (error instanceof Error) {
+    //   res.status(500).json({ message: "Error fetching chats", error: error.message });
+    // } else {
+    //   res.status(500).json({ message: "Unknown error occurred" });
+    // }
   }
 }

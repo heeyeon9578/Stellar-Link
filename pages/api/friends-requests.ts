@@ -111,7 +111,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             await db.collection("friends").updateOne(
               { userId },
               {
-                $push: {
+                $addToSet: {
                   friends: {
                     friendId: new ObjectId(request.fromUserId) ,
                     // name: request.fromUserName,
@@ -128,7 +128,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             await db.collection("friends").updateOne(
               { userId:  new ObjectId(request.fromUserId) },
               {
-                $push: {
+                $addToSet: {
                   friends: {
                     friendId: requesterId,
                     // name: requester.name,

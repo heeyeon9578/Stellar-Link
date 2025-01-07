@@ -75,6 +75,7 @@
     "Frcs":"Friend request canceled successfully!",
     "Ecfr":"Error canceling friend request",
     "Personal":"Personal",
-    "Teams":"Teams"
+    "Teams":"Teams",
+    "GenerateRoom":"Generate Room"
 
 }
