@@ -254,7 +254,7 @@ export default function ProfileContent() {
           value={name}
           lang="ko"
           onChange={(e) => setName(e.target.value)}
-         className="w-full px-3 py-2 border-customGray rounded-lg"
+         className="w-full text-customPurple px-3 py-2 border-customGray rounded-lg focus:outline-none focus:ring-2 focus:ring-customLightPurple"
         />
       </div>
 

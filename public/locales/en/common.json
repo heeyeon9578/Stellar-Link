@@ -76,6 +76,10 @@
     "Ecfr":"Error canceling friend request",
     "Personal":"Personal",
     "Teams":"Teams",
-    "GenerateRoom":"Generate Room"
+    "GenerateRoom":"Generate Room",
+    "Title":"ChatRoom Title",
+    "Tmie":"The message is empty.",
+    "Ncf":"No chats found",
+    "Loading":"Loading..."
 
 }

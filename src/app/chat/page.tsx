@@ -1,11 +1,12 @@
 'use client';
-import { usePathname,useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
-import { useEffect,useState } from 'react';
+import { useEffect ,useRef} from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../../store/store";
 import socket from "@/socketIns"; // 위에서 만든 socket.ts 경로
+
 import {
   setChatRoomId,
   setMessages,
@@ -20,6 +21,7 @@ export default function Detail() {
   const messages = useSelector((state: RootState) => state.chat.messages);
   const input = useSelector((state: RootState) => state.chat.input);
   const { data: session, status } = useSession();
+  const isComposingRef = useRef(false);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -143,7 +145,13 @@ export default function Detail() {
               type="text"
               value={input}
               onChange={(e) => dispatch(setInput(e.target.value))}
-              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !isComposingRef.current) {
+                  handleSendMessage();
+                }
+              }}
+              onCompositionStart={() => (isComposingRef.current = true)} // IME 입력 시작
+              onCompositionEnd={() => (isComposingRef.current = false)} // IME 입력 종료
             />
             <button onClick={handleSendMessage}>Send</button>
           </div>

@@ -28,6 +28,7 @@ interface ChatRoom {
   participants: participant[];
   type: string;
   createdAt: string;
+  title?:string;
   messages: {
     chatRoomId: string;
     senderEmail: string;
@@ -62,6 +63,8 @@ export default function ChatContent() {
  const [isAnimating, setIsAnimating] = useState<boolean>(false);
  const [isGenerateChatRoom, setIsGenerateChatRoom] = useState<boolean>(false);
  const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
+ const [title, setTitle] = useState<string>('');
+ 
 // const [type, setType] = useState<'personal' | 'teams'| 'hide'>('personal');
   // 검색어 디바운싱 처리 
   useEffect(() => {
@@ -147,8 +150,10 @@ const filteredData = data.filter((chatRoom) =>
     participant.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
     participant.email.toLowerCase().includes(debouncedSearch.toLowerCase())
   ) ||
-  chatRoom.messages.some((message) =>
-    message.text.toLowerCase().includes(debouncedSearch.toLowerCase())
+  (chatRoom.messages && chatRoom.messages.length > 0 &&
+    chatRoom.messages.some((message) =>
+      message.text.toLowerCase().includes(debouncedSearch.toLowerCase())
+    )
   )
 );
 
@@ -185,11 +190,11 @@ const handleGenerateRoom = () =>{
   if(selectedFriends.length===1){
    type='personal';
   }else{
-    type='hide';
+    type='teams';
   }
   fetch('/api/chat/create-room', {
     method: 'POST',
-    body: JSON.stringify({ participants: selectedFriends, type: type }),
+    body: JSON.stringify({ participants: selectedFriends, type: type, title:title }),
     headers: { 'Content-Type': 'application/json' },
   })
     .then((res) => res.json())
@@ -232,9 +237,10 @@ const handleGenerateRoom = () =>{
         </div>
       {isGenerateChatRoom ? (
         <>  
-          <div className="mt-4 max-h-[500px] overflow-y-auto">
+          <div className="mt-4 max-h-[450px] overflow-y-auto">
             {friends.filter(friend => friend.status !== 'block').length === 0 ? (
-              <p>{t('Yhnfy')}</p> 
+              <DynamicText text={t('Yhnfy')}/>
+          
             ) : (
               <ul>
                 {friends
@@ -247,7 +253,7 @@ const handleGenerateRoom = () =>{
                       type="checkbox"
                       checked={selectedFriends.includes(friend._id)}
                       onChange={() => handleCheckboxChange(friend._id)}
-                      className="mr-2"
+                      className="mr-2 focus:outline-none focus:ring-2 focus:ring-customLightPurple"
                     />
                      <img
                        src={friend.profileImage || "/SVG/default-profile.svg"}
@@ -272,6 +278,19 @@ const handleGenerateRoom = () =>{
               </ul>
             )}
 
+          </div>
+
+          <div className="mb-4" lang="ko">
+            <label className="block text-sm font-bold mb-2">
+              <DynamicText text={t('Title')} />
+            </label>
+            <input
+              type="text"
+              value={title}
+              lang="ko"
+              onChange={(e) => setTitle(e.target.value)}
+             className="w-full px-3 py-2 border-customGray rounded-lg focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+            />
           </div>
 
           <div className="absolute bottom-2 w-full left-0">
@@ -302,6 +321,7 @@ const handleGenerateRoom = () =>{
                 <input
                   type="text"
                   value={search}
+                  lang="ko"
                   placeholder={t('Search')}
                   onChange={(e) => setSearch(e.target.value)}
                   className="w-[100%] text-black/45 border-customGray rounded-xl text-sm bg-transparent focus:outline-none focus:ring-0 focus:border-transparent"
@@ -324,40 +344,146 @@ const handleGenerateRoom = () =>{
             </div>
 
             {loading ? (
-              <div className="text-center mt-4">{t('Loading...')}</div>
+               <DynamicText text={t('Loading')} className="text-gray-500 mt-2"/>
             )  : (
-              <div className="mt-4">
+              <div className="mt-2 max-h-[500px] overflow-y-auto">
                 {filteredData.length === 0 ? (
-                  <div>{t('No chats found')}</div>
+                 <DynamicText text={t('Ncf')} className="text-gray-500"/>
                 ) : (
                   filteredData.map((chatRoom) => (
-                    <div key={chatRoom._id} className="p-4 bg-gray-100 rounded-md mb-2" onClick={()=>{ router.push(`/chat?chatRoomId=${chatRoom._id}`);}}>
+                    <div key={chatRoom._id} className="p-2  rounded-md mb-2 bg-white/50 " onClick={()=>{ router.push(`/chat?chatRoomId=${chatRoom._id}`);}}>
                     
-                      <ul className="mb-2">
-                        {chatRoom.participants.map((participant, index) => (
-                          <li key={index} className="flex items-center text-sm" >
+                      {/** 친구 이름과 날짜 */}
+                      <div className="flex justify-between ">
+                        <ul className="w-[80%] ">
+                        {chatRoom.participants.length === 1 ? (
+                          // 한 명일 때
+                          <li className="flex text-sm ">
                             <img
-                              src={participant.profileImage}
-                              alt={participant.name}
-                              width={30}
-                              height={30}
-                              className="rounded-full mr-2"
+                              src={chatRoom.participants[0].profileImage}
+                              alt={chatRoom.participants[0].name}
+                              width={50}
+                              height={50}
+                              className="rounded-full w-10 h-10  mr-2 border border-white"
                             />
-                            <span>{participant.name} ({participant.email})</span>
-                          </li>
-                        ))}
-                      </ul>
-                      
-                      <ul>
-                        {chatRoom.messages.slice(-1).map((message, index) => (
-                          <li key={index} className="text-sm text-black">
-                            <strong>{message.senderInfo.name}:</strong> {message.text} 
-                            <div>
-                              {message.createdAt}
+                            <div className="flex flex-col text-customPurple">
+                              <DynamicText text={chatRoom.participants[0].name} /> 
+                              
+                              {/** 마지막 메세지 */}
+                              <div className="text-xs text-gray-500">
+                                {chatRoom.messages.length > 0 ? (
+                                  <DynamicText text={`${chatRoom.messages[chatRoom.messages.length - 1].senderInfo.name}: ${chatRoom.messages[chatRoom.messages.length - 1].text}`} /> 
+                                  
+                                ) : (
+                                  <DynamicText text={t('Tmie')}/>
+                                )}
+                              </div>
                             </div>
                           </li>
-                        ))}
-                      </ul>
+                        ) : (
+                          //여러 명 일때
+                          <div>
+                            {/* 참여자 프로필 이미지 표시 */}
+                            <div className="relative flex">
+                              {chatRoom.participants.map((participant, index) => (
+                                <div
+                                  key={index}
+                                  className="absolute"
+                                  style={{
+                                    left: `${index * 20}px`, // 겹치는 간격 조정
+                                    zIndex: chatRoom.participants.length - index, // z-index로 겹침 순서 조정
+                                  }}
+                                >
+                                  <img
+                                    src={participant.profileImage}
+                                    alt={participant.name}
+                                    className="w-8 h-8 rounded-full border border-white"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                            
+
+                            {/* 참여자 프로필 이름 표시 */}
+                            <div className="mt-8 flex flex-wrap text-xs text-customPurple">
+                              {chatRoom.participants.map((participant, index) => (
+                                <div key={index} >
+                                  {!chatRoom.title && <DynamicText className="mr-2" text={participant.name+','} />}
+                                </div>
+                              ))}
+
+                              {/* 제목 표시 */}
+                              {chatRoom.title && (
+                              <div className="mr-2 text-customPurple">
+                                {chatRoom.title}
+                              </div>
+                              )}
+
+
+                              {/* 인원수 표시 */}
+                              {chatRoom.participants.length > 1 && (
+                                <div className="text-xs text-gray-500">
+                                  <DynamicText text={chatRoom.participants.length+1+'명 참여'}/>
+                                  
+                                </div>
+                              )}
+                            </div>
+                            {/** 마지막 메세지 */}
+                            <div className="text-xs text-gray-500">
+                              {chatRoom.messages.length > 0 ? (
+                                 <DynamicText text={`${chatRoom.messages[chatRoom.messages.length - 1].senderInfo.name}: ${chatRoom.messages[chatRoom.messages.length - 1].text}`} /> 
+                              ) : (
+                                <DynamicText text={t('Tmie')}/>
+                              )}
+                            </div>
+                            
+                          </div>
+                        )}
+
+                        
+                        </ul>
+
+                        {/** 날짜 시간 */}
+                        <div className="text-xs flex-nowrap text-gray-500">
+                        {chatRoom.messages.length > 0 ? (
+                          (() => {
+                            const messageDate = new Date(chatRoom.messages[chatRoom.messages.length - 1].createdAt);
+                            const today = new Date();
+                          
+                            // 오늘 날짜인지 확인
+                            const isToday =
+                              messageDate.getFullYear() === today.getFullYear() &&
+                              messageDate.getMonth() === today.getMonth() &&
+                              messageDate.getDate() === today.getDate();
+                          
+                            if (isToday) {
+                              // 오늘 날짜라면 시간만 표시
+                              return new Intl.DateTimeFormat('ko-KR', {
+                                hour: 'numeric',
+                                minute: 'numeric',
+                                hour12: true,
+                              }).format(messageDate);
+                            } else {
+                              // 오늘 날짜가 아니라면 MM월 DD일로 표시
+                              const formattedDate = new Intl.DateTimeFormat('ko-KR', {
+                                month: '2-digit',
+                                day: '2-digit',
+                              }).format(messageDate);
+                            
+                              // MM월 DD일로 표시하기 위해 포맷 후처리
+                              const [month, day] = formattedDate.split('.').map((part) => part.trim());
+                              return `${month}월 ${day}일`;
+                            }
+                          })()
+                        ) : (
+                          // 메시지가 없을 경우 기본 텍스트
+                          <span></span>
+                        )}
+                        </div>
+                      </div>
+
+                      
+                      
                     </div>
                   ))
                 )}

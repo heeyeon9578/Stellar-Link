@@ -33,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ message: "Current user not found." });
     }
 
-    const { participants, type } = req.body;
+    const { participants, type, title  } = req.body;
 
     if (!participants || !type) {
       return res.status(400).json({ message: "Invalid request data." });
@@ -71,7 +71,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const newRoom = await db.collection("messages").insertOne({
       participants: allParticipants,
       type,
+      title: title || null, // title이 없으면 null로 저장
       createdAt: new Date(),
+      messages: []
     });
 
     res.status(200).json({ chatRoomId: newRoom.insertedId });

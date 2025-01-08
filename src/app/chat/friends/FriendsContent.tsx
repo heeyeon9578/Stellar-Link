@@ -393,7 +393,7 @@ const generateChatRoom = () => {
           value={newFriendEmail}
           placeholder={t('EFE')}
           onChange={(e) => setNewFriendEmail(e.target.value)}
-         className="w-[90%] px-3 py-2 border-customGray rounded-xl text-sm text-cuustomGray"
+         className="w-[90%] px-3 py-2 border-customGray rounded-xl text-sm text-customGray focus:outline-none focus:ring-2 focus:ring-customLightPurple"
         />
         <div className="w-[10%] flex items-center justify-end h-full" onClick={handleAddFriend}>
           <Image
@@ -447,11 +447,11 @@ const generateChatRoom = () => {
                      />
 
                      <div>
-                       <div className="text-black font-bold">
-                         {friend.name}
+                       <div className="font-bold text-customPurple">
+                       <DynamicText text={friend.name} /> 
                        </div>
 
-                       <div className="text-customGray text-sm">
+                       <div className="text-customGray text-xs">
                          {friend.email}
                        </div>
                      </div>
@@ -519,7 +519,7 @@ const generateChatRoom = () => {
                           {request.toUserDetails.name}
                         </div>
 
-                        <div className="text-customGray text-sm">
+                        <div className="text-customGray text-xs">
                           {request.toUserDetails.email}
                         </div>
                       </div>
@@ -583,7 +583,7 @@ const generateChatRoom = () => {
                           {request.fromUserDetails.name}
                         </div>
 
-                        <div className="text-customGray text-sm">
+                        <div className="text-customGray text-xs">
                           {request.fromUserDetails.email}
                         </div>
                       </div>
@@ -653,7 +653,7 @@ const generateChatRoom = () => {
                        {friend.name}
                      </div>
 
-                     <div className="text-customGray text-sm">
+                     <div className="text-customGray text-xs">
                        {friend.email}
                      </div>
                    </div>
