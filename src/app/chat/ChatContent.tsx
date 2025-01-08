@@ -249,7 +249,7 @@ if (!isInitialized) return null;
         </div>
       {isGenerateChatRoom ? (
         <>  
-          <div className="mt-4 max-h-[450px] overflow-y-auto">
+          <div className="mt-4 max-h-[50vh] overflow-y-auto">
             {friends.filter(friend => friend.status !== 'block').length === 0 ? (
               <DynamicText text={t('Yhnfy')}/>
           
@@ -317,7 +317,7 @@ if (!isInitialized) return null;
           </div>
         </>
         ):(
-        <>
+        <div className="h-full w-full">
              <div className="w-full h-10 bg-customGray rounded-xl flex">
               <div className="p-2 flex items-center">
                 <Image
@@ -358,12 +358,12 @@ if (!isInitialized) return null;
             {loading ? (
                <DynamicText text={t('Loading')} className="text-gray-500 mt-4"/>
             )  : (
-              <div className="mt-4 max-h-[500px] overflow-y-auto">
+              <div className="mt-4 h-[70%] overflow-y-auto">
                 {filteredData.length === 0 ? (
                  <DynamicText text={t('Ncf')} className="text-gray-500"/>
                 ) : (
                   filteredData.map((chatRoom) => (
-                    <div key={chatRoom._id} className="p-2  rounded-md mb-2 bg-white/50 " onClick={()=>{ router.push(`/chat?chatRoomId=${chatRoom._id}`);}}>
+                    <div key={chatRoom._id} className="p-2 cursor-pointer rounded-md mb-2 bg-white/50 " onClick={()=>{ router.push(`/chat?chatRoomId=${chatRoom._id}`);}}>
                     
                       {/** 친구 이름과 날짜 */}
                       <div className="flex justify-between ">
@@ -456,7 +456,7 @@ if (!isInitialized) return null;
                         </ul>
 
                         {/** 날짜 시간 */}
-                        <div className="text-xs flex-nowrap text-gray-500">
+                        <div className="text-xs flex-nowrap text-gray-500 w-[60px]">
                         {chatRoom.messages.length > 0 ? (
                           (() => {
                             const messageDate = new Date(chatRoom.messages[chatRoom.messages.length - 1].createdAt);
@@ -501,7 +501,7 @@ if (!isInitialized) return null;
                 )}
               </div>
             )}
-        </>
+        </div>
         )}
     </div>
   );

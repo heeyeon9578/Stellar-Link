@@ -5,7 +5,7 @@ import { authOptions } from "../auth/[...nextauth]";
 import { ObjectId } from "mongodb";
 
 /**
- * 채팅창 메시지 가져오기
+ * 채팅 목록 가져오기
  * @param req 
  * @param res 
  * @returns 

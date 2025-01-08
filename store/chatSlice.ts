@@ -1,7 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
+// 참여자 데이터 타입 정의
+interface Participant {
+  id: string;
+  name: string;
+  email: string;
+  profileImage: string;
+}
 // 메시지 데이터 타입 정의
 interface Message {
+  requesterId :string;
   requesterName: string;
   requesterImage:string;
   requesterEmail:string;
@@ -9,11 +16,17 @@ interface Message {
   createdAt: Date;
   chatRoomId: string;
 }
+interface ChatRoomInfo{
+  createdAt: Date;
+  participants: Participant[];
+  title: string;
 
+}
 // 초기 상태 타입 정의
 interface ChatState {
   chatRoomId: string | null;
   messages: Message[];
+  chatRoomInfo:ChatRoomInfo | null; // 초기 상태에서 null 가능
   input: string;
 }
 
@@ -21,6 +34,7 @@ interface ChatState {
 const initialState: ChatState = {
   chatRoomId: null,
   messages: [],
+  chatRoomInfo:null,
   input: "",
 };
 
@@ -31,6 +45,9 @@ const chatSlice = createSlice({
   reducers: {
     setChatRoomId(state, action: PayloadAction<string | null>) {
       state.chatRoomId = action.payload;
+    },
+    setChatRoomInfo(state, action: PayloadAction<ChatRoomInfo | null>) {
+      state.chatRoomInfo = action.payload;
     },
     setMessages(state, action: PayloadAction<Message[]>) {
       state.messages = action.payload;
@@ -43,6 +60,7 @@ const chatSlice = createSlice({
     },
     clearChat(state) {
       state.chatRoomId = null;
+      state.chatRoomInfo = null;
       state.messages = [];
       state.input = "";
     },
@@ -50,6 +68,6 @@ const chatSlice = createSlice({
 });
 
 // 액션 및 리듀서 내보내기
-export const { setChatRoomId, setMessages, addMessage, setInput, clearChat } =
+export const { setChatRoomId,setChatRoomInfo, setMessages, addMessage, setInput, clearChat } =
   chatSlice.actions;
 export default chatSlice.reducer;

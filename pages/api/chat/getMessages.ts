@@ -38,9 +38,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const messages = chatRoom.messages || [];
+    const participantIds = chatRoom.participants.map((id: string) => new ObjectId(id));
+    // 채팅방 참여자 정보 조회
+    const participants = await db
+    .collection("user_cred")
+    .find({ _id: { $in: participantIds } })
+    .toArray();
 
+    // 참여자 정보를 매핑
+    const enrichedParticipants = participants.map((participant: any) => ({
+    id: participant._id.toString(),
+    name: participant.name || "Unknown User",
+    email: participant.email || "Unknown Email",
+    profileImage: participant.profileImage || "/SVG/default-profile.svg",
+    }));
+
+    // 메시지가 없을 경우 빈 배열 반환
     if (messages.length === 0) {
-      return res.status(200).json([]);
+      return res.status(200).json({
+        chatRoomInfo: {
+          title: chatRoom.title ,
+          participants: enrichedParticipants,
+          createdAt: chatRoom.createdAt || null,
+        },
+        messages: [],
+      });
     }
 
     // 모든 사용자 ID 추출
@@ -70,8 +92,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       requesterImage: userMap[msg.requesterId]?.profileImage || "/SVG/default-profile.svg",
     }));
 
-    // 결과 반환
-    res.status(200).json(enrichedMessages);
+   // 결과 반환: 채팅방 정보 + 메시지
+   res.status(200).json({
+    chatRoomInfo: {
+      title: chatRoom.title ,
+      participants: enrichedParticipants,
+      createdAt: chatRoom.createdAt || null,
+    },
+    messages: enrichedMessages,
+  });
   } catch (error) {
     console.error("Error fetching messages:", error);
     res.status(500).json({ message: "Error fetching messages" });
