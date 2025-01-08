@@ -23,7 +23,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
       </div>
 
       {/* 상세 부분 */}
-      <div className="flex-[5] border-2 border-customGray rounded-xl bg-white/90 backdrop-blur-lg">
+      <div className="flex-[5] border-2 border-customGray rounded-xl bg-white/90 backdrop-blur-lg p-4" >
         {children}
       </div>
     </div>

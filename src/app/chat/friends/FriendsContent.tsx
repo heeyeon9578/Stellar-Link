@@ -123,6 +123,7 @@ export default function FriendsContent() {
   useEffect(() => {
     console.log("friends changed:", friends, receivedRequests,sentRequests);
   }, [friends,receivedRequests,sentRequests]);
+
   useEffect(() => {
     if (i18n.isInitialized) {
       setIsInitialized(true);
@@ -134,6 +135,7 @@ export default function FriendsContent() {
       };
     }
   }, [i18n]);
+
   useEffect(() => {
     // 컴포넌트가 마운트될 때, Thunk 액션을 디스패치해서 데이터 로드
     dispatch(fetchFriends());
@@ -431,7 +433,7 @@ const generateChatRoom = () => {
         (
           <div className="mt-4 max-h-[400px] overflow-y-auto">
             {filteredFriends.filter(friend => friend.status !== 'block').length === 0 ? (
-              <p>{t('Yhnfy')}</p>
+             <DynamicText text={t('Yhnfy')}/>
             ) : (
               <ul>
                 {filteredFriends
@@ -476,14 +478,12 @@ const generateChatRoom = () => {
                       }}
                        >
                          <button onClick={() => handleBlockFriend(friend._id)} className="text-red-500">
-                         {t('Block')}
+                          <DynamicText text={t('Block')}/>
                          </button>
                          <button onClick={() => handleDeleteFriend(friend._id)} >
-                           {t('Delete')}
+                           <DynamicText text={t('Delete')}/>
                          </button>
-                         {/* <button onClick={() => handleUnblockFriend(friend.email)}>
-                            {t('Unblock')}
-                         </button> */}
+                         
                        </div>
                      )}
                    
@@ -500,7 +500,7 @@ const generateChatRoom = () => {
       {isClicked==='Request'&&(
         <div className="mt-4 max-h-[400px] overflow-y-auto"> 
           {filteredSentRequests.length === 0 ? (
-            <p>{t('Nsfr')}</p>
+            <DynamicText text={t('Nsfr')}/>
           ) : (
             <ul>
               {filteredSentRequests.map((request) => (
@@ -544,7 +544,7 @@ const generateChatRoom = () => {
                        }}
                         >
                           <button onClick={() => handleCancelRequest(request.toUserDetails._id)} className="text-red-500">
-                          {t('Cancel')}
+                            <DynamicText text={t('Cancel')}/>
                           </button>
                         </div>
                       )}
@@ -608,14 +608,12 @@ const generateChatRoom = () => {
                         }}
                          >
                           <button onClick={() => handleRequestAction(request.fromUserDetails._id, "accepted")} className="text-red-500">
-                          {t('Accept')}
+                            <DynamicText text={t('Accept')}/>
                           </button>
                           <button onClick={() => handleRequestAction(request.fromUserDetails._id, "rejected")}>
-                            {t('Reject')}
+                            <DynamicText text={t('Reject')}/>
                           </button>
-                          {/* <button onClick={() => handleUnblockFriend(friend.email)}>
-                             {t('Unblock')}
-                          </button> */}
+                          
                         </div>
                       )}
                     
@@ -635,7 +633,7 @@ const generateChatRoom = () => {
 
           <div className="mt-4 max-h-[400px] overflow-y-auto">
           {filteredFriends.filter(friend => friend.status === 'block').length === 0 ? (
-            <p>{t('Yhnfy')}</p>
+            <DynamicText text={t('Yhnfy')}/>
           ) : (
             <ul>
               {filteredFriends.filter(friend => friend.status === 'block').map((friend) => (
@@ -678,10 +676,10 @@ const generateChatRoom = () => {
                     }}
                      >
                        <button onClick={() => handleUnblockFriend(friend._id)} className="text-red-500">
-                       {t('Unblock')}
+                        <DynamicText text={t('Unblock')}/>
                        </button>
                        <button onClick={() => handleDeleteFriend(friend._id)} >
-                         {t('Delete')}
+                         <DynamicText text={t('Delete')}/>
                        </button>
                    
                      </div>

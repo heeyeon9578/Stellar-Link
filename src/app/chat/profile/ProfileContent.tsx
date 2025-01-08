@@ -304,7 +304,8 @@ export default function ProfileContent() {
                 onClick={() => setPasswordVisible(!passwordVisible)}
                 className="absolute inset-y-0 right-2 flex items-center text-customPurple text-xs md:text-sm bg-transparent hover:text-underline-offset-4"
               >
-                {passwordVisible ? t('Hide') : t('Show')}
+               
+                {passwordVisible ?<DynamicText text={t('Hide')} /> : <DynamicText text={t('Show')} />}
               </button>
             </div>
             {passwordError && <div className="text-xs text-red-500 mt-1">{passwordError}</div>}
@@ -326,7 +327,7 @@ export default function ProfileContent() {
                 onClick={() => setPasswordConfirmVisible(!passwordConfirmVisible)}
                 className="absolute inset-y-0 right-2 flex items-center text-customPurple text-xs md:text-sm bg-transparent hover:text-underline-offset-4"
               >
-                {passwordConfirmVisible ? t('Hide') : t('Show')}
+                {passwordConfirmVisible ?<DynamicText text={t('Hide')} /> : <DynamicText text={t('Show')} />}
               </button>
             </div>
             {passwordConfirmError && <div className="text-xs text-red-500 mt-1">{passwordConfirmError}</div>}

@@ -10,6 +10,7 @@ import 'animate.css'; // animate.css 불러오기
 import Lottie from 'lottie-react'; // 올바른 컴포넌트 이름
 import chattingSVG from '../../public/json/chatting.json';
 import Rectangle from "./components/Rectangle";
+import DynamicText from "./components/DynamicText";
 
 export default function Home() {
   const { t,i18n } = useTranslation('common');
@@ -69,7 +70,7 @@ export default function Home() {
               style={{ animationDuration: '2s' }}
               onAnimationEnd={handleAnimationEnd1} // 애니메이션 종료 시 호출
             >
-              {t('intro1')}
+              <DynamicText text={t('intro1')}/>
             </div>
 
             <div
@@ -77,7 +78,7 @@ export default function Home() {
               style={{ animationDuration: '4s' }}
               onAnimationEnd={handleAnimationEnd2} // 애니메이션 종료 시 호출
             >
-        {t('intro2')}
+              <DynamicText text={t('intro2')}/>
       </div>
           </div>
 

@@ -8,6 +8,7 @@ import 'animate.css';
 import Rectangle from '../components/Rectangle';
 import { signIn } from 'next-auth/react'; // next-auth signIn 함수
 import Button from '../components/Button';
+import DynamicText from '../components/DynamicText';
 
 export default function SignupPage() {
   const { t, i18n } = useTranslation('common');
@@ -201,11 +202,11 @@ export default function SignupPage() {
        
         <div className="flex-1 flex flex-col justify-center items-center md:m-16 m-4">
           
-          <h2 className="text-2xl md:text-4xl font-bold mb-6 text-white mb-12">{t('Signup')}</h2>
+          <h2 className="text-2xl md:text-4xl font-bold mb-6 text-white mb-12"><DynamicText text={t('Signup')}/></h2>
 
           {/* 이메일 입력란 */} 
           <div className='w-full mb-4'>
-            <div className='text-sm mb-1'>{t('Email')}</div>
+            <div className='text-sm mb-1'><DynamicText text={t('Email')}/></div>
             
             <div className='flex space-x-4'>
             <input
@@ -228,7 +229,7 @@ export default function SignupPage() {
             size='sm'
             className={`justify-center`}
           >
-            {loading ? <div></div> : <div>{t('Send')}</div>}
+            {loading ? <div></div> : <div><DynamicText text={t('Send')}/></div>}
           </Button>
             </div>
             {/* 이메일 입력란 아래 에러 메시지 */}
@@ -241,7 +242,7 @@ export default function SignupPage() {
           {isCodeSend &&(
             <div>
               <div className='w-full mb-4'>
-                <div className='text-sm mb-1'>{t('Code')}</div>
+                <div className='text-sm mb-1'><DynamicText text={t('Code')}/></div>
 
                 <div className='flex space-x-4'>
                   <input
@@ -260,7 +261,7 @@ export default function SignupPage() {
                     size='sm'
                     className={`w-full justify-center`}
                   >
-                    {loading ? <div></div> : <div>{t('Confirm')}</div>}
+                    {loading ? <div></div> : <div><DynamicText text={t('Confirm')}/></div>}
                   </Button>
 
                 </div>
@@ -277,7 +278,7 @@ export default function SignupPage() {
               <>
               {/* 이름 입력란 */} 
                 <div className='w-full mb-4'>
-                  <div className='text-sm mb-1'>{t('Name')}</div>
+                  <div className='text-sm mb-1'><DynamicText text={t('Name')}/></div>
                   <div className='flex space-x-4'>
                   <input
                     type="default"
@@ -294,7 +295,7 @@ export default function SignupPage() {
 
                 {/* 비밀번호 입력란 */}
                 <div className='w-full'>
-                <div className='text-sm mb-1'>{t('Password')}</div>
+                <div className='text-sm mb-1'><DynamicText text={t('Password')}/></div>
                 <div className="w-full relative mb-1">
                   <input
                     type={passwordVisible ? 'text' : 'password'}
@@ -317,7 +318,7 @@ export default function SignupPage() {
                     
                 `}
                   >
-                    {passwordVisible ? <div>{t('Hide')}</div> : <div>{t('Show')}</div>}
+                    {passwordVisible ? <div><DynamicText text={t('Hide')}/></div> : <div><DynamicText text={t('Show')}/></div>}
                     
                   </button>
                     
@@ -330,7 +331,7 @@ export default function SignupPage() {
 
                {/* 비밀번호 확인 입력란 */}
                <div className='w-full'>
-                <div className='text-sm mb-1'>{t('PasswordConfirm')}</div>
+                <div className='text-sm mb-1'><DynamicText text={t('PasswordConfirm')}/></div>
                 <div className="w-full relative mb-1">
                   <input
                     type={passwordConfirmVisible ? 'text' : 'password'}
@@ -353,7 +354,7 @@ export default function SignupPage() {
                     
                 `}
                   >
-                    {passwordConfirmVisible ? <div>{t('Hide')}</div> : <div>{t('Show')}</div>}
+                    {passwordConfirmVisible ? <div><DynamicText text={t('Hide')}/></div> : <div><DynamicText text={t('Show')}/></div>}
                     
                   </button>
                     
@@ -372,7 +373,7 @@ export default function SignupPage() {
                 size='md'
                 className={`w-full justify-center hidden md:flex mt-4`}
               >
-                {loading ? <div></div> : <div>{t('Signup')}</div>}
+                {loading ? <div></div> : <div><DynamicText text={t('Signup')}/></div>}
               </Button>
                     
               {/* 로그인 버튼 - 모바일*/}
@@ -383,11 +384,11 @@ export default function SignupPage() {
                 size='sm'
                 className={`w-full justify-center md:hidden mt-2`}
               >
-                {loading ? <div></div> : <div>{t('Signup')}</div>}
+                {loading ? <div></div> : <div><DynamicText text={t('Signup')}/></div>}
               </Button></>
           )}
 
-          <div className='md:m-8 m-4  text-xs'>{t('orcontinuewith')}</div>
+          <div className='md:m-8 m-4  text-xs'><DynamicText text={t('orcontinuewith')}/></div>
 
           {/* 소셜 로그인 버튼 */}
           <div className="w-full flex flex-row space-x-4">

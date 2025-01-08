@@ -8,6 +8,7 @@ import 'animate.css';
 import Rectangle from '../components/Rectangle';
 import { signIn } from 'next-auth/react'; // next-auth signIn 함수
 import Button from '../components/Button';
+import DynamicText from '../components/DynamicText';
 
 export default function LoginPage() {
   const { t, i18n } = useTranslation('common');
@@ -122,11 +123,11 @@ export default function LoginPage() {
        
         <div className="flex-1 flex flex-col justify-center items-center md:m-16 m-4">
           
-          <h2 className="text-2xl md:text-4xl font-bold mb-6 text-white mb-12">{t('Login')}</h2>
+          <h2 className="text-2xl md:text-4xl font-bold mb-6 text-white mb-12"><DynamicText text={t('Login')}/></h2>
 
           {/* 이메일 입력란 */}
           <div className='w-full mb-4'>
-            <div className='text-sm mb-1'>{t('Email')}</div>
+            <div className='text-sm mb-1'><DynamicText text={t('Email')}/></div>
             
             <input
               type="email"
@@ -141,7 +142,7 @@ export default function LoginPage() {
           
           {/* 비밀번호 입력란 */}
           <div className='w-full'>
-            <div className='text-sm mb-1'>{t('Password')}</div>
+            <div className='text-sm mb-1'><DynamicText text={t('Password')}/></div>
             <div className="w-full relative mb-1">
               <input
                 type={passwordVisible ? 'text' : 'password'}
@@ -164,7 +165,7 @@ export default function LoginPage() {
               
             `}
               >
-                {passwordVisible ? <div>{t('Hide')}</div> : <div>{t('Show')}</div>}
+                {passwordVisible ? <div><DynamicText text={t('Hide')}/></div> : <div><DynamicText text={t('Show')}/></div>}
 
               </button>
                
@@ -183,7 +184,7 @@ export default function LoginPage() {
             
               onClick={() =>{router.push('/forget-passwd')}}
             >
-              {t('ForgetPassword')}
+              <DynamicText text={t('ForgetPassword')}/>
             </button>
           </div>
 
@@ -196,7 +197,7 @@ export default function LoginPage() {
             size='md'
             className={`w-full justify-center hidden md:flex`}
           >
-            {loading ? <div>{t('Signin')}</div> : <div>{t('Signin')}</div>}
+            {loading ? <div><DynamicText text={t('Signin')}/></div> : <div><DynamicText text={t('Signin')}/></div>}
           </Button>
 
           {/* 로그인 버튼 - 모바일*/}
@@ -207,10 +208,10 @@ export default function LoginPage() {
             size='sm'
             className={`w-full justify-center md:hidden`}
           >
-            {loading ? <div>{t('Signin')}</div> : <div>{t('Signin')}</div>}
+            {loading ? <div><DynamicText text={t('Signin')}/></div> : <div><DynamicText text={t('Signin')}/></div>}
           </Button>
 
-          <div className='md:m-8 m-4  text-xs'>{t('orcontinuewith')}</div>
+          <div className='md:m-8 m-4  text-xs'><DynamicText text={t('orcontinuewith')}/></div>
 
           {/* 소셜 로그인 버튼 */}
           <div className="w-full flex flex-row space-x-4">
@@ -263,7 +264,7 @@ export default function LoginPage() {
 
 
           <div className='md:m-8 m-4 text-xs flex items-center justify-center flex-wrap'>
-            <div>{t('Donthaveanaccountyet')}</div>
+            <div><DynamicText text={t('Donthaveanaccountyet')}/></div>
 
             <div className='cursor-pointer font-bold ml-2 text-xs text-white
               bg-transparent text-white
@@ -273,7 +274,7 @@ export default function LoginPage() {
              onClick={()=>{// 로그인 성공 시 리디렉트
               router.push('/signup');
             }}
-              >{t('Registerforfree')}</div>
+              ><DynamicText text={t('Registerforfree')}/></div>
           </div>
         </div>
       </Rectangle>

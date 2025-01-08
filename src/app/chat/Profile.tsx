@@ -19,7 +19,7 @@ export default function Profile() {
   const isFriendPage = pathname?.startsWith('/chat/friends');
   const isChatPage = pathname===('/chat')
   const isColorPage = pathname?.startsWith('/chat/color')
-
+  
   useEffect(() => {
     if (pathname?.startsWith('/chat/profile')) {
       setSelectedSection('profile');
@@ -56,11 +56,14 @@ export default function Profile() {
     navigateTo: string
   ) => {
     const isSelected = selectedSection === key; // 현재 섹션이 선택된 상태인지 확인
-
+    const clickIcon = () =>{
+      setSelectedSection(key);
+      router.push(navigateTo);
+    }
     return (
       <div
         className="profile"
-        onClick={() => setSelectedSection(key)} // 섹션 선택 상태 업데이트
+        onClick={clickIcon} // 섹션 선택 상태 업데이트
       >
         {isSelected && (
           <Image
@@ -72,7 +75,7 @@ export default function Profile() {
             className="cursor-pointer absolute top-0 left-0"
           />
         )}
-        <div className="profile-circle" onClick={() => router.push(navigateTo)}>
+        <div className="profile-circle" >
           { key !== 'profile'? (
             <Image
             src={svgSrc}

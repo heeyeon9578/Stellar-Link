@@ -41,7 +41,7 @@ interface ChatRoom {
 
 export default function ChatContent() {
   const dispatch = useAppDispatch();
-  const { t } = useTranslation('common');
+  const { t,i18n } = useTranslation('common');
   const [search, setSearch] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
   const [isClicked, setIsClicked] = useState<'All' | 'Personal' | 'Teams' | 'Hide'>('All');
@@ -49,6 +49,7 @@ export default function ChatContent() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const [isInitialized, setIsInitialized] = useState(false);
   const menus = [
     { name: t('All'), onClick: () => setIsClicked('All') },
     { name: t('Personal'), onClick: () => setIsClicked('Personal') },
@@ -206,7 +207,18 @@ const handleGenerateRoom = () =>{
 
     });
 }
-
+useEffect(() => {
+  if (i18n.isInitialized) {
+    setIsInitialized(true);
+  } else {
+    const handleInitialized = () => setIsInitialized(true);
+    i18n.on('initialized', handleInitialized);
+    return () => {
+      i18n.off('initialized', handleInitialized);
+    };
+  }
+}, [i18n]);
+if (!isInitialized) return null;
   return (
     <div className="mx-auto p-8 rounded-lg h-full text-customBlue relative">
       <div className="flex justify-between items-center">
@@ -262,11 +274,11 @@ const handleGenerateRoom = () =>{
                      />
 
                      <div>
-                       <div className="text-black font-bold">
-                         {friend.name}
+                       <div className="text-customPurple font-bold">
+                         <DynamicText text={friend.name}/>
                        </div>
 
-                       <div className="text-customGray text-sm">
+                       <div className="text-customGray text-xs">
                          {friend.email}
                        </div>
                      </div>
@@ -289,7 +301,7 @@ const handleGenerateRoom = () =>{
               value={title}
               lang="ko"
               onChange={(e) => setTitle(e.target.value)}
-             className="w-full px-3 py-2 border-customGray rounded-lg focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+             className="w-full text-customPurple px-3 py-2 border-customGray rounded-lg focus:outline-none focus:ring-2 focus:ring-customLightPurple"
             />
           </div>
 
@@ -344,9 +356,9 @@ const handleGenerateRoom = () =>{
             </div>
 
             {loading ? (
-               <DynamicText text={t('Loading')} className="text-gray-500 mt-2"/>
+               <DynamicText text={t('Loading')} className="text-gray-500 mt-4"/>
             )  : (
-              <div className="mt-2 max-h-[500px] overflow-y-auto">
+              <div className="mt-4 max-h-[500px] overflow-y-auto">
                 {filteredData.length === 0 ? (
                  <DynamicText text={t('Ncf')} className="text-gray-500"/>
                 ) : (

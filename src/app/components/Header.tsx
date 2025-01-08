@@ -6,6 +6,7 @@ import Button from './Button';
 import { useTranslation } from 'react-i18next';
 import '../../../i18n'
 import 'animate.css'; // animate.css 불러오기
+import DynamicText from './DynamicText';
 
 const Header: React.FC = () => {
   const router = useRouter();
@@ -57,23 +58,23 @@ const Header: React.FC = () => {
         {/* 네비게이션 바 */}
         <nav className="hidden md:flex space-x-5">
           <Button variant="main" className="animate__animated animate__zoomIn" >
-            {t('AboutMe')}
+            <DynamicText text={t('AboutMe')}/>
           </Button>
           <Button variant="main" className="animate__animated animate__zoomIn">
-          {t('Quests')}
+            <DynamicText text= {t('Quests')}/>
           </Button>
           <Button variant="main" className="animate__animated animate__zoomIn">
-          {t('Skills')}
+            <DynamicText text={t('Skills')}/>
           </Button>
           <Button variant="primary" className="animate__animated animate__zoomIn" onClick={goToLogin}>
-          {t('Login')}
+            <DynamicText text={t('Login')}/>
           </Button>
         </nav>
 
         <div className='md:hidden flex'>
           {/* 로그인 버튼 (모바일 전용) */}
           <div className="md:hidden mr-4 ">
-            <Button size="sm" variant="primary" onClick={goToLogin}>{t('Login')}</Button>
+            <Button size="sm" variant="primary" onClick={goToLogin}><DynamicText text={t('Login')}/></Button>
           </div>
 
           {/* 모바일 메뉴 버튼 */}
@@ -108,13 +109,13 @@ const Header: React.FC = () => {
         className="hidden flex flex-col space-y-3 mt-3 px-2 md:hidden"
       >
         <Button size="sm" variant="main" className="animate__animated">
-        {t('AboutMe')}
+          <DynamicText text={t('AboutMe')}/>
         </Button>
         <Button size="sm" variant="main" className="animate__animated">
-        {t('Quests')}
+          <DynamicText text={t('Quests')}/>
         </Button>
         <Button size="sm" variant="main" className="animate__animated">
-        {t('Skills')}
+          <DynamicText text={t('Skills')}/>
         </Button>
         
       </div>
