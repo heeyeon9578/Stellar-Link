@@ -92,8 +92,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
       const requesterName = requester.name?.toString() || "Unknown User";
       const requesterImage = requester.profileImage?.toString() || "/SVG/default-profile.svg";
       const requesterEmail = requester.email?.toString() || "Unknown Email";
-        
+      const id = new ObjectId();
       const messageData = {
+        id: id,
         ...data,
         requesterId,
         // requesterName:requesterName,
@@ -114,6 +115,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
 
         const message = {
           ...data,
+          id: id,
           requesterId,
           requesterName,
           requesterEmail,

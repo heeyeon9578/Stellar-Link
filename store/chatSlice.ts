@@ -8,6 +8,7 @@ interface Participant {
 }
 // 메시지 데이터 타입 정의
 interface Message {
+  id:string;
   requesterId :string;
   requesterName: string;
   requesterImage:string;

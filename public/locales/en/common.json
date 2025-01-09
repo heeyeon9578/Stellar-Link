@@ -80,6 +80,10 @@
     "Title":"ChatRoom Title",
     "Tmie":"The message is empty.",
     "Ncf":"No chats found",
-    "Loading":"Loading..."
+    "Loading":"Loading...",
+    "Exit":"Exit",
+    "InviteFriends":"Invite Friends"
+    
+
 
 }

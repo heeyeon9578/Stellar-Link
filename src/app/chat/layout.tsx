@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react';
 import Profile from './Profile';
 import Content from './Content';
-
+import ChatRoom from './ChatRoom'
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
 
@@ -24,7 +24,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
       {/* 상세 부분 */}
       <div className="flex-[5] border-2 border-customGray rounded-xl bg-white/90 backdrop-blur-lg p-4" >
-        {children}
+        <ChatRoom></ChatRoom>
       </div>
     </div>
   );

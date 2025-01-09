@@ -1,5 +1,6 @@
 'use client';
-import { useEffect, useState } from "react";
+import { useEffect, useState,useRef } from "react";
+import { useSession } from 'next-auth/react';
 import { useTranslation } from 'react-i18next';
 import '../../../i18n';
 import Image from 'next/image';
@@ -11,6 +12,7 @@ import { RootState } from '../../../store/store';
 import { useAppDispatch} from '../../../store/hooks';
 import { useSelector } from 'react-redux';
 import { fetchFriends } from '../../../store/friendsSlice';
+
 interface participant{
   name:string;
   id:string;
@@ -38,13 +40,27 @@ interface ChatRoom {
     createdAt: string;
   }[];
 }
+interface MenuPosition {
+  x: number;
+  y: number;
+}
 
+
+interface Friend {
+  _id: string;
+  email: string;
+  name: string;
+  profileImage?: string;
+  status: string;
+  addedAt?: string;
+}
 export default function ChatContent() {
+  const { data: session, status } = useSession();
   const dispatch = useAppDispatch();
   const { t,i18n } = useTranslation('common');
   const [search, setSearch] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
-  const [isClicked, setIsClicked] = useState<'All' | 'Personal' | 'Teams' | 'Hide'>('All');
+  const [isClicked, setIsClicked] = useState<'All' | 'Personal' | 'Teams' >('All');
   const [data, setData] = useState<ChatRoom[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +70,7 @@ export default function ChatContent() {
     { name: t('All'), onClick: () => setIsClicked('All') },
     { name: t('Personal'), onClick: () => setIsClicked('Personal') },
     { name: t('Teams'), onClick: () => setIsClicked('Teams') },
-    { name: t('Hide'), onClick: () => setIsClicked('Hide') },
+   
   ];
   const {
     list: friends,
@@ -65,8 +81,19 @@ export default function ChatContent() {
  const [isGenerateChatRoom, setIsGenerateChatRoom] = useState<boolean>(false);
  const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
  const [title, setTitle] = useState<string>('');
- 
-// const [type, setType] = useState<'personal' | 'teams'| 'hide'>('personal');
+ const [menuVisible, setMenuVisible] = useState<boolean>(false);
+ const [filteredFriends, setFilteredFriends] = useState<Friend[]>([]);
+ const [menuPosition, setMenuPosition] = useState<MenuPosition>({ x: 0, y: 0 });
+  const [currentChatRoomId,setCurrentChatRoomId] = useState<string>('');
+ const popupRef = useRef<HTMLUListElement | null>(null); // Ref를 HTMLUListElement로 변경
+ const [currentContextMenuChatRoomId, setCurrentContextMenuChatRoomId] = useState<string | null>(null);
+   useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside); // 클릭 감지 이벤트 등록
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside); // 컴포넌트 언마운트 시 이벤트 제거
+    };
+  }, []);
+
   // 검색어 디바운싱 처리 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -87,13 +114,6 @@ export default function ChatContent() {
         }
         const result = await response.json();
         setData(result);
-        console.log(`
-          
-          
-          result
-
-          
-          `,result)
       } catch (error: unknown) {
         console.error(error);
         setError(error instanceof Error ? error.message : 'Unknown error');
@@ -106,12 +126,13 @@ export default function ChatContent() {
 
   useEffect(() => {
     console.log("friends changed:", friends);
+    setFilteredFriends(friends); // 새로운 상태 변수 `filteredFriends` 필요
   }, [friends]);
 
   useEffect(() => {
     // 컴포넌트가 마운트될 때, Thunk 액션을 디스패치해서 데이터 로드
     dispatch(fetchFriends());
-
+    
     console.log(`friends`,friends)
   }, [dispatch]);
   // 필터링된 데이터
@@ -164,6 +185,12 @@ const generateChatRoom = () => {
   // 애니메이션이 끝난 후 상태를 초기화
   setTimeout(() => {
     setIsAnimating(false);
+    if(isGenerateChatRoom){
+      setFilteredFriends(friends); // 새로운 상태 변수 `filteredFriends` 필요
+      setSelectedFriends([]);
+      setCurrentChatRoomId('');
+      setMenuVisible(false);
+    }
     setIsGenerateChatRoom(!isGenerateChatRoom);
     // 실제 채팅방 생성 로직을 여기에 추가하세요
     console.log("채팅방 생성");
@@ -185,8 +212,46 @@ const handleCheckboxChange = (friendId: string) => {
     
   });
 };
+// 우클릭 핸들러
+const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>,chatRoomId: string) => {
+  event.preventDefault(); // 기본 브라우저 메뉴 비활성화
+  setMenuPosition({ x: event.pageX, y: event.pageY });
+  setMenuVisible(true); // 메뉴 표시
+  setCurrentContextMenuChatRoomId(chatRoomId); // 현재 우클릭된 채팅방 ID 저장
+};
+
+// 클릭 핸들러 (메뉴 닫기)
+const handleClickOutside = (event: MouseEvent) => {
+  // 클릭한 요소가 팝업 내부가 아닐 경우 팝업 닫기
+  if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
+    setMenuVisible(false);
+  }
+};
+
+// Esc 키로 메뉴 닫기
+useEffect(() => {
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      setMenuVisible(false);
+    }
+  };
+
+  window.addEventListener("keydown", handleKeyDown);
+  return () => {
+    window.removeEventListener("keydown", handleKeyDown);
+  };
+}, []);
 
 const handleGenerateRoom = () =>{
+  if(currentChatRoomId){
+    fetchInviteChatRoom(currentChatRoomId);
+  }else{
+    fetchGenerateRoom();
+  }
+  
+}
+
+const fetchGenerateRoom = () =>{
   let type='';
   if(selectedFriends.length===1){
    type='personal';
@@ -202,11 +267,125 @@ const handleGenerateRoom = () =>{
     .then((data) => {
       setSelectedFriends([]);
       setIsGenerateChatRoom(false);
+      // 새 채팅방 데이터를 기존 상태에 추가
+      setData((prevData) => [
+        {
+          _id: data.chatRoomId, // 서버에서 반환된 채팅방 ID
+          participants: selectedFriends.map((id) => ({
+            id,
+            name: friends.find((friend) => friend._id === id)?.name || 'Unknown',
+            email: friends.find((friend) => friend._id === id)?.email || 'Unknown',
+            profileImage: friends.find((friend) => friend._id === id)?.profileImage || '/SVG/default-profile.svg',
+          })),
+          type: type,
+          title: title || '',
+          createdAt: new Date().toISOString(),
+          messages: [], // 새로 생성된 채팅방에는 메시지가 없음
+        },
+        ...prevData, // 기존 데이터 유지
+      ]);
+
       // 채팅 방 ID로 이동
       router.push(`/chat?chatRoomId=${data.chatRoomId}`);
-
+      setFilteredFriends(friends); // 새로운 상태 변수 `filteredFriends` 필요
+      
     });
 }
+
+const handelExitChatRoom =(chatRoomId:string)=>{
+  fetch('/api/chat/exit-room', {
+    method: 'POST',
+    body: JSON.stringify({ chatRoomId:chatRoomId, user:session?.user.id }),
+    headers: { 'Content-Type': 'application/json' },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(`
+        
+        
+        data
+        
+        
+        
+        `,data)
+      setMenuVisible(false);
+      setData((prevData) => prevData.filter((room) => room._id !== chatRoomId));
+      router.push('/chat')
+      router.refresh(); 
+    });
+}
+const handleInviteChatRoom = (chatRoomId: string) => {
+  console.log(`
+    
+    
+    
+    chatRoom._id : ${chatRoomId}
+    
+    
+    `,)
+  // 현재 채팅방의 참여자 가져오기
+  const currentChatRoom = data.find((room) => room._id === chatRoomId);
+
+  if (!currentChatRoom) {
+    console.error("Chat room not found");
+    return;
+  }
+
+  // 이미 참여 중인 사용자의 ID 목록
+  const existingParticipantIds = currentChatRoom.participants.map((p) => p.id);
+  console.log(`
+    
+    
+
+
+
+    existingParticipantIds
+    
+    
+
+    
+    
+    `,existingParticipantIds)
+  // 친구 목록에서 이미 참여 중인 사용자를 제외한 목록 생성
+  const filteredFriends = friends.filter(
+    (friend) => !existingParticipantIds.includes(friend._id)
+  );
+
+  // 상태 업데이트로 필터링된 친구 목록을 설정 (필요한 경우 사용)
+  setSelectedFriends([]);
+  setFilteredFriends(filteredFriends); // 새로운 상태 변수 `filteredFriends` 필요
+
+  // 현재 초대 중인 채팅방 ID 설정
+  setCurrentChatRoomId(chatRoomId);
+
+  // 생성 창 열기
+  generateChatRoom();
+};
+const fetchInviteChatRoom =(chatRoomId:string)=>{
+
+  let type='';
+  if(selectedFriends.length===1){
+   type='personal';
+  }else{
+    type='teams';
+  }
+
+  fetch('/api/chat/create-room', {
+    method: 'POST',
+    body: JSON.stringify({ chatRoomId:chatRoomId,participants: selectedFriends, type:type }),
+    headers: { 'Content-Type': 'application/json' },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      setSelectedFriends([]);
+      setIsGenerateChatRoom(false);
+      setFilteredFriends(friends); // 새로운 상태 변수 `filteredFriends` 필요
+      setCurrentChatRoomId('');
+      setMenuVisible(false);
+      router.push(`/chat?chatRoomId=${data.chatRoomId}`);
+    });
+}
+
 useEffect(() => {
   if (i18n.isInitialized) {
     setIsInitialized(true);
@@ -250,12 +429,12 @@ if (!isInitialized) return null;
       {isGenerateChatRoom ? (
         <>  
           <div className="mt-4 max-h-[50vh] overflow-y-auto">
-            {friends.filter(friend => friend.status !== 'block').length === 0 ? (
+            {filteredFriends?.filter(friend => friend.status !== 'block').length === 0 ? (
               <DynamicText text={t('Yhnfy')}/>
           
             ) : (
               <ul>
-                {friends
+                {filteredFriends
                 .filter(friend => friend.status !== 'block')
                 .map((friend)  => (
                   <li key={friend._id} className="flex mb-4 ">
@@ -363,8 +542,46 @@ if (!isInitialized) return null;
                  <DynamicText text={t('Ncf')} className="text-gray-500"/>
                 ) : (
                   filteredData.map((chatRoom) => (
-                    <div key={chatRoom._id} className="p-2 cursor-pointer rounded-md mb-2 bg-white/50 " onClick={()=>{ router.push(`/chat?chatRoomId=${chatRoom._id}`);}}>
+                    <div 
+                    key={chatRoom._id} 
+                    className="p-2 cursor-pointer rounded-md mb-2 bg-white/50 "
+                    onClick={(e) => {
+                      if (!menuVisible) {
+                        router.push(`/chat?chatRoomId=${chatRoom._id}`);
+                      } else {
+                        e.stopPropagation(); // 클릭 이벤트 버블링을 막음
+                      }
+                    }}
+                    onContextMenu={(e) => handleContextMenu(e, chatRoom._id)} // 우클릭 이벤트// 우클릭 이벤트
                     
+                     >
+                     <div>
+                        {/* 우클릭 메뉴 */}
+                        {menuVisible && currentContextMenuChatRoomId === chatRoom._id && (
+                        <ul
+                          ref={popupRef}
+                          className="absolute bg-white/80 text-xs shadow-md list-none p-2 rounded-md z-100"
+                          style={{
+                            top: menuPosition.y - 50,
+                            left: menuPosition.x - 150,
+                          }}
+                        >
+                          <li
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                            onClick={() => handleInviteChatRoom(chatRoom._id)}
+                          >
+                            <DynamicText text={t('InviteFriends')} />
+                          </li>
+                          <li
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-red-500"
+                            onClick={() => handelExitChatRoom(chatRoom._id)}
+                          >
+                            <DynamicText text={t('Exit')} />
+                          </li>
+                        </ul>
+                      )}
+                    </div>
+
                       {/** 친구 이름과 날짜 */}
                       <div className="flex justify-between ">
                         <ul className="w-[80%] ">
