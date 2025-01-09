@@ -9,7 +9,7 @@ import socket from "@/socketIns"; // 위에서 만든 socket.ts 경로
 import { useTranslation } from 'react-i18next';
 import '../../../i18n';
 import DynamicText from '../components/DynamicText';
-
+import { useRouter } from 'next/navigation';
 import {
   setChatRoomId,
   setChatRoomInfo,
@@ -27,7 +27,7 @@ export default function Detail() {
   const messages = useSelector((state: RootState) => state.chat.messages);
   const input = useSelector((state: RootState) => state.chat.input);
   const chatRoomInfo = useSelector((state: RootState) => state.chat.chatRoomInfo);
-
+  const router = useRouter();
   const { data: session, status } = useSession();
   const [isInitialized, setIsInitialized] = useState(false);
   const isComposingRef = useRef(false);
@@ -88,18 +88,14 @@ export default function Detail() {
         return response.json();
       })
       .then((data) => {
-        console.log(`
-          
-          
-          data
-          
-          
-          
-          `,data)
+
         dispatch(setMessages(data.messages)); // 메시지 상태 업데이트
         dispatch(setChatRoomInfo(data.chatRoomInfo)); // 채팅방 정보 상태 업데이트
       })
-      .catch((error) => console.error("Error fetching messages:", error));
+      .catch((error) => {
+        console.error("Error fetching messages:", error)
+        router.push('/chat');
+      });
     }
   }, [chatRoomId, dispatch]);
 
@@ -153,6 +149,11 @@ export default function Detail() {
     }, 200);
     
   };
+
+  const handleGoToBack = () =>{
+      router.push('/chat');
+  }
+
    // 메시지 변경 감지 후 애니메이션 설정
    useEffect(() => {
     if (messages.length > 0) {
@@ -165,6 +166,7 @@ export default function Detail() {
       }, 500); // 애니메이션 시간 (0.5초)
     }
   }, [messages]);
+
   useEffect(() => {
     if (i18n.isInitialized) {
       setIsInitialized(true);
@@ -176,7 +178,9 @@ export default function Detail() {
       };
     }
   }, [i18n]);
+
   if (!isInitialized) return null;
+
   return (
     <div className="w-full h-full text-black">
       
@@ -185,7 +189,19 @@ export default function Detail() {
 
           {/** 타이틀 섹션 */}
            
-          <div className="h-[10%]">
+          <div className="h-[15%]">
+            {/** 뒤로가기 버튼 */}
+            <div className="flex justify-start mb-2">
+              <Image
+                src="/SVG/back.svg"
+                alt="back"
+                width={30}
+                height={30}
+                priority
+                className={`cursor-pointer ${isAnimatingFileAdd ? 'animate__animated animate__headShake' : ''}`}
+                onClick={handleGoToBack}
+              />
+            </div>
             {chatRoomInfo?.title? (
               <div>
 

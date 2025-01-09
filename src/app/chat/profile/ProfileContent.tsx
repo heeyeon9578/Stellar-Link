@@ -205,6 +205,20 @@ export default function ProfileContent() {
       setIsSubmitting(false);
     }
   };
+    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const input = e.target.value;
+      const maxLength = 10;
+    
+      // 입력된 문자열의 실제 문자 길이를 계산 (한글 포함)
+      const charCount = Array.from(input).length;
+    
+      // 10글자를 초과하지 않도록 제한
+      if (charCount <= maxLength) {
+        setName(input);
+      } else {
+        alert(t('NameMaxLength', { maxLength })); // 10글자 초과 시 알림 (번역 메시지 사용)
+      }
+    };
 
   return (
     <div className="mx-auto p-8 rounded-lg h-full text-customBlue relative ">
@@ -253,7 +267,7 @@ export default function ProfileContent() {
           type="text"
           value={name}
           lang="ko"
-          onChange={(e) => setName(e.target.value)}
+          onChange={handleNameChange}
          className="w-full text-customPurple px-3 py-2 border-customGray rounded-lg focus:outline-none focus:ring-2 focus:ring-customLightPurple"
         />
       </div>

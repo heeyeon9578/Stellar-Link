@@ -45,7 +45,6 @@ interface MenuPosition {
   y: number;
 }
 
-
 interface Friend {
   _id: string;
   email: string;
@@ -65,6 +64,7 @@ export default function ChatContent() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const messages = useSelector((state: RootState) => state.chat.messages);
   const [isInitialized, setIsInitialized] = useState(false);
   const menus = [
     { name: t('All'), onClick: () => setIsClicked('All') },
@@ -93,6 +93,25 @@ export default function ChatContent() {
       document.removeEventListener("mousedown", handleClickOutside); // 컴포넌트 언마운트 시 이벤트 제거
     };
   }, []);
+  
+  // 메시지가 변경될 때마다 스크롤 이동
+  useEffect(() => {
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+
+      // 기존 데이터를 업데이트
+      setData((prevData) =>
+        prevData.map((chatRoom) => {
+          if (chatRoom._id === lastMessage.chatRoomId) {
+            chatRoom.messages[chatRoom.messages.length - 1].senderInfo.name = lastMessage.requesterName;
+            chatRoom.messages[chatRoom.messages.length - 1].text = lastMessage.text;
+          }
+          return chatRoom; // 다른 채팅방은 그대로 유지
+        })
+      );
+    }
+
+  }, [messages]);
 
   // 검색어 디바운싱 처리 
   useEffect(() => {
@@ -114,6 +133,14 @@ export default function ChatContent() {
         }
         const result = await response.json();
         setData(result);
+        console.log(`
+          
+          
+          원래 데이터는?
+          
+          
+          
+          `,result)
       } catch (error: unknown) {
         console.error(error);
         setError(error instanceof Error ? error.message : 'Unknown error');
@@ -596,8 +623,8 @@ if (!isInitialized) return null;
                               className="rounded-full w-10 h-10  mr-2 border border-white"
                             />
                             <div className="flex flex-col text-customPurple">
-                              <DynamicText text={chatRoom.participants[0].name} /> 
-                              
+                              {!chatRoom.title && <DynamicText text={chatRoom.participants[0].name} /> }
+                              {chatRoom.title && <DynamicText text={chatRoom.title} /> }
                               {/** 마지막 메세지 */}
                               <div className="text-xs text-gray-500">
                                 {chatRoom.messages.length > 0 ? (
@@ -644,7 +671,7 @@ if (!isInitialized) return null;
                               {/* 제목 표시 */}
                               {chatRoom.title && (
                               <div className="mr-2 text-customPurple">
-                                {chatRoom.title}
+                                <DynamicText text={chatRoom.title}/>
                               </div>
                               )}
 
