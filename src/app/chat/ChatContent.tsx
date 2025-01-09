@@ -93,7 +93,7 @@ export default function ChatContent() {
       document.removeEventListener("mousedown", handleClickOutside); // 컴포넌트 언마운트 시 이벤트 제거
     };
   }, []);
-  
+
   // 메시지가 변경될 때마다 스크롤 이동
   useEffect(() => {
     if (messages.length > 0) {
@@ -571,7 +571,7 @@ if (!isInitialized) return null;
                   filteredData.map((chatRoom) => (
                     <div 
                     key={chatRoom._id} 
-                    className="p-2 cursor-pointer rounded-md mb-2 bg-white/50 "
+                    className="p-2 cursor-pointer rounded-md mb-2 bg-white/50 h-[80px]"
                     onClick={(e) => {
                       if (!menuVisible) {
                         router.push(`/chat?chatRoomId=${chatRoom._id}`);
@@ -611,34 +611,39 @@ if (!isInitialized) return null;
 
                       {/** 친구 이름과 날짜 */}
                       <div className="flex justify-between ">
-                        <ul className="w-[80%] ">
+                        <ul className="w-[80%] h-[70px]">
                         {chatRoom.participants.length === 1 ? (
                           // 한 명일 때
-                          <li className="flex text-sm ">
+                          <li className="flex text-sm flex-col h-[70px]">
                             <img
                               src={chatRoom.participants[0].profileImage}
                               alt={chatRoom.participants[0].name}
-                              width={50}
-                              height={50}
-                              className="rounded-full w-10 h-10  mr-2 border border-white"
+                              width={30}
+                              height={30}
+                              className="rounded-full w-8 h-8 mr-2 border border-white"
                             />
-                            <div className="flex flex-col text-customPurple">
-                              {!chatRoom.title && <DynamicText text={chatRoom.participants[0].name} /> }
-                              {chatRoom.title && <DynamicText text={chatRoom.title} /> }
+                            <div className="flex flex-col text-customPurple text-sm">
+
+                              <div className=" h-[20px]">
+                                {!chatRoom.title && <DynamicText text={chatRoom.participants[0].name} /> }
+                                {chatRoom.title && <DynamicText text={chatRoom.title} /> }
+                              </div>
+
                               {/** 마지막 메세지 */}
-                              <div className="text-xs text-gray-500">
+                              <div className="text-xs text-gray-500 overflow-hidden text-ellipsis h-[18px]">
                                 {chatRoom.messages.length > 0 ? (
-                                  <DynamicText text={`${chatRoom.messages[chatRoom.messages.length - 1].senderInfo.name}: ${chatRoom.messages[chatRoom.messages.length - 1].text}`} /> 
+                                  <DynamicText className="" text={`${chatRoom.messages[chatRoom.messages.length - 1].senderInfo.name}: ${chatRoom.messages[chatRoom.messages.length - 1].text}`} /> 
                                   
                                 ) : (
                                   <DynamicText text={t('Tmie')}/>
                                 )}
                               </div>
+
                             </div>
                           </li>
                         ) : (
                           //여러 명 일때
-                          <div>
+                          <div className="h-[70px]">
                             {/* 참여자 프로필 이미지 표시 */}
                             <div className="relative flex">
                               {chatRoom.participants.map((participant, index) => (
@@ -661,13 +666,21 @@ if (!isInitialized) return null;
                             
 
                             {/* 참여자 프로필 이름 표시 */}
-                            <div className="mt-8 flex flex-wrap text-xs text-customPurple">
-                              {chatRoom.participants.map((participant, index) => (
-                                <div key={index} >
-                                  {!chatRoom.title && <DynamicText className="mr-2" text={participant.name+','} />}
-                                </div>
-                              ))}
-
+                            <div className="mt-8 flex flex-nowrap h-[20px] text-sm text-customPurple overflow-hidden whitespace-nowrap text-ellipsis" >
+                            {chatRoom.participants.map((participant, index) => (
+                              <span key={index}>
+                                {!chatRoom.title && (
+                                  <DynamicText 
+                                    className="mr-2" 
+                                    text={
+                                      index === chatRoom.participants.length - 1 
+                                        ? participant.name 
+                                        : participant.name + ','
+                                    } 
+                                  />
+                                )}
+                              </span>
+                            ))}
                               {/* 제목 표시 */}
                               {chatRoom.title && (
                               <div className="mr-2 text-customPurple">
@@ -677,15 +690,14 @@ if (!isInitialized) return null;
 
 
                               {/* 인원수 표시 */}
-                              {chatRoom.participants.length > 1 && (
-                                <div className="text-xs text-gray-500">
-                                  <DynamicText text={chatRoom.participants.length+1+'명 참여'}/>
+                              <div className="text-xs text-gray-500">
+                                  <DynamicText text={(chatRoom.participants.length+1).toString()}/>
                                   
-                                </div>
-                              )}
+                              </div>
+
                             </div>
                             {/** 마지막 메세지 */}
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-500 overflow-hidden text-ellipsis  h-[18px]">
                               {chatRoom.messages.length > 0 ? (
                                  <DynamicText text={`${chatRoom.messages[chatRoom.messages.length - 1].senderInfo.name}: ${chatRoom.messages[chatRoom.messages.length - 1].text}`} /> 
                               ) : (
