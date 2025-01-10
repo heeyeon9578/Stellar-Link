@@ -13,13 +13,18 @@ type NextApiResponseWithSocket = NextApiResponse & {
     };
   };
 };
-
 interface ChatMessage {
   chatRoomId: string;
   senderEmail: string;
   text: string;
-
+  file?: {
+    name: string;
+    type: string;
+    data?: string; // 클라이언트에서 전송
+    url?: string;  // 서버에서 추가
+  };
 }
+
 
 let io: IOServer | undefined;
 
@@ -74,35 +79,44 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
       // Handle incoming messages
       socket.on("send_message", async(data: ChatMessage) => {
 
-      //const requesterEmail = session.user?.email;
-      const requester = await db.collection("user_cred").findOne({ email: data.senderEmail });
+        //const requesterEmail = session.user?.email;
+        const requester = await db.collection("user_cred").findOne({ email: data.senderEmail });
 
-      if (!requester) {
-        console.error("User not found in database");
-        socket.emit("error", { message: "User not found in database" }); // 클라이언트로 에러 전송
-        return;
-      }
-      console.log(`
-        
-        requester
-        
-        
-        `,requester)
-      const requesterId = requester._id?.toString() || "Unknown";
-      const requesterName = requester.name?.toString() || "Unknown User";
-      const requesterImage = requester.profileImage?.toString() || "/SVG/default-profile.svg";
-      const requesterEmail = requester.email?.toString() || "Unknown Email";
-      const id = new ObjectId();
-      const messageData = {
-        id: id,
-        ...data,
-        requesterId,
-        // requesterName:requesterName,
-        // requesterImage:requesterImage,
-        createdAt: new Date(),
-      };
-        
-    
+        if (!requester) {
+          console.error("User not found in database");
+          socket.emit("error", { message: "User not found in database" }); // 클라이언트로 에러 전송
+          return;
+        }
+        console.log(`
+
+          requester
+
+
+          `,requester)
+        const requesterId = requester._id?.toString() || "Unknown";
+        const requesterName = requester.name?.toString() || "Unknown User";
+        const requesterImage = requester.profileImage?.toString() || "/SVG/default-profile.svg";
+        const requesterEmail = requester.email?.toString() || "Unknown Email";
+        const id = new ObjectId();
+
+        const messageData = {
+          id: id,
+          ...data,
+          requesterId,
+          // requesterName:requesterName,
+          // requesterImage:requesterImage,
+          createdAt: new Date(),
+        };
+
+        // 파일 처리 (URL만 포함하는 방식)
+        if (data.file?.url) {
+          messageData.file = {
+            name: data.file.name,
+            type: data.file.type,
+            url: data.file.url, // 클라이언트에서 전달된 URL 사용
+          };
+        }
+
         // 메시지 추가 또는 새 채팅방 생성
         await db.collection("messages").updateOne(
           { _id: new ObjectId(data.chatRoomId)}, // 검색 조건

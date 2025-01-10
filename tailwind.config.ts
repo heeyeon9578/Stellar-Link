@@ -26,6 +26,8 @@ export default {
       },
       borderRadius: {
         'custom': '20px', // 20px의 사용자 정의 라운드 값
+        'custom-myChat': '16px 0 16px 16px', // 커스텀 border-radius,
+        'custom-otherChat': '0  16px 16px 16px', // 커스텀 border-radius
       },
       boxShadow: {
         custom: '0px 4px 4px rgba(0, 0, 0, 0.25)', // 사용자 정의 그림자

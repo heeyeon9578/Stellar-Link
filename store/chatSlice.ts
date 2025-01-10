@@ -16,6 +16,12 @@ interface Message {
   text: string;
   createdAt: Date;
   chatRoomId: string;
+  file?: {
+    name: string;
+    type: string;
+    data?: string; // 클라이언트에서 전송
+    url?: string;  // 서버에서 추가
+  };
 }
 interface ChatRoomInfo{
   createdAt: Date;

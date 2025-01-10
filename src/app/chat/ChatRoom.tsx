@@ -17,11 +17,12 @@ import {
   addMessage,
   setInput,
 } from "../../../store/chatSlice";
+import { setFips } from 'crypto';
 
 export default function Detail() {
   const { t,i18n } = useTranslation('common');
   const searchParams = useSearchParams();
-
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const chatRoomId = useSelector((state: RootState) => state.chat.chatRoomId);
   const messages = useSelector((state: RootState) => state.chat.messages);
@@ -36,13 +37,7 @@ export default function Detail() {
   const [animatedMessageIndex, setAnimatedMessageIndex] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    if (status === "authenticated") {
-      console.log("User is authenticated:", session);
-    } else {
-      console.log("User is not authenticated");
-    }
-  }, [status, session]);
+
 
   // URL 파라미터에서 chatRoomId 가져오기
   useEffect(() => {
@@ -130,28 +125,97 @@ export default function Detail() {
   /**
    * 메시지 전송
    */
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     setIsAnimating(true);
-    setTimeout(() => {
+  
+    setTimeout(async () => {
       setIsAnimating(false);
-      if (input.trim()) {
+  
+      if (selectedFile) {
+        try {
+          // Step 1: Get Presigned URL from the server
+          const fileName = encodeURIComponent(selectedFile.name);
+          const response = await fetch(`/api/post/image?file=${fileName}`);
+      
+
+          if (!response.ok) {
+            throw new Error('이미지 업로드 URL을 가져오는 데 실패했습니다.');
+          }
+    
+          const data = await response.json();
+
+          const formData = new FormData();
+
+          Object.entries(data.fields).forEach(([key, value]) => {
+            formData.append(key, value as string);
+          });
+          formData.append("file", selectedFile); // 파일은 반드시 "file" 키로 추가
+         
+          const uploadResult = await fetch(data.url, {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!uploadResult.ok) {
+            console.error('S3 Upload Error:', uploadResult.status, uploadResult.statusText);
+            throw new Error('이미지 업로드 실패');
+          }
+          
+  
+          // 업로드된 이미지 URL
+          let uploadedUrl = `${data.url}/${data.fields.key}`;
+        
+          // Step 3: Send message with file URL via socket
+          const message = {
+            chatRoomId,
+            senderEmail: session?.user.email,
+            text: "File",
+            file: {
+              name: selectedFile.name,
+              type: selectedFile.type,
+              url:uploadedUrl, // Use the key to reconstruct the URL if needed
+            },
+          };
+  
+          socket?.emit("send_message", message);
+  
+          // Reset file state
+          setSelectedFile(null);
+        } catch (error) {
+          console.error("Error handling file upload:", error);
+          setSelectedFile(null);
+        }
+      } else if (input.trim()) {
+        // Handle text message
         const message = {
           chatRoomId,
-          senderEmail:session?.user.email,
+          senderEmail: session?.user.email,
           text: input,
         };
   
-        
+        // Send message via socket
         socket?.emit("send_message", message);
-        dispatch(setInput("")); // 입력 필드 초기화
+  
+        // Reset input field
+        dispatch(setInput(""));
       }
-    
     }, 200);
-    
   };
+  
 
   const handleGoToBack = () =>{
       router.push('/chat');
+  }
+
+  // 파일 선택 핸들러
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+
+  const deleteFile = () =>{
+    setSelectedFile(null);
   }
 
    // 메시지 변경 감지 후 애니메이션 설정
@@ -286,14 +350,44 @@ export default function Detail() {
               return (
                 <div key={msg.id}>
                 {isUser ? (
-                <div key={msg.id} className={`flex items-center mb-4 justify-end ${
+                <div key={msg.id} className={`flex mb-4 justify-end ${
                   animatedMessageIndex === index ? "animate__animated animate__fadeInUp" : ""
                 }`}>
-                  <div className="text-xs text-gray-400">{formattedDate}</div>
+                 
                   
-                  <div className="flex flex-col items-end">
-                    <strong className="text-sm">{msg.requesterName}</strong>
-                    <span className="text-xs text-gray-500">{msg.text || "No message"}</span>
+                  <div className="flex flex-col items-end ">
+                    <DynamicText className="text-sm text-customPurple" text={msg.requesterName}/>
+                    <div className='flex items-end'>
+                        <div className="text-xs text-gray-400">{formattedDate}</div>
+                        <span className="ml-2 text-xs text-gray-500 bg-customRectangle rounded-custom-myChat max-w-[300px] p-2 flex-wrap">
+                        {msg.file? (
+                            <>
+                             {msg.file.type.startsWith("image/") ? (
+                                // 이미지 파일
+                                <img
+                                  src={msg.file.url}
+                                  alt={msg.file.name}
+                                  className="max-w-full rounded-lg"
+                                />
+                              ) : (
+                                // 일반 파일 (다운로드 링크 제공)
+                                <a
+                                  href={msg.file.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-500 underline"
+                                >
+                                  {msg.file.name}
+                                </a>
+                              )}
+                            </>
+                          ):(
+                            <>
+                            {msg.text || "No message"}
+                            </>
+                          )}
+                        </span>
+                    </div>
                   </div>
                   <img
                     src={msg.requesterImage || "/SVG/default-profile.svg"}
@@ -305,7 +399,7 @@ export default function Detail() {
 
                 </div>
                 ):(
-                  <div key={msg.id} className={`flex items-center mb-4 ${
+                  <div key={msg.id} className={`flex mb-4 ${
                     animatedMessageIndex === index ? "animate__animated animate__fadeInUp" : ""
                   }`}>
                   <img
@@ -314,57 +408,106 @@ export default function Detail() {
                     className="w-[30px] h-[30px] rounded-full object-cover mr-2 border border-white"
                   />
                   <div className="flex flex-col">
-                    <strong className="text-sm">{msg.requesterName}</strong>
-                    <span className="text-xs text-gray-500">{msg.text || "No message"}</span>
+                    <DynamicText className="text-sm text-customPurple" text={msg.requesterName}/>
+                    <div className='flex items-end'>
+                        <div className="text-xs text-gray-500 bg-customRectangle max-w-[300px] p-2 flex-wrap rounded-custom-otherChat">
+                          {msg.file? (
+                            <>
+                             {msg.file.type.startsWith("image/") ? (
+                                // 이미지 파일
+                                <img
+                                  src={msg.file.url}
+                                  alt={msg.file.name}
+                                  className="max-w-full rounded-lg"
+                                />
+                              ) : (
+                                // 일반 파일 (다운로드 링크 제공)
+                                <a
+                                  href={msg.file.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-500 underline"
+                                >
+                                  {msg.file.name}
+                                </a>
+                              )}
+                            </>
+                          ):(
+                            <>
+                            {msg.text || "No message"}
+                            </>
+                          )}
+                          
+                        </div>
+                      <div className="ml-2 text-xs text-gray-400">{formattedDate}</div>
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-400">{formattedDate}</div>
+                  
                   {/* 채팅 끝에 위치한 더미 div */}
                   <div ref={messagesEndRef}></div>
 
                 </div>
                 )}</div>
-
-
-
-
-
-
-               
               );
             })}
           </div>
           
           {/** 전송 섹션 */}
-          <div className="flex w-full items-center ">
-            {/** 첨부 버튼 */}
-            <div className="flex  w-[10%] justify-center">
-              <Image
-                src="/SVG/clip.svg"
-                alt="clip"
-                width={15}
-                height={15}
-                priority
-                className={`cursor-pointer ${isAnimatingFileAdd ? 'animate__animated animate__headShake' : ''}`}
-                onClick={handleSendMessage}
+          <div className="flex w-full items-center">
+             {/** 첨부 버튼 */}
+              <div className="flex w-[10%] justify-center">
+                <label htmlFor="fileInput" className="cursor-pointer">
+                  <Image
+                    src="/SVG/clip.svg"
+                    alt="clip"
+                    width={15}
+                    height={15}
+                    priority
+                    className="cursor-pointer"
+                  />
+                </label>
+                <input
+                  id="fileInput"
+                  type="file"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+              </div>
+              
+              {/** 입력 필드 */}
+            <div className='w-[80%] relative'>
+              <input
+                type="text"
+                disabled={selectedFile? true:false}
+                value={selectedFile ? selectedFile.name : input}
+                lang="ko"
+                onChange={(e) => dispatch(setInput(e.target.value))}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !isComposingRef.current) {
+                    handleSendMessage();
+                  }
+                }}
+                onCompositionStart={() => (isComposingRef.current = true)}
+                onCompositionEnd={() => (isComposingRef.current = false)}
+                className={selectedFile? `w-full px-3 py-1 border-customGray rounded-xl text-sm text-gray-500 bg-gray-300 focus:outline-none focus:ring-2 focus:ring-customLightPurple`:
+                    `w-full px-3 py-1 border-customGray rounded-xl text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-customLightPurple`}
               />
+              {selectedFile &&(
+                <div className='absolute top-2 right-2' onClick={deleteFile}>
+                <Image
+                  src="/SVG/fileCancel.svg"
+                  alt="fileCancel"
+                  width={15}
+                  height={15}
+                  priority
+                  className="cursor-pointer"
+                />
+              </div>
+              )}
             </div>
-
-            {/** 입력 필드 */}
-            <input
-              type="text"
-              value={input}
-              lang="ko"
-              onChange={(e) => dispatch(setInput(e.target.value))}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !isComposingRef.current) {
-                  handleSendMessage();
-                }
-              }}
-              onCompositionStart={() => (isComposingRef.current = true)}
-              onCompositionEnd={() => (isComposingRef.current = false)}
-              className="w-[80%] px-3 py-1 border-customGray rounded-xl text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-customLightPurple"
-            />
-
+              
+           
+              
             {/** 전송 버튼 */}
             <div className="flex w-[10%] justify-center">
               <Image

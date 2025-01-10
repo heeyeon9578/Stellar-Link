@@ -120,9 +120,7 @@ export default function FriendsContent() {
     }));
   };
 
-  useEffect(() => {
-    console.log("friends changed:", friends, receivedRequests,sentRequests);
-  }, [friends,receivedRequests,sentRequests]);
+
 
   useEffect(() => {
     if (i18n.isInitialized) {
@@ -142,7 +140,6 @@ export default function FriendsContent() {
     dispatch(fetchReceivedRequests());
     dispatch(fetchSentRequests());
 
-    console.log(`friends`,friends)
   }, [dispatch]);
 
   // 친구 추가 요청
@@ -195,7 +192,7 @@ export default function FriendsContent() {
   // 친구 요청 수락/거절 (이것도 필요하다면 Slice에 Thunk로 옮길 수 있음)
   const handleRequestAction = async (fromUserId: string, action: "accepted" | "rejected") => {
     try {
-      console.log(`Handling request action: ${action} for fromUserId: ${fromUserId}`);
+    
 
       const response = await fetch("/api/friends-requests", {
         method: "PATCH",
@@ -344,8 +341,8 @@ const generateChatRoom = () => {
   // 애니메이션이 끝난 후 상태를 초기화
   setTimeout(() => {
     setIsAnimating(false);
-    // 실제 채팅방 생성 로직을 여기에 추가하세요
-    console.log("채팅방 생성");
+
+  
   }, 1000); // 애니메이션 지속 시간에 맞게 설정 (예: 1초)
 }
 
@@ -431,7 +428,7 @@ const generateChatRoom = () => {
       {
         isClicked==='All' && 
         (
-          <div className="mt-4 max-h-[400px] overflow-y-auto">
+          <div className="mt-4 max-h-[50vh] overflow-y-auto">
             {filteredFriends.filter(friend => friend.status !== 'block').length === 0 ? (
              <DynamicText text={t('Yhnfy')}/>
             ) : (
@@ -498,7 +495,7 @@ const generateChatRoom = () => {
       }
     
       {isClicked==='Request'&&(
-        <div className="mt-4 max-h-[400px] overflow-y-auto"> 
+        <div className="mt-4 max-h-[50vh] overflow-y-auto"> 
           {filteredSentRequests.length === 0 ? (
             <DynamicText text={t('Nsfr')}/>
           ) : (
@@ -561,7 +558,7 @@ const generateChatRoom = () => {
         isClicked==='Pending' &&
         (
 
-          <div className="mt-4 max-h-[400px] overflow-y-auto">
+          <div className="mt-4 max-h-[50vh] overflow-y-auto">
         
             {filteredReceivedRequests.length === 0 ? (
               <p>No friend requests received.</p>
@@ -631,7 +628,7 @@ const generateChatRoom = () => {
         isClicked==='Blocked' &&
         (
 
-          <div className="mt-4 max-h-[400px] overflow-y-auto">
+          <div className="mt-4 max-h-[50vh] overflow-y-auto">
           {filteredFriends.filter(friend => friend.status === 'block').length === 0 ? (
             <DynamicText text={t('Yhnfy')}/>
           ) : (

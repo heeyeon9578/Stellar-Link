@@ -133,14 +133,6 @@ export default function ChatContent() {
         }
         const result = await response.json();
         setData(result);
-        console.log(`
-          
-          
-          원래 데이터는?
-          
-          
-          
-          `,result)
       } catch (error: unknown) {
         console.error(error);
         setError(error instanceof Error ? error.message : 'Unknown error');
@@ -152,15 +144,14 @@ export default function ChatContent() {
   }, [isClicked]);
 
   useEffect(() => {
-    console.log("friends changed:", friends);
+  
     setFilteredFriends(friends); // 새로운 상태 변수 `filteredFriends` 필요
   }, [friends]);
 
   useEffect(() => {
     // 컴포넌트가 마운트될 때, Thunk 액션을 디스패치해서 데이터 로드
     dispatch(fetchFriends());
-    
-    console.log(`friends`,friends)
+   
   }, [dispatch]);
   // 필터링된 데이터
 
@@ -219,8 +210,8 @@ const generateChatRoom = () => {
       setMenuVisible(false);
     }
     setIsGenerateChatRoom(!isGenerateChatRoom);
-    // 실제 채팅방 생성 로직을 여기에 추가하세요
-    console.log("채팅방 생성");
+  
+ 
   }, 500); // 애니메이션 지속 시간에 맞게 설정 (예: 1초)
 }
 
@@ -327,14 +318,7 @@ const handelExitChatRoom =(chatRoomId:string)=>{
   })
     .then((res) => res.json())
     .then((data) => {
-      console.log(`
-        
-        
-        data
-        
-        
-        
-        `,data)
+
       setMenuVisible(false);
       setData((prevData) => prevData.filter((room) => room._id !== chatRoomId));
       router.push('/chat')
@@ -342,14 +326,7 @@ const handelExitChatRoom =(chatRoomId:string)=>{
     });
 }
 const handleInviteChatRoom = (chatRoomId: string) => {
-  console.log(`
-    
-    
-    
-    chatRoom._id : ${chatRoomId}
-    
-    
-    `,)
+
   // 현재 채팅방의 참여자 가져오기
   const currentChatRoom = data.find((room) => room._id === chatRoomId);
 
@@ -360,19 +337,7 @@ const handleInviteChatRoom = (chatRoomId: string) => {
 
   // 이미 참여 중인 사용자의 ID 목록
   const existingParticipantIds = currentChatRoom.participants.map((p) => p.id);
-  console.log(`
-    
-    
 
-
-
-    existingParticipantIds
-    
-    
-
-    
-    
-    `,existingParticipantIds)
   // 친구 목록에서 이미 참여 중인 사용자를 제외한 목록 생성
   const filteredFriends = friends.filter(
     (friend) => !existingParticipantIds.includes(friend._id)
@@ -571,7 +536,7 @@ if (!isInitialized) return null;
                   filteredData.map((chatRoom) => (
                     <div 
                     key={chatRoom._id} 
-                    className="p-2 cursor-pointer rounded-md mb-2 bg-white/50 h-[80px]"
+                    className="p-2 cursor-pointer rounded-xl mb-2 bg-white/50 h-[80px]"
                     onClick={(e) => {
                       if (!menuVisible) {
                         router.push(`/chat?chatRoomId=${chatRoom._id}`);
@@ -587,7 +552,7 @@ if (!isInitialized) return null;
                         {menuVisible && currentContextMenuChatRoomId === chatRoom._id && (
                         <ul
                           ref={popupRef}
-                          className="absolute bg-white/80 text-xs shadow-md list-none p-2 rounded-md z-100"
+                          className="absolute bg-white/80 text-xs shadow-md list-none p-2 rounded-xl z-100"
                           style={{
                             top: menuPosition.y - 50,
                             left: menuPosition.x - 150,

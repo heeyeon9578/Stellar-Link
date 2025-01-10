@@ -91,12 +91,6 @@ export default function ProfileContent() {
     }
   }, [i18n]);
 
-  useEffect(() => {
-    console.log(`
-       session?.user?.name: ${session?.user?.name}
-       session?.user?.profileImage: ${session?.user?.profileImage}
-      `, session);
-  }, [session]);
 
   if (!isInitialized) return null;
 
@@ -127,24 +121,13 @@ export default function ProfileContent() {
       if (file) {
         const filename = encodeURIComponent(file.name);
         const res = await fetch(`/api/post/image?file=${filename}`);
-        console.log(`
-
-
-          /api/post/image?file=${filename}
-          
-          
-          `,res)
+   
         if (!res.ok) {
           throw new Error('이미지 업로드 URL을 가져오는 데 실패했습니다.');
         }
 
         const data = await res.json();
-        console.log(`
-
-
-          data
-          
-          `,data)
+    
         const formData = new FormData();
         Object.entries({...data.fields, file}).forEach(([key, value]) => {
           formData.append(key, value as string | Blob);
@@ -155,12 +138,7 @@ export default function ProfileContent() {
           method: 'POST',
           body: formData,
         });
-        console.log(`
-
-
-          uploadResult
-          
-          `,uploadResult)
+  
         if (!uploadResult.ok) {
           console.error('S3 Upload Error:', uploadResult.status, uploadResult.statusText);
           throw new Error('이미지 업로드 실패');
