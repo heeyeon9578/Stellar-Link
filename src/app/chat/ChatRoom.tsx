@@ -18,6 +18,24 @@ import {
   setInput,
 } from "../../../store/chatSlice";
 import { setFips } from 'crypto';
+interface Message {
+  id: string;
+  requesterId: string;
+  senderEmail: string;
+  requesterName: string;
+  readBy: string[]; // 반드시 string[]이어야 합니다.
+  requesterImage: string;
+  requesterEmail: string;
+  text: string;
+  createdAt: Date;
+  chatRoomId: string;
+  file?: {
+    name: string;
+    type: string;
+    data?: string;
+    url?: string;
+  };
+}
 
 export default function Detail() {
   const { t,i18n } = useTranslation('common');
@@ -110,31 +128,60 @@ export default function Detail() {
       
       
       `,messages )
+     //socket.emit("mark_as_read", { chatRoomId: chatRoomId, userId: session?.user.id });
   }, [messages]); // 메시지가 변경될 때마다 실행  
 
   useEffect(() => {
     if (chatRoomId && socket.connected) {
-      
       socket.emit("join_room", chatRoomId);
       console.log("Joining room:", chatRoomId);
-      socket.emit("mark_as_read", { chatRoomId: chatRoomId, userId: session?.user.id });
+  
+     // 메시지 읽음 상태 업데이트
+     socket.on("update_read_status", ({ chatRoomId: updatedChatRoomId, userId }) => {
+      console.log(`
+        update_read_status
+        updatedChatRoomId: ${updatedChatRoomId}
+        userId: ${userId}
+      `);
+      
+      if (updatedChatRoomId === chatRoomId) {
+        // 모든 메시지에서 `readBy`에 userId를 추가
+        const updatedMessages = messages.map((msg) => ({
+          ...msg,
+          readBy: msg.readBy.includes(userId)
+            ? msg.readBy // 이미 userId가 포함된 경우 그대로 유지
+            : [...msg.readBy, userId], // 포함되지 않은 경우 추가
+        }));
+      
+        // Redux 상태 업데이트
+        dispatch(setMessages(updatedMessages));
+      }
+    });
+
+  
       // 메시지 수신 이벤트
       socket.on("receive_message", (message) => {
         if (message.chatRoomId === chatRoomId) {
-          console.log("New message received for this chat room:", message);
-          socket.emit("mark_as_read", { chatRoomId: chatRoomId, userId: session?.user.id });
           dispatch(addMessage(message));
-        } else {
-          console.log("Message received for another chat room. Ignoring.");
+
         }
+        socket.emit("mark_as_read", { chatRoomId: chatRoomId, userId: session?.user.id });
       });
   
       return () => {
         socket.off("receive_message");
+        socket.off("update_read_status");
       };
     }
-  }, [chatRoomId, socket.connected]);
-
+  }, [chatRoomId, socket.connected, messages, dispatch]);
+  const fetchMarkAsRead = (chatRoomId:string) =>{
+    fetch('/api/chat/mark-as-read', {
+      method: 'POST',
+      body: JSON.stringify({ chatRoomId: chatRoomId, user: session?.user.id }),
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+ 
   /**
    * 메시지 전송
    */
@@ -192,6 +239,7 @@ export default function Detail() {
   
           socket?.emit("send_message", message);
           socket.emit("mark_as_read", { chatRoomId: chatRoomId, userId: session?.user.id });
+          //fetchMarkAsRead(chatRoomId || "");
           // Reset file state
           setSelectedFile(null);
         } catch (error) {
@@ -212,7 +260,7 @@ export default function Detail() {
         // Reset input field
         dispatch(setInput(""));
       }
-    }, 200);
+    }, 300);
   };
   
 
@@ -241,7 +289,7 @@ export default function Detail() {
       // 일정 시간 후 애니메이션 상태 제거
       setTimeout(() => {
         setAnimatedMessageIndex(null);
-      }, 500); // 애니메이션 시간 (0.5초)
+      }, 300); // 애니메이션 시간 (0.5초)
     }
   }, [messages]);
 
@@ -345,7 +393,8 @@ export default function Detail() {
               const messageDate = new Date(msg.createdAt);
               const today = new Date();
               const isUser = msg.requesterId === session?.user.id.toString();
-
+              const participantCount = chatRoomInfo?.participants.length ||0;
+              const unreadCount =  participantCount- (msg.readBy?.length || 0);
               // 오늘 날짜인지 확인
               const isToday =
                 messageDate.getFullYear() === today.getFullYear() &&
@@ -372,7 +421,15 @@ export default function Detail() {
                   <div className="flex flex-col items-end ">
                     <DynamicText className="text-sm text-customPurple" text={msg.requesterName}/>
                     <div className='flex items-end'>
-                        <div className="text-xs text-gray-400">{formattedDate}</div>
+                      <div className='flex flex-col items-end'>
+                        {/** 안 읽은 사람 수 표시 */}
+                        {unreadCount > 0 && (
+                          <div className="text-xs text-customLightPurple">
+                            {unreadCount}
+                          </div>
+                        )}
+                         <div className="text-xs text-gray-400">{formattedDate}</div>
+                      </div>
                         <span className="ml-2 text-xs text-gray-500 bg-customRectangle rounded-custom-myChat max-w-[300px] p-2 flex-wrap">
                         {msg.file? (
                             <>
@@ -401,7 +458,9 @@ export default function Detail() {
                             </>
                           )}
                         </span>
+                        
                     </div>
+                    
                   </div>
                   <img
                     src={msg.requesterImage || "/SVG/default-profile.svg"}
@@ -453,7 +512,14 @@ export default function Detail() {
                           )}
                           
                         </div>
-                      <div className="ml-2 text-xs text-gray-400">{formattedDate}</div>
+                        <div className='flex flex-col ml-2'>
+                        {unreadCount > 0 && (
+                          <div className="text-xs text-customLightPurple">
+                            {unreadCount}
+                          </div>
+                        )}
+                      <div className=" text-xs text-gray-400">{formattedDate}</div>
+                        </div>
                     </div>
                   </div>
                   

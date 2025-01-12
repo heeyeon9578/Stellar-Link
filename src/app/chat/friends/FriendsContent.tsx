@@ -430,7 +430,7 @@ const generateChatRoom = () => {
         (
           <div className="mt-4 max-h-[50vh] overflow-y-auto">
             {filteredFriends.filter(friend => friend.status !== 'block').length === 0 ? (
-             <DynamicText text={t('Yhnfy')}/>
+             <DynamicText className="text-gray-500" text={t('Yhnfy')}/>
             ) : (
               <ul>
                 {filteredFriends
@@ -497,7 +497,7 @@ const generateChatRoom = () => {
       {isClicked==='Request'&&(
         <div className="mt-4 max-h-[50vh] overflow-y-auto"> 
           {filteredSentRequests.length === 0 ? (
-            <DynamicText text={t('Nsfr')}/>
+            <DynamicText className="text-gray-500" text={t('Nsfr')}/>
           ) : (
             <ul>
               {filteredSentRequests.map((request) => (
@@ -561,7 +561,7 @@ const generateChatRoom = () => {
           <div className="mt-4 max-h-[50vh] overflow-y-auto">
         
             {filteredReceivedRequests.length === 0 ? (
-              <p>No friend requests received.</p>
+              <DynamicText className='text-gray-500' text={t('Nfrr')}/>
             ) : (
               <ul>
                 {filteredReceivedRequests.map((request) => (
@@ -630,7 +630,7 @@ const generateChatRoom = () => {
 
           <div className="mt-4 max-h-[50vh] overflow-y-auto">
           {filteredFriends.filter(friend => friend.status === 'block').length === 0 ? (
-            <DynamicText text={t('Yhnfy')}/>
+            <DynamicText className="text-gray-500" text={t('Yhnfy')}/>
           ) : (
             <ul>
               {filteredFriends.filter(friend => friend.status === 'block').map((friend) => (

@@ -6,24 +6,25 @@ interface Participant {
   email: string;
   profileImage: string;
 }
-// 메시지 데이터 타입 정의
 interface Message {
-  id:string;
-  requesterId :string;
+  id: string;
+  requesterId: string;
   senderEmail: string;
   requesterName: string;
-  requesterImage:string;
-  requesterEmail:string;
+  readBy: string[]; // 반드시 string[]이어야 합니다.
+  requesterImage: string;
+  requesterEmail: string;
   text: string;
   createdAt: Date;
   chatRoomId: string;
   file?: {
     name: string;
     type: string;
-    data?: string; // 클라이언트에서 전송
-    url?: string;  // 서버에서 추가
+    data?: string;
+    url?: string;
   };
 }
+
 interface ChatRoomInfo{
   createdAt: Date;
   participants: Participant[];

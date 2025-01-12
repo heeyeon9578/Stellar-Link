@@ -845,7 +845,7 @@ if (!isInitialized) return null;
                              />
                         </div>
                         }
-                        <ul className="w-[80%] h-[70px]">
+                        <ul className="w-[50%] h-[70px]">
                         {chatRoom.participants.length === 1 ? (
                           // 한 명일 때
                           <li className="flex text-sm flex-col h-[70px]">
@@ -897,7 +897,7 @@ if (!isInitialized) return null;
                           //여러 명 일때
                           <div className="h-[70px]">
                             {/* 참여자 프로필 이미지 표시 */}
-                            <div className="relative flex">
+                            <div className="relative flex ">
                               {chatRoom.participants.map((participant, index) => (
                                 <div
                                   key={index}
@@ -918,7 +918,8 @@ if (!isInitialized) return null;
                             
 
                             {/* 참여자 프로필 이름 표시 */}
-                            <div className="mt-8 flex flex-nowrap h-[20px] text-sm text-customPurple overflow-hidden whitespace-nowrap text-ellipsis" >
+                            <div className="mt-8 flex h-[20px] text-sm text-customPurple flex-wrap overflow-hidden whitespace-nowrap text-ellipsis" >
+                              <div className="">
                               {
                                 editChatRoomName===chatRoom._id ?(
                                   <>
@@ -956,6 +957,7 @@ if (!isInitialized) return null;
                                 ) 
                               }
 
+                              </div>
 
                               {/* 인원수 표시 */}
                               <div className="text-xs text-gray-500">
