@@ -392,7 +392,7 @@ const generateChatRoom = () => {
           value={newFriendEmail}
           placeholder={t('EFE')}
           onChange={(e) => setNewFriendEmail(e.target.value)}
-         className="w-[90%] px-3 py-2 border-customGray rounded-xl text-sm text-customGray focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+         className="w-[90%] px-3 py-2 border-customGray rounded-xl text-sm text-customGray focus:border-transparent focus:outline-none focus:ring-2 focus:ring-customLightPurple"
         />
         <div className="w-[10%] flex items-center justify-end h-full" onClick={handleAddFriend}>
           <Image

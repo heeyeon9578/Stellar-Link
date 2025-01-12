@@ -84,8 +84,12 @@
     "Exit":"Exit",
     "InviteFriends":"Invite Friends",
     "NameMaxLength":"Name Max Length is 10 words",
-    "participants":"participants"
-    
+    "participants":"participants",
+    "lang":"en-US",
+    "month":"/",
+    "day":"",
+    "EditName":"Edit Name"
+   
 
 
 }

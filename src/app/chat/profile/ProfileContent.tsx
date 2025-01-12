@@ -246,7 +246,7 @@ export default function ProfileContent() {
           value={name}
           lang="ko"
           onChange={handleNameChange}
-         className="w-full text-customPurple px-3 py-2 border-customGray rounded-lg focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+         className="w-full text-customPurple px-3 py-2 border-customGray rounded-lg focus:outline-none focus:border-transparent focus:ring-2 focus:ring-customLightPurple"
         />
       </div>
 

@@ -12,7 +12,15 @@ import { RootState } from '../../../store/store';
 import { useAppDispatch} from '../../../store/hooks';
 import { useSelector } from 'react-redux';
 import { fetchFriends } from '../../../store/friendsSlice';
-
+import { useSearchParams } from 'next/navigation';
+import socket from "@/socketIns"; // 위에서 만든 socket.ts 경로
+import {
+  setChatRoomId,
+  setChatRoomInfo,
+  setMessages,
+  addMessage,
+  setInput,
+} from "../../../store/chatSlice";
 interface participant{
   name:string;
   id:string;
@@ -38,6 +46,10 @@ interface ChatRoom {
     text: string;
     requesterId: string;
     createdAt: string;
+    requesterEmail?:string;
+    requesterImage?:string;
+    requesterName?:string;
+
   }[];
 }
 interface MenuPosition {
@@ -66,12 +78,14 @@ export default function ChatContent() {
   const router = useRouter();
   const messages = useSelector((state: RootState) => state.chat.messages);
   const [isInitialized, setIsInitialized] = useState(false);
+  const searchParams = useSearchParams();
   const menus = [
     { name: t('All'), onClick: () => setIsClicked('All') },
     { name: t('Personal'), onClick: () => setIsClicked('Personal') },
     { name: t('Teams'), onClick: () => setIsClicked('Teams') },
    
   ];
+  
   const {
     list: friends,
    
@@ -84,34 +98,231 @@ export default function ChatContent() {
  const [menuVisible, setMenuVisible] = useState<boolean>(false);
  const [filteredFriends, setFilteredFriends] = useState<Friend[]>([]);
  const [menuPosition, setMenuPosition] = useState<MenuPosition>({ x: 0, y: 0 });
-  const [currentChatRoomId,setCurrentChatRoomId] = useState<string>('');
+ const [currentChatRoomId,setCurrentChatRoomId] = useState<string>('');
  const popupRef = useRef<HTMLUListElement | null>(null); // Ref를 HTMLUListElement로 변경
  const [currentContextMenuChatRoomId, setCurrentContextMenuChatRoomId] = useState<string | null>(null);
+ const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
+
+ const [editChatRoomName,setEditChatRoomName] = useState<string>("");
    useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside); // 클릭 감지 이벤트 등록
     return () => {
       document.removeEventListener("mousedown", handleClickOutside); // 컴포넌트 언마운트 시 이벤트 제거
     };
   }, []);
+ // URL 파라미터에서 chatRoomId 가져오기
+ useEffect(() => {
+  const id = searchParams?.get("chatRoomId");
+  if (id) {
+    dispatch(setChatRoomId(id));
+  }else{
+    dispatch(setChatRoomId(null));
+  }
+}, [searchParams, dispatch]);
+useEffect(() => {
+  console.log("Socket instance:", socket);
+  console.log("Socket connected:", socket.connected);
 
-  // 메시지가 변경될 때마다 스크롤 이동
+  socket.on("connect", () => {
+    console.log("Socket connected");
+  });
+
+  socket.on("connect_error", (error) => {
+    console.error("Socket connection error:", error);
+  });
+
+  socket.on("disconnect", (reason) => {
+    console.log("Socket disconnected:", reason);
+  });
+
+  return () => {
+    socket.off("connect");
+    socket.off("connect_error");
+    socket.off("disconnect");
+  };
+}, []);
+useEffect(() => {
+  socket.on("receive_message", (message) => {
+    console.log(`
+      
+      
+      
+      
+      receive_message for ChatContent
+      
+      
+      
+      
+      `,message)
+      setData((prevData) => {
+        // 업데이트된 채팅방을 찾기
+        const updatedChatRoomIndex = prevData.findIndex(
+          (chatRoom) => chatRoom._id === message.chatRoomId
+        );
+  
+        if (updatedChatRoomIndex === -1) return prevData; // 채팅방이 없으면 그대로 반환
+  
+        // 기존 데이터를 복사하여 수정
+        const updatedChatRoom = { ...prevData[updatedChatRoomIndex] };
+  
+        if(updatedChatRoom.messages.length>0){
+          // 메시지 업데이트
+        updatedChatRoom.messages[updatedChatRoom.messages.length - 1] = {
+          ...updatedChatRoom.messages[updatedChatRoom.messages.length - 1],
+          text: message.text,
+          senderInfo: {
+            ...updatedChatRoom.messages[updatedChatRoom.messages.length - 1].senderInfo,
+            name: message.requesterName,
+          },
+          createdAt: message.createdAt.toString(),
+        };
+        }else{
+          updatedChatRoom.messages = [
+            {
+              chatRoomId: message.chatRoomId,
+              senderEmail: message.senderEmail,
+              senderInfo: {
+                id: message.requesterId,
+                name: message.requesterName,
+                email: message.senderEmail,
+                profileImage: "", // 기본 이미지 처리 (필요시 수정)
+              },
+              text: message.text,
+              requesterId: message.requesterId,
+              createdAt: new Date(message.createdAt).toISOString(),
+            },]
+        }
+  
+        // 기존 리스트에서 해당 채팅방 제거
+        const updatedData = prevData.filter((chatRoom) => chatRoom._id !== message.chatRoomId);
+  
+        // 채팅방을 최상단에 추가
+        return [updatedChatRoom, ...updatedData];
+
+        
+      });
+   // 안 읽은 메시지 수 업데이트
+   if (message.requesterId !== session?.user.id) {
+    // 메시지를 보낸 사람이 현재 사용자가 아니라면 unreadCounts 증가
+    setUnreadCounts((prevCounts) => {
+      const updatedCounts = { ...prevCounts };
+      updatedCounts[message.chatRoomId] =
+        (prevCounts[message.chatRoomId] || 0) + 1;
+      return updatedCounts;
+    });
+  }
+  });
+
+// 새로운 이벤트 리스너 추가: `update_read_status`
+socket.on("update_read_status", ({ chatRoomId, userId }) => {
+  console.log(`update_read_status for ChatRoom: ${chatRoomId}, User: ${userId}`);
+  if (userId === session?.user.id) {
+    console.log(`
+      
+      
+      로그인한 사용자와 업데이트한 사용자가 같아서 읽음 표시 0으로 변경
+      
+      
+      
+      `);
+    setUnreadCounts((prevCounts) => {
+      const updatedCounts = { ...prevCounts };
+      updatedCounts[chatRoomId] = 0; // 읽음 처리
+      return updatedCounts;
+    });
+  }
+});
+  return () => {
+    socket.off("receive_message");
+    socket.off("update_read_status"); // 정리
+
+  };
+}, []);
+
   useEffect(() => {
-    if (messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-
-      // 기존 데이터를 업데이트
-      setData((prevData) =>
-        prevData.map((chatRoom) => {
-          if (chatRoom._id === lastMessage.chatRoomId) {
-            chatRoom.messages[chatRoom.messages.length - 1].senderInfo.name = lastMessage.requesterName;
-            chatRoom.messages[chatRoom.messages.length - 1].text = lastMessage.text;
-          }
-          return chatRoom; // 다른 채팅방은 그대로 유지
-        })
+    const fetchUnreadCounts = async () => {
+      try {
+        const response = await fetch('/api/chat/unread-counts');
+        if (!response.ok) {
+          throw new Error('Failed to fetch unread counts');
+        }
+        const data = await response.json();
+        const counts = data.reduce((acc: Record<string, number>, room: any) => {
+          acc[room._id] = room.unreadCount;
+          return acc;
+        }, {});
+        console.log(`
+          
+          
+          
+          
+          counts
+          
+          
+          
+          `,counts )
+        setUnreadCounts(counts);
+      } catch (error) {
+        console.error("Error fetching unread counts:", error);
+      }
+    };
+  
+    fetchUnreadCounts();
+  }, []);
+  
+  // 메시지가 변경될 때마다 처리
+useEffect(() => {
+  if (messages.length > 0) {
+    const lastMessage = messages[messages.length - 1];
+   
+    setData((prevData) => {
+      // 업데이트된 채팅방을 찾기
+      const updatedChatRoomIndex = prevData.findIndex(
+        (chatRoom) => chatRoom._id === lastMessage.chatRoomId
       );
-    }
 
-  }, [messages]);
+      if (updatedChatRoomIndex === -1) return prevData; // 채팅방이 없으면 그대로 반환
+
+      // 기존 데이터를 복사하여 수정
+      const updatedChatRoom = { ...prevData[updatedChatRoomIndex] };
+
+      if(updatedChatRoom.messages.length>0){
+        // 메시지 업데이트
+      updatedChatRoom.messages[updatedChatRoom.messages.length - 1] = {
+        ...updatedChatRoom.messages[updatedChatRoom.messages.length - 1],
+        text: lastMessage.text,
+        senderInfo: {
+          ...updatedChatRoom.messages[updatedChatRoom.messages.length - 1].senderInfo,
+          name: lastMessage.requesterName,
+        },
+        createdAt: lastMessage.createdAt.toString(),
+      };
+      }else{
+        updatedChatRoom.messages = [
+          {
+            chatRoomId: lastMessage.chatRoomId,
+            senderEmail: lastMessage.senderEmail,
+            senderInfo: {
+              id: lastMessage.requesterId,
+              name: lastMessage.requesterName,
+              email: lastMessage.senderEmail,
+              profileImage: "", // 기본 이미지 처리 (필요시 수정)
+            },
+            text: lastMessage.text,
+            requesterId: lastMessage.requesterId,
+            createdAt: new Date(lastMessage.createdAt).toISOString(),
+          },]
+      }
+
+      // 기존 리스트에서 해당 채팅방 제거
+      const updatedData = prevData.filter((chatRoom) => chatRoom._id !== lastMessage.chatRoomId);
+
+      // 채팅방을 최상단에 추가
+      return [updatedChatRoom, ...updatedData];
+    });
+  }
+}, [messages]);
+
 
   // 검색어 디바운싱 처리 
   useEffect(() => {
@@ -155,35 +366,6 @@ export default function ChatContent() {
   }, [dispatch]);
   // 필터링된 데이터
 
-// useEffect(()=>{
-//   tempUser();
-// },[])
-
- // 임시 유저 생성
-//  const tempUser = async () => {
-
-//   try {
-//     // 이 부분도 Thunk로 만들 수 있지만,
-//     // 예시는 그대로 로컬 fetch 예시를 유지
-//     const response = await fetch(`/api/tempUsers`, {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-     
-//     });
-
-//     if (!response.ok) {
-//       const errorData = await response.json();
-//       throw new Error(errorData.message || t('failAddFriend'));
-//     }
-
-  
-//   } catch (err) {
-//     console.log(err)
-//   }
-// };
-
 
 const filteredData = data.filter((chatRoom) =>
   chatRoom.participants.some((participant) =>
@@ -213,7 +395,7 @@ const generateChatRoom = () => {
   
  
   }, 500); // 애니메이션 지속 시간에 맞게 설정 (예: 1초)
-}
+};
 
 // 체크박스 상태를 관리하는 함수
 const handleCheckboxChange = (friendId: string) => {
@@ -230,6 +412,7 @@ const handleCheckboxChange = (friendId: string) => {
     
   });
 };
+
 // 우클릭 핸들러
 const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>,chatRoomId: string) => {
   event.preventDefault(); // 기본 브라우저 메뉴 비활성화
@@ -308,7 +491,7 @@ const fetchGenerateRoom = () =>{
       setFilteredFriends(friends); // 새로운 상태 변수 `filteredFriends` 필요
       
     });
-}
+};
 
 const handelExitChatRoom =(chatRoomId:string)=>{
   fetch('/api/chat/exit-room', {
@@ -353,6 +536,7 @@ const handleInviteChatRoom = (chatRoomId: string) => {
   // 생성 창 열기
   generateChatRoom();
 };
+
 const fetchInviteChatRoom =(chatRoomId:string)=>{
 
   let type='';
@@ -376,7 +560,59 @@ const fetchInviteChatRoom =(chatRoomId:string)=>{
       setMenuVisible(false);
       router.push(`/chat?chatRoomId=${data.chatRoomId}`);
     });
+};
+
+const handleEditChatRoomName = (chatRoomId:string) =>{
+  setEditChatRoomName(chatRoomId);
+  setMenuVisible(false);
+};
+
+const cancelEditChatRoom = () =>{
+  setEditChatRoomName('');
+  
+};
+
+const fetchEditChatRoomName = (chatRoomId:string) =>{
+  fetch('/api/chat/edit-room', {
+    method: 'PATCH',
+    body: JSON.stringify({chatRoomId:chatRoomId, title:title }),
+    headers: { 'Content-Type': 'application/json' },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      // UI 업데이트
+    setData((prevData) =>
+      prevData.map((chatRoom) =>
+        chatRoom._id === chatRoomId
+          ? { ...chatRoom, title: title || chatRoom.title }
+          : chatRoom
+      )
+    );
+
+    // 제목 편집 모드 종료
+    setEditChatRoomName('');
+    setTitle(''); // 입력 필드 초기화
+   
+    });
+};
+const fetchMarkAsRead = (chatRoomId:string) =>{
+  fetch('/api/chat/mark-as-read', {
+    method: 'POST',
+    body: JSON.stringify({ chatRoomId: chatRoomId, user: session?.user.id }),
+    headers: { 'Content-Type': 'application/json' }
+  });
 }
+const enterChatRoom = (chatRoomId:string)=> {
+  router.push(`/chat?chatRoomId=${chatRoomId}`);
+   // 안 읽은 메시지 수를 0으로 설정
+   setUnreadCounts((prevCounts) => {
+    const updatedCounts = { ...prevCounts };
+    updatedCounts[chatRoomId] = 0; // 현재 채팅방 메시지 읽음 처리
+    return updatedCounts;
+  });
+
+  fetchMarkAsRead(chatRoomId);
+};
 
 useEffect(() => {
   if (i18n.isInitialized) {
@@ -389,7 +625,9 @@ useEffect(() => {
     };
   }
 }, [i18n]);
+
 if (!isInitialized) return null;
+
   return (
     <div className="mx-auto p-8 rounded-lg h-full text-customBlue relative">
       <div className="flex justify-between items-center">
@@ -436,8 +674,8 @@ if (!isInitialized) return null;
                       type="checkbox"
                       checked={selectedFriends.includes(friend._id)}
                       onChange={() => handleCheckboxChange(friend._id)}
-                      className="mr-2 focus:outline-none focus:ring-2 focus:ring-customLightPurple"
-                    />
+                      className="appearance-none checked:bg-customLightPurple checked:border-customLightPurple mr-2 focus:outline-none rounded-full focus:ring-2 focus:ring-customLightPurple focus:border-transparent"
+                    /> 
                      <img
                        src={friend.profileImage || "/SVG/default-profile.svg"}
                        alt={`${friend.name}'s profile`}
@@ -535,19 +773,20 @@ if (!isInitialized) return null;
                 ) : (
                   filteredData.map((chatRoom) => (
                     <div 
+                    
                     key={chatRoom._id} 
                     className="p-2 cursor-pointer rounded-xl mb-2 bg-white/50 h-[80px]"
                     onClick={(e) => {
-                      if (!menuVisible) {
-                        router.push(`/chat?chatRoomId=${chatRoom._id}`);
+                      if (!menuVisible && !editChatRoomName) {
+                        enterChatRoom(chatRoom._id);
                       } else {
                         e.stopPropagation(); // 클릭 이벤트 버블링을 막음
                       }
                     }}
-                    onContextMenu={(e) => handleContextMenu(e, chatRoom._id)} // 우클릭 이벤트// 우클릭 이벤트
+                    onContextMenu={(e) => handleContextMenu(e, chatRoom._id)} // 우클릭 이벤트
                     
                      >
-                     <div>
+                     <div className="z-100">
                         {/* 우클릭 메뉴 */}
                         {menuVisible && currentContextMenuChatRoomId === chatRoom._id && (
                         <ul
@@ -556,8 +795,15 @@ if (!isInitialized) return null;
                           style={{
                             top: menuPosition.y - 50,
                             left: menuPosition.x - 150,
+                            zIndex: 9999, // 최상단으로 설정
                           }}
                         >
+                          <li
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                            onClick={() =>handleEditChatRoomName(chatRoom._id)}
+                          >
+                            <DynamicText text={t('EditName')} />
+                          </li>
                           <li
                             className="px-4 py-2 cursor-pointer hover:bg-gray-100"
                             onClick={() => handleInviteChatRoom(chatRoom._id)}
@@ -575,7 +821,30 @@ if (!isInitialized) return null;
                     </div>
 
                       {/** 친구 이름과 날짜 */}
-                      <div className="flex justify-between ">
+                      <div className="flex justify-between relative">
+                        {editChatRoomName===chatRoom._id && 
+                        <div className="absolute flex top-9 right-7">
+                           <Image
+                              src="/SVG/confirm.svg"
+                              alt="confirm"
+                              width={15}
+                              height={15}
+                              priority
+                              className={`cursor-pointer ${isAnimating ? 'animate__animated animate__flip' : ''}`} // 애니메이션 클래스 추가
+                              onClick={()=>{fetchEditChatRoomName(chatRoom._id)}}
+                            />
+                          
+                            <Image
+                               src="/SVG/cancelChange.svg"
+                               alt="cancelChange"
+                               width={15}
+                               height={15}
+                               priority
+                               className={`cursor-pointer ${isAnimating ? 'animate__animated animate__flip' : ''}`} // 애니메이션 클래스 추가
+                               onClick={cancelEditChatRoom}
+                             />
+                        </div>
+                        }
                         <ul className="w-[80%] h-[70px]">
                         {chatRoom.participants.length === 1 ? (
                           // 한 명일 때
@@ -587,12 +856,30 @@ if (!isInitialized) return null;
                               height={30}
                               className="rounded-full w-8 h-8 mr-2 border border-white"
                             />
-                            <div className="flex flex-col text-customPurple text-sm">
+                            <div className="flex flex-col text-customPurple text-sm ">
 
-                              <div className=" h-[20px]">
-                                {!chatRoom.title && <DynamicText text={chatRoom.participants[0].name} /> }
-                                {chatRoom.title && <DynamicText text={chatRoom.title} /> }
-                              </div>
+                            <div className="flex flex-nowrap h-[20px] text-sm text-customPurple overflow-hidden whitespace-nowrap text-ellipsis ">
+                              {
+                                editChatRoomName ===chatRoom._id ? (
+                                  <>
+                                    <input
+                                      type="text"
+                                      value={title}
+                                      lang="ko"
+                                      onChange={(e) => setTitle(e.target.value)}
+                                     className="w-full text-xs text-customPurple px-3 py-2 border-customGray rounded-lg focus:outline-none focus:ring-0 focus:border-customLightPurple"
+                                    />
+                                  </>
+                                ):(
+                                <>
+                                {!chatRoom.title && <DynamicText text={chatRoom.participants[0].name} />}
+                                {chatRoom.title && (
+                                  <DynamicText text={chatRoom.title} />
+                                )}
+                                </>
+                                )
+                              }
+                            </div>
 
                               {/** 마지막 메세지 */}
                               <div className="text-xs text-gray-500 overflow-hidden text-ellipsis h-[18px]">
@@ -632,26 +919,42 @@ if (!isInitialized) return null;
 
                             {/* 참여자 프로필 이름 표시 */}
                             <div className="mt-8 flex flex-nowrap h-[20px] text-sm text-customPurple overflow-hidden whitespace-nowrap text-ellipsis" >
-                            {chatRoom.participants.map((participant, index) => (
-                              <span key={index}>
-                                {!chatRoom.title && (
-                                  <DynamicText 
-                                    className="mr-2" 
-                                    text={
-                                      index === chatRoom.participants.length - 1 
-                                        ? participant.name 
-                                        : participant.name + ','
-                                    } 
-                                  />
-                                )}
-                              </span>
-                            ))}
-                              {/* 제목 표시 */}
-                              {chatRoom.title && (
-                              <div className="mr-2 text-customPurple">
-                                <DynamicText text={chatRoom.title}/>
-                              </div>
-                              )}
+                              {
+                                editChatRoomName===chatRoom._id ?(
+                                  <>
+                                  <input
+                                      type="text"
+                                      value={title}
+                                      lang="ko"
+                                      onChange={(e) => setTitle(e.target.value)}
+                                     className="w-full text-xs text-customPurple px-3 py-2 border-customGray rounded-lg focus:outline-none focus:ring-0 focus:border-customLightPurple"
+                                    />
+                                  </>
+                                ):(
+                                  <>
+                                   {chatRoom.participants.map((participant, index) => (
+                                      <span key={index}>
+                                        {!chatRoom.title && (
+                                          <DynamicText 
+                                            className="mr-2" 
+                                            text={
+                                              index === chatRoom.participants.length - 1 
+                                                ? participant.name 
+                                                : participant.name + ','
+                                            } 
+                                          />
+                                        )}
+                                      </span>
+                                    ))}
+                                    {/* 제목 표시 */}
+                                    {chatRoom.title && (
+                                    <div className="mr-2 text-customPurple">
+                                      <DynamicText text={chatRoom.title}/>
+                                    </div>
+                                    )}
+                                  </>
+                                ) 
+                              }
 
 
                               {/* 인원수 표시 */}
@@ -669,7 +972,12 @@ if (!isInitialized) return null;
                                 <DynamicText text={t('Tmie')}/>
                               )}
                             </div>
-                            
+                            {/* 안 읽은 메시지 개수 표시 */}
+                            {unreadCounts[chatRoom._id] > 0 && (
+                              <span className="absolute bottom-0 right-0 bg-customLightPurple text-white text-xs rounded-full px-2 py-1">
+                                {unreadCounts[chatRoom._id]}
+                              </span>
+                            )}
                           </div>
                         )}
 
@@ -677,7 +985,7 @@ if (!isInitialized) return null;
                         </ul>
 
                         {/** 날짜 시간 */}
-                        <div className="text-xs flex-nowrap text-gray-500 w-[60px]">
+                        <div className="text-xs flex-nowrap text-gray-500 w-[60px] flex justify-end">
                         {chatRoom.messages.length > 0 ? (
                           (() => {
                             const messageDate = new Date(chatRoom.messages[chatRoom.messages.length - 1].createdAt);
@@ -691,21 +999,21 @@ if (!isInitialized) return null;
                           
                             if (isToday) {
                               // 오늘 날짜라면 시간만 표시
-                              return new Intl.DateTimeFormat('ko-KR', {
+                              return new Intl.DateTimeFormat(t('lang'), {
                                 hour: 'numeric',
                                 minute: 'numeric',
                                 hour12: true,
                               }).format(messageDate);
                             } else {
                               // 오늘 날짜가 아니라면 MM월 DD일로 표시
-                              const formattedDate = new Intl.DateTimeFormat('ko-KR', {
+                              return new Intl.DateTimeFormat(t('lang'), {
                                 month: '2-digit',
                                 day: '2-digit',
                               }).format(messageDate);
                             
-                              // MM월 DD일로 표시하기 위해 포맷 후처리
-                              const [month, day] = formattedDate.split('.').map((part) => part.trim());
-                              return `${month}월 ${day}일`;
+                              // // MM월 DD일로 표시하기 위해 포맷 후처리
+                              // const [month, day] = formattedDate.split('.').map((part) => part.trim());
+                              // return `${month} ${day}`;
                             }
                           })()
                         ) : (

@@ -217,7 +217,7 @@ export default function SignupPage() {
               onChange={(e) => setEmail(e.target.value)} // 상태 업데이트
               className="w-[80%] md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 
               rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple  
-              disabled:bg-gray-300 disabled:cursor-not-allowed
+              disabled:bg-gray-300 disabled:cursor-not-allowed focus:border-transparent
               "
             />
 
@@ -250,7 +250,7 @@ export default function SignupPage() {
                     placeholder=""
                     value={code}
                     onChange={(e) => setCode(e.target.value)} // 상태 업데이트
-                    className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple "
+                    className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focus:border-transparent focus:outline-none focus:ring-2 focus:ring-customLightPurple "
                   />
 
                   {/* 인증 번호 확인 */}
@@ -287,7 +287,7 @@ export default function SignupPage() {
                     onChange={(e) => setName(e.target.value)} // 상태 업데이트
                     className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 
                     rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple  
-                    disabled:bg-gray-300 disabled:cursor-not-allowed
+                    disabled:bg-gray-300 disabled:cursor-not-allowed focus:border-transparent
                     "
                   />
                   </div>
@@ -302,7 +302,7 @@ export default function SignupPage() {
                     placeholder=""
                     value={password}
                     onChange={(e) => setPassword(e.target.value)} // 상태 업데이트
-                    className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+                    className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focus:outline-none  focus:border-transparent focus:ring-2 focus:ring-customLightPurple"
                   />
 
 
@@ -338,7 +338,7 @@ export default function SignupPage() {
                     placeholder=""
                     value={passwordConfirm}
                     onChange={(e) => setPasswordConfirm(e.target.value)} // 상태 업데이트
-                    className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+                    className="w-full md:px-4 px-2  md:py-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-customPurple focus:border-transparent focus:outline-none focus:ring-2 focus:ring-customLightPurple"
                   />
 
 
@@ -393,7 +393,7 @@ export default function SignupPage() {
           {/* 소셜 로그인 버튼 */}
           <div className="w-full flex flex-row space-x-4">
             <button
-              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:border-transparent focus:ring-2 focus:ring-customLightPurple"
               onClick={() => signIn('google', { callbackUrl: '/chat' })}
             >
              <Image
@@ -407,7 +407,7 @@ export default function SignupPage() {
 
             </button>
             <button
-              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:border-transparent focus:ring-2 focus:ring-customLightPurple"
               onClick={() => signIn('github', { callbackUrl: '/chat' })}
             >
               <Image
@@ -420,7 +420,7 @@ export default function SignupPage() {
               />
             </button>
             <button
-              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:border-transparent focus:outline-none focus:ring-2 focus:ring-customLightPurple"
               onClick={() => signIn('discord', { callbackUrl: '/chat' })}
             >
               <div className='w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center'>

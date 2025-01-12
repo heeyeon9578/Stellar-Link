@@ -10,6 +10,7 @@ interface Participant {
 interface Message {
   id:string;
   requesterId :string;
+  senderEmail: string;
   requesterName: string;
   requesterImage:string;
   requesterEmail:string;

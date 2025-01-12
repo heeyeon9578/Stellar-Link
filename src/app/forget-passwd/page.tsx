@@ -423,7 +423,7 @@ export default function ForgetPasswordPage() {
 
             </button>
             <button
-              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:border-transparent focus:outline-none focus:ring-2 focus:ring-customLightPurple"
               onClick={() => signIn('github', { callbackUrl: '/chat' })}
             >
               <Image
@@ -436,7 +436,7 @@ export default function ForgetPasswordPage() {
               />
             </button>
             <button
-              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+              className="w-full py-1.5 md:py-2.5 text-white bg-white rounded-lg text-sm font-medium flex justify-center items-center focus:outline-none  focus:border-transparent focus:ring-2 focus:ring-customLightPurple"
               onClick={() => signIn('discord', { callbackUrl: '/chat' })}
             >
               <div className='w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center'>

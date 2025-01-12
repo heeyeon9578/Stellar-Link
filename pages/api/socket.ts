@@ -106,6 +106,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
           // requesterName:requesterName,
           // requesterImage:requesterImage,
           createdAt: new Date(),
+          readBy: [new ObjectId(requesterId)], // Add sender to `readBy`
         };
 
         // 파일 처리 (URL만 포함하는 방식)
@@ -135,13 +136,41 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
           requesterEmail,
           requesterImage,
           createdAt: new Date(),
+          readBy: [new ObjectId(requesterId)], // Add sender to `readBy`
         };
     
         console.log("Message received:", message);
           // 메시지 브로드캐스트
-        io?.to(data.chatRoomId).emit("receive_message", message);
+        //io?.to(data.chatRoomId).emit("receive_message", message);
+        io?.emit("receive_message", message);
       });
 
+       // 메시지 읽음 이벤트
+       socket.on("mark_as_read", async ({ chatRoomId, userId }) => {
+        try {
+          const client = await connectDB;
+          const db = client.db("StellarLink");
+        
+          await db.collection("messages").updateOne(
+            { _id: new ObjectId(chatRoomId) },
+            {
+              $addToSet: {
+                "messages.$[elem].readBy": new ObjectId(userId),
+              },
+            },
+            {
+              arrayFilters: [{ "elem.readBy": { $ne: new ObjectId(userId) } }],
+            }
+          );
+          
+        
+          // 읽음 업데이트를 같은 채팅방 사용자들에게 브로드캐스트
+          io?.emit("update_read_status", { chatRoomId, userId });
+        } catch (error) {
+          console.error("Error in mark_as_read:", error);
+        }
+      });
+      
       socket.on("disconnect", () => {
 
       });

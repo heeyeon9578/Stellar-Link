@@ -99,6 +99,17 @@ export default function Detail() {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
+     console.log(`
+      
+      
+      
+      
+      messages update for ChatRoom
+      
+      
+      
+      
+      `,messages )
   }, [messages]); // 메시지가 변경될 때마다 실행  
 
   useEffect(() => {
@@ -106,10 +117,12 @@ export default function Detail() {
       
       socket.emit("join_room", chatRoomId);
       console.log("Joining room:", chatRoomId);
+      socket.emit("mark_as_read", { chatRoomId: chatRoomId, userId: session?.user.id });
       // 메시지 수신 이벤트
       socket.on("receive_message", (message) => {
         if (message.chatRoomId === chatRoomId) {
           console.log("New message received for this chat room:", message);
+          socket.emit("mark_as_read", { chatRoomId: chatRoomId, userId: session?.user.id });
           dispatch(addMessage(message));
         } else {
           console.log("Message received for another chat room. Ignoring.");
@@ -178,7 +191,7 @@ export default function Detail() {
           };
   
           socket?.emit("send_message", message);
-  
+          socket.emit("mark_as_read", { chatRoomId: chatRoomId, userId: session?.user.id });
           // Reset file state
           setSelectedFile(null);
         } catch (error) {
@@ -204,7 +217,8 @@ export default function Detail() {
   
 
   const handleGoToBack = () =>{
-      router.push('/chat');
+    window.location.href = '/chat';
+    
   }
 
   // 파일 선택 핸들러
@@ -340,12 +354,12 @@ export default function Detail() {
             
               // 날짜 포맷 결정
               const formattedDate = isToday
-                ? new Intl.DateTimeFormat("ko-KR", {
+                ? new Intl.DateTimeFormat(t('lang'), {
                     hour: "numeric",
                     minute: "numeric",
                     hour12: true,
                   }).format(messageDate)
-                : `${messageDate.getMonth() + 1}월 ${messageDate.getDate()}일`;
+                : `${messageDate.getMonth() + 1}${t('month')} ${messageDate.getDate()}${t('day')}`;
                 
               return (
                 <div key={msg.id}>
@@ -489,8 +503,8 @@ export default function Detail() {
                 }}
                 onCompositionStart={() => (isComposingRef.current = true)}
                 onCompositionEnd={() => (isComposingRef.current = false)}
-                className={selectedFile? `w-full px-3 py-1 border-customGray rounded-xl text-sm text-gray-500 bg-gray-300 focus:outline-none focus:ring-2 focus:ring-customLightPurple`:
-                    `w-full px-3 py-1 border-customGray rounded-xl text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-customLightPurple`}
+                className={selectedFile? `w-full px-3 py-1 border-customGray rounded-xl text-sm text-gray-500 bg-gray-300 focus:outline-none focus:ring-2 focus:border-transparent focus:ring-customLightPurple`:
+                    `w-full px-3 py-1 border-customGray rounded-xl text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-customLightPurple focus:border-transparent`}
               />
               {selectedFile &&(
                 <div className='absolute top-2 right-2' onClick={deleteFile}>
