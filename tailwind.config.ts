@@ -31,7 +31,13 @@ export default {
         blue500:"#3B82F6",
         green500:"#10B981",
         yellow500:"#F59E0B",
-        pink500:"#EC4899"
+        pink500:"#EC4899",
+        themePink:"#91034F",
+        themeYellow: "#9F7000",
+        themeGreen: "#4E5B02",
+        themeBlue:"#030391",
+        themeDarkBlue:"#02025B",
+        themeBlack:"#01012B"
 
       },
       safelist: [

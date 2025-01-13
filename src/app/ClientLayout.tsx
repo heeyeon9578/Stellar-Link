@@ -9,6 +9,7 @@ import socket from "@/socketIns"; // 위에서 만든 socket.ts 경로
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+
   const isChatPage = pathname?.startsWith('/chat')
   useEffect(() => {
     console.log("Socket instance:", socket);
@@ -32,6 +33,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       socket.off("disconnect");
     };
   }, []);
+ 
   return (
     <div className={`text-white`}>
       {!isChatPage && <Header />}

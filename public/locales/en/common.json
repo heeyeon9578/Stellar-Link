@@ -89,7 +89,10 @@
     "month":"/",
     "day":"",
     "EditName":"Edit Name",
-    "Nfrr":"No friend requests received."
+    "Nfrr":"No friend requests received.",
+    "Top":"Top",
+    "Middle":"Middle",
+    "Bottom":"Bottom"
    
 
 

@@ -182,6 +182,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
         console.log("색상 업데이트 성공:", result);
         io?.to(chatRoomId).emit("changed_textColor", data);
       });
+      // Save theme to the database and broadcast changes
+      socket.on("change_theme", async ({ userId, section, color }) => {
+        if (!userId || !section || !color) {
+          console.error("Invalid theme update data");
+          return;
+        }
+      
+        await db.collection("user_cred").updateOne(
+          { _id: new ObjectId(userId) },
+          {
+            $set: { [`theme.${section}`]: color }, // 개별 속성만 업데이트
+          },
+          { upsert: true } // 문서가 없으면 생성
+        );
+        
+      
+        // Broadcast the change to other connected clients
+        socket.broadcast.emit("theme_updated", { userId, section, color });
+      });
+      
       // Handle incoming messages
       socket.on("send_message", async(data: ChatMessage) => {
 

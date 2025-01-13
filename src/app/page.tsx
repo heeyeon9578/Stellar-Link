@@ -11,14 +11,14 @@ import Lottie from 'lottie-react'; // 올바른 컴포넌트 이름
 import chattingSVG from '../../public/json/chatting.json';
 import Rectangle from "./components/Rectangle";
 import DynamicText from "./components/DynamicText";
-
+import { useSession } from "next-auth/react";
 export default function Home() {
   const { t,i18n } = useTranslation('common');
   const [isInitialized, setIsInitialized] = useState(false);
   const [animation1, setAnimation1] = useState('animate__zoomInLeft');
   const [animation2, setAnimation2] = useState('animate__zoomInLeft');
   const [inSection2, setInSection2] = useState(false); // 섹션 2 도달 여부 상태
-
+  const { data: session } = useSession();
   const handleAnimationEnd1 = () => {
     setAnimation1('animate__pulse'); // 첫 번째 애니메이션 이후 반복 애니메이션 설정
   };
@@ -52,6 +52,25 @@ export default function Home() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll); // 클린업
   }, []);
+  // Fetch the user's initial theme from the database
+  useEffect(() => {
+    const fetchTheme = async () => {
+      if (!session?.user?.id) return;
+
+      const response = await fetch(`/api/user/theme?userId=${session.user.id}`);
+      const { top, middle, bottom } = await response.json();
+      applyTheme(top, middle, bottom);
+    };
+
+    fetchTheme();
+
+  }, [session]);
+  // Set CSS variables for the theme
+  const applyTheme = (top: string, middle: string, bottom: string) => {
+    document.documentElement.style.setProperty("--top-color", top);
+    document.documentElement.style.setProperty("--middle-color", middle);
+    document.documentElement.style.setProperty("--bottom-color", bottom);
+  };
 
   if (!isInitialized) return null;
   return (

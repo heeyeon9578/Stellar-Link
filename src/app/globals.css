@@ -3,8 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --top-color: #01012B;
+  --middle-color: #02025B;
+  --bottom-color: #030391;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -52,8 +53,13 @@ body {
   color: white; /* 텍스트 색상 */
 }
 
-.chat-layout{
-  background-image: linear-gradient(to bottom, #01012B, #02025B, #030391); /* 두 번째 레이어: 그라데이션 */
+.chat-layout {
+  background-image: linear-gradient(
+    to bottom,
+    var(--top-color),
+    var(--middle-color),
+    var(--bottom-color)
+  );
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
