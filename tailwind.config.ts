@@ -28,6 +28,10 @@ export default {
         yellow200: "#FEF9C3",
         pink200: "#FBCFE8",
         purple200: "#D8B4FE",
+        blue500:"#3B82F6",
+        green500:"#10B981",
+        yellow500:"#F59E0B",
+        pink500:"#EC4899"
 
       },
       safelist: [

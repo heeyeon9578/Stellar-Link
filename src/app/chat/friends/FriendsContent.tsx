@@ -442,7 +442,7 @@ const generateChatRoom = () => {
                      <img
                        src={friend.profileImage || "/SVG/default-profile.svg"}
                        alt={`${friend.name}'s profile`}
-                       className="w-[50px] h-[50px] rounded-full mr-2" 
+                       className="w-[50px] h-[50px] rounded-full mr-2 object-cover" 
                      />
 
                      <div>
@@ -508,7 +508,7 @@ const generateChatRoom = () => {
                       <img
                         src={request.toUserDetails.profileImage || "/SVG/default-profile.svg"}
                         alt={`${request.toUserDetails.name}'s profile`}
-                        className="w-[50px] h-[50px] rounded-full mr-2" 
+                        className="w-[50px] h-[50px] rounded-full mr-2 object-cover" 
                       />
 
                       <div>
@@ -572,7 +572,7 @@ const generateChatRoom = () => {
                       <img
                         src={request.fromUserDetails.profileImage || "/SVG/default-profile.svg"}
                         alt={`${request.fromUserDetails.name}'s profile`}
-                        className="w-[50px] h-[50px] rounded-full mr-2" 
+                        className="w-[50px] h-[50px] rounded-full mr-2 object-cover" 
                       />
 
                       <div>
@@ -640,7 +640,7 @@ const generateChatRoom = () => {
                    <img
                      src={friend.profileImage || "/SVG/default-profile.svg"}
                      alt={`${friend.name}'s profile`}
-                     className="w-[50px] h-[50px] rounded-full mr-2" 
+                     className="w-[50px] h-[50px] rounded-full mr-2 object-cover" 
                    />
 
                    <div>

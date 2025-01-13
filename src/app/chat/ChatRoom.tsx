@@ -19,6 +19,7 @@ import {
   setInput,
 } from "../../../store/chatSlice";
 import { setFips } from 'crypto';
+import { bool } from 'aws-sdk/clients/signer';
 interface Message {
   id: string;
   requesterId: string;
@@ -57,6 +58,9 @@ export default function Detail() {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [selectedColor,setSelectedColor] = useState<string>('');
   const [participantColors, setParticipantColors] = useState<{ [userId: string]: string }>({});
+  const [participantTextColors, setParticipantTextColors] = useState<{ [userId: string]: string }>({});
+  const [isColorChange, setIsColorChange] = useState<boolean>(false);
+
   const colorClasses: Record<string, string> = {
     customRectangle: "bg-customRectangle",
     blue200: "bg-blue200",
@@ -64,6 +68,12 @@ export default function Detail() {
     yellow200: "bg-yellow200",
     pink200: "bg-pink200",
     purple200: "bg-purple200",
+    black: "bg-black",
+    blue500: "bg-blue500",
+    green500: "bg-green500",
+    yellow500: "bg-yellow500",
+    pink500: "bg-pink500",
+    customPurple: "bg-customPurple",
   };
   const borderClasses: Record<string, string> = {
     customRectangle: "border-customRectangle",
@@ -74,6 +84,14 @@ export default function Detail() {
     purple200: "border-purple200",
   };
   
+  const textColorClasses: Record<string, string> = {
+    black: "text-black",
+    blue500: "text-blue500",
+    green500: "text-green500",
+    yellow500: "text-yellow500",
+    pink500: "text-pink500",
+    customPurple: "text-customPurple",
+  };
  
   
   // URL 파라미터에서 chatRoomId 가져오기
@@ -191,7 +209,20 @@ export default function Detail() {
         }
       }
     );
-
+     // 색상 변경 이벤트 처리
+     socket.on(
+      "changed_textColor",
+      (data: { chatRoomId: string; userId: string; color: string }) => {
+        console.log("Color change received:", data);
+        // 현재 채팅룸과 동일한 경우에만 반영
+        if (data.chatRoomId === chatRoomId) {
+          setParticipantTextColors((prev) => ({
+            ...prev,
+            [data.userId]: data.color,
+          }));
+        }
+      }
+    );
       // 메시지 수신 이벤트
       socket.on("receive_message", (message) => {
         if (message.chatRoomId === chatRoomId) {
@@ -226,6 +257,15 @@ export default function Detail() {
             {}
           );
           setParticipantColors(colorMapping); // 색상 데이터를 상태로 저장
+
+          const textColorMapping = data.participants.reduce(
+            (acc: { [key: string]: string }, participant: any) => {
+              acc[participant.userId] = participant.textColor;
+              return acc;
+            },
+            {}
+          );
+          setParticipantTextColors(textColorMapping); // 색상 데이터를 상태로 저장
         })
         .catch((error) => console.error("Error fetching participants colors:", error));
     }
@@ -353,19 +393,26 @@ export default function Detail() {
       
       `,data)
     socket?.emit("change_color", data);
-    // 서버에 색상 업데이트 요청
-    // fetch('/api/chat/updateColor', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     chatRoomId:chatRoomId,
-    //     userId: session?.user.id,
-    //     color: color,
-    //   }),
-    // });
+
   };
 
-  
+  const handleTextColorChange = (color:string) => {
+    // 선택한 색상 상태 업데이트
+    setSelectedColor(color);
+    const data = {
+      chatRoomId, // 이미 서버에서 검증할 것이므로 변환하지 않음
+      userId: session?.user.id.toString(), // userId도 문자열로 전송
+      color,
+    };
+    console.log(`
+      
+      data
+      
+      
+      `,data)
+    socket?.emit("change_textColor", data);
+
+  };
    // 메시지 변경 감지 후 애니메이션 설정
    useEffect(() => {
     if (messages.length > 0) {
@@ -431,7 +478,7 @@ export default function Detail() {
                      <img
                        src={participant.profileImage}
                        alt={participant.name}
-                       className="w-8 h-8 rounded-full border border-white"
+                       className="w-8 h-8 rounded-full border border-white object-cover"
                      />
                     </div>
 
@@ -461,7 +508,7 @@ export default function Detail() {
                         <img
                         src={participant.profileImage}
                         alt={participant.name}
-                        className="w-8 h-8 rounded-full border border-white"
+                        className="w-8 h-8 rounded-full border border-white object-cover"
                         />
                       </div>
                     ))}
@@ -469,15 +516,58 @@ export default function Detail() {
                   <div className='text-sm text-gray-500'>({chatRoomInfo?.participants.length || 0})</div>
                 </div>
               )}
-              <div className='absolute bottom-0 right-2 flex'>
+              <div className='absolute bottom-0 right-2 flex flex-col items-end '>
                 
-              {['customRectangle','blue200', 'green200', 'yellow200', 'pink200', 'purple200'].map((color, idx) => (
+              {
+                isColorChange && 
+                <>
+                <div className='flex mb-1'>
+                {['black','blue500', 'green500', 'yellow500', 'pink500', 'customPurple'].map((color, idx) => (
                 <div
                   key={idx}
-                  className={`w-8 h-8 ${colorClasses[color]} rounded-full cursor-pointer border border-white hover:scale-125 hover:animate__animated hover:animate__bounce`}
-                  onClick={() => handleColorChange(color)}
+                  className={`w-6 h-6 ${colorClasses[color]} mr-1 rounded-full cursor-pointer border border-white hover:scale-125 hover:animate__animated hover:animate__bounce`}
+                  onClick={() => handleTextColorChange(color)}
                 ></div>
-              ))}
+                ))}
+                <Image
+                  src="/SVG/text.svg"
+                  alt="text"
+                  width={24}
+                  height={24}
+                  priority
+                  
+                  className=""
+                />
+              </div>
+                <div className='flex mb-1'>
+                  {['customRectangle','blue200', 'green200', 'yellow200', 'pink200', 'purple200'].map((color, idx) => (
+                  <div
+                    key={idx}
+                    className={`w-6 h-6  mr-1 ${colorClasses[color]} rounded-full cursor-pointer border border-white hover:scale-125 hover:animate__animated hover:animate__bounce`}
+                    onClick={() => handleColorChange(color)}
+                  ></div>
+                  ))}
+                  <Image
+                    src="/SVG/colorChange.svg"
+                    alt="colorChange"
+                    width={24}
+                    height={24}
+                    priority
+                    
+                    className=""
+                  />
+                </div>
+                </>
+              }
+               <Image
+                    src="/SVG/more.svg"
+                    alt="colorChange"
+                    width={30}
+                    height={30}
+                    priority
+                    onClick={()=>{setIsColorChange(!isColorChange)}}
+                    className="cursor-pointer hover:scale-125"
+                  />
               </div>
             </div>
             
@@ -489,8 +579,11 @@ export default function Detail() {
           <div className="h-[90%] overflow-y-auto">
             {messages.map((msg,index) => {
                const messageColor = participantColors[msg.requesterId] || "customRectangle"; // 기본 색상 설정
-               
+               const messageTextColor = participantTextColors[msg.requesterId] || "customPurple"; // 기본 색상 설정
+
               const dynamicBorderClass = borderClasses[messageColor] || "border-customRectangle";
+              const dynamicTextClass = textColorClasses[messageTextColor] || "text-customPurple";
+
               // 메시지 날짜 포맷 처리
               const messageDate = new Date(msg.createdAt);
               const today = new Date();
@@ -521,7 +614,7 @@ export default function Detail() {
                  
                   
                   <div className="flex flex-col items-end ">
-                    <DynamicText className="text-sm text-customPurple" text={msg.requesterName}/>
+                    <DynamicText className={`text-sm ${dynamicTextClass}`} text={msg.requesterName}/>
                     <div className='flex items-end'>
                       <div className='flex flex-col items-end'>
                         {/** 안 읽은 사람 수 표시 */}
@@ -567,7 +660,7 @@ export default function Detail() {
                   <img
                     src={msg.requesterImage || "/SVG/default-profile.svg"}
                     alt="Profile"
-                    className={`w-[30px] h-[30px] rounded-full object-cover mr-2 border border-2 ${dynamicBorderClass}`}
+                    className={`w-[30px] h-[30px] object-cover rounded-full object-cover mr-2 border border-2 ${dynamicBorderClass}`}
                   />
                   {/* 채팅 끝에 위치한 더미 div */}
                   <div ref={messagesEndRef}></div>
@@ -583,7 +676,7 @@ export default function Detail() {
                     className={`w-[30px] h-[30px] rounded-full object-cover mr-2 border border-2 ${dynamicBorderClass}`}
                   />
                   <div className="flex flex-col">
-                    <DynamicText className="text-sm text-customPurple" text={msg.requesterName}/>
+                    <DynamicText className={`text-sm ${dynamicTextClass}`} text={msg.requesterName}/>
                     <div className='flex items-end'>
                         <div className={`text-xs text-gray-500 bg-${messageColor} max-w-[300px] p-2 flex-wrap rounded-custom-otherChat`}>
                           {msg.file? (

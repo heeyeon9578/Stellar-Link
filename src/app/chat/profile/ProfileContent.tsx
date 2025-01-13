@@ -210,9 +210,9 @@ export default function ProfileContent() {
           <img
             src={profileImage || '/SVG/default-profile.svg'}
             alt="Profile"
-            className="w-28 h-28 rounded-full mx-auto"
+            className="w-28 h-28 rounded-full mx-auto object-cover"
           />
-
+             
           <div className="absolute bg-white w-[20px] h-[20px] rounded-full flex justify-center items-center bottom-0 right-0">
             <Image
               src="/SVG/imageChange.svg"

@@ -679,7 +679,7 @@ if (!isInitialized) return null;
                      <img
                        src={friend.profileImage || "/SVG/default-profile.svg"}
                        alt={`${friend.name}'s profile`}
-                       className="w-[50px] h-[50px] rounded-full mr-2" 
+                       className="w-[50px] h-[50px] rounded-full mr-2 object-cover" 
                      />
 
                      <div>
@@ -854,7 +854,7 @@ if (!isInitialized) return null;
                               alt={chatRoom.participants[0].name}
                               width={30}
                               height={30}
-                              className="rounded-full w-8 h-8 mr-2 border border-white"
+                              className="rounded-full w-8 h-8 mr-2 border border-white object-cover"
                             />
                             <div className="flex flex-col text-customPurple text-sm ">
 
@@ -910,7 +910,7 @@ if (!isInitialized) return null;
                                   <img
                                     src={participant.profileImage}
                                     alt={participant.name}
-                                    className="w-8 h-8 rounded-full border border-white"
+                                    className="w-8 h-8 rounded-full border border-white object-cover"
                                   />
                                 </div>
                               ))}
