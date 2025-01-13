@@ -22,8 +22,19 @@ export default {
         customLightPurple: '#CD84F1', // 추가 색상
         customRectangle:"#F4F4F7",
         customGray:"#BEBFD3",
-        customBlue:"#030391"
+        customBlue:"#030391",
+        blue200: "#BFDBFE", // 동적으로 사용될 색상 추가
+        green200: "#C6F6D5", // 예시로 추가된 색상
+        yellow200: "#FEF9C3",
+        pink200: "#FBCFE8",
+        purple200: "#D8B4FE",
+
       },
+      safelist: [
+        {
+          pattern: /(bg|border)-(customRectangle|blue200|green200|yellow200|pink200|purple200)/,
+        },
+      ],
       borderRadius: {
         'custom': '20px', // 20px의 사용자 정의 라운드 값
         'custom-myChat': '16px 0 16px 16px', // 커스텀 border-radius,

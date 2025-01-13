@@ -1,6 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { connectDB } from '@/util/database';
 import { sendVerificationEmail } from '@/util/sendEmail';
+import { getServerSession } from "next-auth";
+import { authOptions } from "./auth/[...nextauth]"; // 인증 옵션 경로 조정
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
@@ -15,6 +18,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const db = (await connectDB).db('StellarLink');
     const user = await db.collection('user_cred').findOne({ email });
+    const session = await getServerSession(req, res, authOptions);
+    if (!session) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
     if (!user) {
       return res.status(404).json({ message: 'Email is not registered' });

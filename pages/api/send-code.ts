@@ -1,6 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import {connectDB} from '@/util/database';
 import { sendVerificationEmail } from '@/util/sendEmail';
+import { getServerSession } from "next-auth";
+import { authOptions } from "./auth/[...nextauth]"; // 인증 옵션 경로 조정
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -16,7 +18,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const db = client.db('StellarLink');
       const collection = db.collection('verificationCodes');
       const user = await db.collection('user_cred').findOne({ email });
-
+      const session = await getServerSession(req, res, authOptions);
+      if (!session) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+  
       if (user) {
         return res.status(404).json({ message: 'Email is already registered.' });
       }

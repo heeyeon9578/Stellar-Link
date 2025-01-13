@@ -4,7 +4,7 @@ import { ObjectId } from "mongodb";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]"; // 인증 옵션 경로 조정
 /**
- * 채팅방 만들기
+ * 채팅방 나가기
  * @param req 
  * @param res 
  * @returns 

@@ -3,7 +3,12 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]";
 import { ObjectId } from "mongodb";
-
+/**
+ * 안 읽은 참여자 수 세기
+ * @param req 
+ * @param res 
+ * @returns 
+ */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
       if (req.method !== "GET") {

@@ -8,6 +8,7 @@ import { RootState, AppDispatch } from "../../../store/store";
 import socket from "@/socketIns"; // 위에서 만든 socket.ts 경로
 import { useTranslation } from 'react-i18next';
 import '../../../i18n';
+import 'animate.css';
 import DynamicText from '../components/DynamicText';
 import { useRouter } from 'next/navigation';
 import {
@@ -54,9 +55,27 @@ export default function Detail() {
   const [isAnimatingFileAdd, setIsAnimatingFileAdd] = useState<boolean>(false);
   const [animatedMessageIndex, setAnimatedMessageIndex] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-
-
+  const [selectedColor,setSelectedColor] = useState<string>('');
+  const [participantColors, setParticipantColors] = useState<{ [userId: string]: string }>({});
+  const colorClasses: Record<string, string> = {
+    customRectangle: "bg-customRectangle",
+    blue200: "bg-blue200",
+    green200: "bg-green200",
+    yellow200: "bg-yellow200",
+    pink200: "bg-pink200",
+    purple200: "bg-purple200",
+  };
+  const borderClasses: Record<string, string> = {
+    customRectangle: "border-customRectangle",
+    blue200: "border-blue200",
+    green200: "border-green200",
+    yellow200: "border-yellow200",
+    pink200: "border-pink200",
+    purple200: "border-purple200",
+  };
+  
+ 
+  
   // URL 파라미터에서 chatRoomId 가져오기
   useEffect(() => {
     const id = searchParams?.get("chatRoomId");
@@ -158,7 +177,21 @@ export default function Detail() {
       }
     });
 
-  
+    // 색상 변경 이벤트 처리
+    socket.on(
+      "changed_color",
+      (data: { chatRoomId: string; userId: string; color: string }) => {
+        console.log("Color change received:", data);
+        // 현재 채팅룸과 동일한 경우에만 반영
+        if (data.chatRoomId === chatRoomId) {
+          setParticipantColors((prev) => ({
+            ...prev,
+            [data.userId]: data.color,
+          }));
+        }
+      }
+    );
+
       // 메시지 수신 이벤트
       socket.on("receive_message", (message) => {
         if (message.chatRoomId === chatRoomId) {
@@ -174,6 +207,31 @@ export default function Detail() {
       };
     }
   }, [chatRoomId, socket.connected, messages, dispatch]);
+
+  useEffect(() => {
+    if (chatRoomId) {
+      fetch(`/api/chat/getParticipantsColors?chatRoomId=${chatRoomId}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to fetch participants colors");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          const colorMapping = data.participants.reduce(
+            (acc: { [key: string]: string }, participant: any) => {
+              acc[participant.userId] = participant.color;
+              return acc;
+            },
+            {}
+          );
+          setParticipantColors(colorMapping); // 색상 데이터를 상태로 저장
+        })
+        .catch((error) => console.error("Error fetching participants colors:", error));
+    }
+  }, [chatRoomId]);
+
+  
   const fetchMarkAsRead = (chatRoomId:string) =>{
     fetch('/api/chat/mark-as-read', {
       method: 'POST',
@@ -260,7 +318,7 @@ export default function Detail() {
         // Reset input field
         dispatch(setInput(""));
       }
-    }, 300);
+    }, 500);
   };
   
 
@@ -280,6 +338,34 @@ export default function Detail() {
     setSelectedFile(null);
   }
 
+  const handleColorChange = (color:string) => {
+    // 선택한 색상 상태 업데이트
+    setSelectedColor(color);
+    const data = {
+      chatRoomId, // 이미 서버에서 검증할 것이므로 변환하지 않음
+      userId: session?.user.id.toString(), // userId도 문자열로 전송
+      color,
+    };
+    console.log(`
+      
+      data
+      
+      
+      `,data)
+    socket?.emit("change_color", data);
+    // 서버에 색상 업데이트 요청
+    // fetch('/api/chat/updateColor', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({
+    //     chatRoomId:chatRoomId,
+    //     userId: session?.user.id,
+    //     color: color,
+    //   }),
+    // });
+  };
+
+  
    // 메시지 변경 감지 후 애니메이션 설정
    useEffect(() => {
     if (messages.length > 0) {
@@ -289,7 +375,7 @@ export default function Detail() {
       // 일정 시간 후 애니메이션 상태 제거
       setTimeout(() => {
         setAnimatedMessageIndex(null);
-      }, 300); // 애니메이션 시간 (0.5초)
+      }, 500); // 애니메이션 시간 (0.5초)
     }
   }, [messages]);
 
@@ -315,21 +401,22 @@ export default function Detail() {
 
           {/** 타이틀 섹션 */}
            
-          <div className="h-[15%]">
+          <div className="h-[15%] ">
             {/** 뒤로가기 버튼 */}
-            <div className="flex justify-start mb-2">
+            <div className="flex justify-start mb-2 ">
               <Image
                 src="/SVG/back.svg"
                 alt="back"
                 width={30}
                 height={30}
                 priority
-                className={`cursor-pointer ${isAnimatingFileAdd ? 'animate__animated animate__headShake' : ''}`}
+                className={`cursor-pointer hover:scale-125 ${isAnimatingFileAdd ? 'animate__animated animate__headShake' : ''}`}
                 onClick={handleGoToBack}
               />
             </div>
-            {chatRoomInfo?.title? (
-              <div>
+            <div className='relative h-[50px]'>
+              {chatRoomInfo?.title? (
+              <div className=''>
 
                 <div className="relative flex">
                  {chatRoomInfo?.participants.map((participant, index) => (
@@ -359,7 +446,7 @@ export default function Detail() {
 
               </div>
 
-              ):(
+                ):(
                 <div>
                   <div className="relative flex ml-[22px]">
                     {chatRoomInfo?.participants.map((participant, index) => (
@@ -381,14 +468,29 @@ export default function Detail() {
                   </div>
                   <div className='text-sm text-gray-500'>({chatRoomInfo?.participants.length || 0})</div>
                 </div>
-            )}
-              
+              )}
+              <div className='absolute bottom-0 right-2 flex'>
+                
+              {['customRectangle','blue200', 'green200', 'yellow200', 'pink200', 'purple200'].map((color, idx) => (
+                <div
+                  key={idx}
+                  className={`w-8 h-8 ${colorClasses[color]} rounded-full cursor-pointer border border-white hover:scale-125 hover:animate__animated hover:animate__bounce`}
+                  onClick={() => handleColorChange(color)}
+                ></div>
+              ))}
+              </div>
+            </div>
+            
+       
             
           </div>
 
           {/** 채팅 섹션 */}
           <div className="h-[90%] overflow-y-auto">
             {messages.map((msg,index) => {
+               const messageColor = participantColors[msg.requesterId] || "customRectangle"; // 기본 색상 설정
+               
+              const dynamicBorderClass = borderClasses[messageColor] || "border-customRectangle";
               // 메시지 날짜 포맷 처리
               const messageDate = new Date(msg.createdAt);
               const today = new Date();
@@ -430,7 +532,7 @@ export default function Detail() {
                         )}
                          <div className="text-xs text-gray-400">{formattedDate}</div>
                       </div>
-                        <span className="ml-2 text-xs text-gray-500 bg-customRectangle rounded-custom-myChat max-w-[300px] p-2 flex-wrap">
+                        <span className={`ml-2 text-xs text-gray-500 bg-${messageColor} rounded-custom-myChat max-w-[300px] p-2 flex-wrap`}>
                         {msg.file? (
                             <>
                              {msg.file.type.startsWith("image/") ? (
@@ -465,7 +567,7 @@ export default function Detail() {
                   <img
                     src={msg.requesterImage || "/SVG/default-profile.svg"}
                     alt="Profile"
-                    className="w-[30px] h-[30px] rounded-full object-cover mr-2 border border-white"
+                    className={`w-[30px] h-[30px] rounded-full object-cover mr-2 border border-2 ${dynamicBorderClass}`}
                   />
                   {/* 채팅 끝에 위치한 더미 div */}
                   <div ref={messagesEndRef}></div>
@@ -478,12 +580,12 @@ export default function Detail() {
                   <img
                     src={msg.requesterImage || "/SVG/default-profile.svg"}
                     alt="Profile"
-                    className="w-[30px] h-[30px] rounded-full object-cover mr-2 border border-white"
+                    className={`w-[30px] h-[30px] rounded-full object-cover mr-2 border border-2 ${dynamicBorderClass}`}
                   />
                   <div className="flex flex-col">
                     <DynamicText className="text-sm text-customPurple" text={msg.requesterName}/>
                     <div className='flex items-end'>
-                        <div className="text-xs text-gray-500 bg-customRectangle max-w-[300px] p-2 flex-wrap rounded-custom-otherChat">
+                        <div className={`text-xs text-gray-500 bg-${messageColor} max-w-[300px] p-2 flex-wrap rounded-custom-otherChat`}>
                           {msg.file? (
                             <>
                              {msg.file.type.startsWith("image/") ? (
@@ -543,7 +645,7 @@ export default function Detail() {
                     width={15}
                     height={15}
                     priority
-                    className="cursor-pointer"
+                    className="cursor-pointer hover:scale-125"
                   />
                 </label>
                 <input
@@ -596,7 +698,7 @@ export default function Detail() {
                 width={20}
                 height={20}
                 priority
-                className={`cursor-pointer ${isAnimating ? 'animate__animated animate__headShake' : ''}`}
+                className={`cursor-pointer hover:scale-125 ${isAnimating ? 'animate__animated animate__headShake' : ''}`}
                 onClick={handleSendMessage}
               />
             </div>

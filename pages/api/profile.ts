@@ -1,6 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcryptjs';
 import { connectDB } from '@/util/database';
+import { getServerSession } from "next-auth";
+import { authOptions } from "./auth/[...nextauth]"; // 인증 옵션 경로 조정
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'PUT') {
@@ -17,6 +19,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     const db = (await connectDB).db('StellarLink');
+    const session = await getServerSession(req, res, authOptions);
+    if (!session) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
     const updates: any = {};
     if (name) updates.name = name;

@@ -641,7 +641,7 @@ if (!isInitialized) return null;
          width={25}
          height={25}
          priority
-         className={`cursor-pointer ${isAnimating ? 'animate__animated animate__flip' : ''}`} // 애니메이션 클래스 추가
+         className={`cursor-pointer hover:scale-125 ${isAnimating ? 'animate__animated animate__flip' : ''}`} // 애니메이션 클래스 추가
          onClick={generateChatRoom}
        />
        ):(
@@ -651,7 +651,7 @@ if (!isInitialized) return null;
         width={25}
         height={25}
         priority
-        className={`cursor-pointer ${isAnimating ? 'animate__animated animate__flip' : ''}`} // 애니메이션 클래스 추가
+        className={`cursor-pointer hover:scale-125 ${isAnimating ? 'animate__animated animate__flip' : ''}`} // 애니메이션 클래스 추가
         onClick={generateChatRoom}
       />
        )}

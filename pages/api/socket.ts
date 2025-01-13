@@ -75,6 +75,61 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
         socket.join(room);
   
       });
+      function isValidObjectId(id: string): boolean {
+        return ObjectId.isValid(id) && new ObjectId(id).toString() === id;
+      }
+      socket.on("change_color", async(data )=>{
+        const { chatRoomId, userId, color } = data;
+        if (!isValidObjectId(chatRoomId) || !isValidObjectId(userId)) {
+          console.error("Invalid ObjectId format");
+          return;
+        }
+        console.log(`
+          
+          change_color
+          chatRoomId:${chatRoomId}
+          userId:${userId}
+          color:${color}
+          `)
+        // 문서가 없으면 생성
+        const result = await db.collection("participants").updateOne(
+          { _id: new ObjectId(chatRoomId) },
+          {
+            $setOnInsert: { _id: new ObjectId(chatRoomId), participants: [] }, // 문서 생성 시 빈 participants 배열 추가
+          },
+          { upsert: true } // 없으면 생성
+        );
+
+        // participants 배열에서 userId가 존재하는지 확인
+        const existingParticipant = await db.collection("participants").findOne({
+          _id: new ObjectId(chatRoomId),
+          "participants.userId": new ObjectId(userId),
+        });
+
+        if (existingParticipant) {
+          // 이미 존재하면 색상 업데이트
+          await db.collection("participants").updateOne(
+            { _id: new ObjectId(chatRoomId), "participants.userId": new ObjectId(userId) },
+            { $set: { "participants.$.color": color } }
+          );
+        } else {
+          // 존재하지 않으면 배열에 추가
+          await db.collection("participants").updateOne(
+            { _id: new ObjectId(chatRoomId) },
+            {
+              $push: {
+                participants: {
+                  userId: new ObjectId(userId),
+                  color: color,
+                },
+              },
+            }
+          );
+        }
+
+        console.log("색상 업데이트 성공:", result);
+        io?.to(chatRoomId).emit("changed_color", data);
+      });
 
       // Handle incoming messages
       socket.on("send_message", async(data: ChatMessage) => {
