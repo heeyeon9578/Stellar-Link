@@ -95,7 +95,9 @@
     "Bottom":"Bottom",
     "Tanbf":"There are no blocked friends.",
     "SortByName":"Name",
-    "SortByLatest":"Latest"
+    "SortByLatest":"Latest",
+    "Effd":"Error fetching friends data.",
+    "Ptal":"Please try again later."
    
 
 

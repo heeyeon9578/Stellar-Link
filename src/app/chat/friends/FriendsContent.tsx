@@ -61,7 +61,7 @@ export default function FriendsContent() {
     setIsMenuOpen(false); // 옵션 선택 후 메뉴 닫기
   };
   const toggleMenu = () => {
-    setIsMenuOpen((prev) => !prev); // 메뉴 열기/닫기 상태 토글
+    setIsMenuOpen(!isMenuOpen); // 메뉴 열기/닫기 상태 토글
   };
   // 로컬 상태 (새로운 친구 추가용)
   const [newFriendEmail, setNewFriendEmail] = useState<string>("");
@@ -398,8 +398,8 @@ const generateChatRoom = () => {
   if (error) {
     return (
       <div className="p-8 text-red-500">
-        <p>{t("Error fetching friends data.")}</p>
-        <p>{t("Please try again later.")}</p>
+         <p>{t("Effd")}</p>
+         <p>{t("Ptal")}</p>
       </div>
     );
   }
@@ -474,7 +474,9 @@ const generateChatRoom = () => {
 
       
       </div>
-      <div className="relative bg-black " style={{zIndex:'9999'}}>
+
+      {/** 정렬 */}
+      <div onClick={toggleMenu} className="relative bg-black cursor-pointer" style={{zIndex:'9999'}}>
         {/* 메뉴를 여는 버튼 */}
         <div className="right-0 absolute flex mt-3">
           <div
@@ -491,7 +493,7 @@ const generateChatRoom = () => {
             height={15}
             priority
             className="cursor-pointer hover:scale-125"
-            onClick={toggleMenu}
+            
           />
           ):(
             <Image
@@ -501,7 +503,7 @@ const generateChatRoom = () => {
             height={15}
             priority
             className="cursor-pointer hover:scale-125"
-            onClick={toggleMenu}
+           
           />
           )}
         </div>

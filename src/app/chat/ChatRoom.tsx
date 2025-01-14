@@ -18,26 +18,7 @@ import {
   addMessage,
   setInput,
 } from "../../../store/chatSlice";
-import { setFips } from 'crypto';
-import { bool } from 'aws-sdk/clients/signer';
-interface Message {
-  id: string;
-  requesterId: string;
-  senderEmail: string;
-  requesterName: string;
-  readBy: string[]; // 반드시 string[]이어야 합니다.
-  requesterImage: string;
-  requesterEmail: string;
-  text: string;
-  createdAt: Date;
-  chatRoomId: string;
-  file?: {
-    name: string;
-    type: string;
-    data?: string;
-    url?: string;
-  };
-}
+
 
 export default function Detail() {
   const { t,i18n } = useTranslation('common');
