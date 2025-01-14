@@ -33,6 +33,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return res.status(404).json({ message: "Requester not found." });
         }
        
+       
+        // Extract sort parameters from the query and ensure they are strings
+        const sortBy = Array.isArray(req.query.sortBy) ? req.query.sortBy[0] : req.query.sortBy || "addedAt";
+        const order = Array.isArray(req.query.order) ? req.query.order[0] : req.query.order || "desc";
+        
+        // Validate sortBy and order
+        const validSortBy = ["addedAt", "name"];
+        const validOrder = ["asc", "desc"];
+        if (!validSortBy.includes(sortBy) || !validOrder.includes(order)) {
+          return res.status(400).json({ message: "Invalid sorting parameters." });
+        }
         const friendship = await db.collection("friends").findOne({ userId: requesterId });
         
         if (!friendship || !friendship.friends) {
@@ -51,9 +62,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             };
           })
         );
-        return res.status(200).json(friendDetails);
+        //return res.status(200).json(friendDetails);
        
+         // Sort the data using JavaScript (for simplicity)
+         const sortedFriends = friendDetails.sort((a, b) => {
+          if (sortBy === "addedAt") {
+            const dateA = new Date(a.addedAt || 0).getTime();
+            const dateB = new Date(b.addedAt || 0).getTime();
+            return order === "asc" ? dateA - dateB : dateB - dateA;
+          } else if (sortBy === "name") {
+            return order === "asc"
+              ? (a.name || "").localeCompare(b.name || "")
+              : (b.name || "").localeCompare(a.name || "");
+          }
+          return 0;
+        });
 
+        return res.status(200).json(sortedFriends);
 
       } catch (error) {
         console.log(error)

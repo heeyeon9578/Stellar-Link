@@ -66,3 +66,19 @@ body {
   color: white; /* 텍스트 색상 */
   height: 100vh;
 }
+/* global.css */
+@keyframes pulse {
+  0% {
+    background-color: #e0e0e0;
+  }
+  50% {
+    background-color: #f5f5f5;
+  }
+  100% {
+    background-color: #e0e0e0;
+  }
+}
+
+.skeleton {
+  display: inline-block;
+}

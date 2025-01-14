@@ -12,19 +12,24 @@ import Button from '@/app/components/Button';
 import DynamicText from '../../../app/components/DynamicText';
 import { useRouter } from 'next/navigation';
 import 'animate.css';
+import Skeleton from "@/app/components/Skeleton"; // 스켈레톤 컴포넌트 가져오기
 
 export default function FriendsContent() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { t,i18n } = useTranslation('common');
   const [isClicked, setIsClicked] = useState<'All'|'Request'|'Pending'|'Blocked'>('All');
-  const [isMoreClicked,setIsMoreClicked] = useState<Record<string, boolean>>({});
-  const [isCancelClicked,setIsCancelClicked] = useState<Record<string, boolean>>({});
-  const [isAcceptClicked,setIsAcceptClicked] = useState<Record<string, boolean>>({});
+  // const [isMoreClicked,setIsMoreClicked] = useState<Record<string, boolean>>({});
+  // 더보기 메뉴가 열려 있는 친구의 ID만 저장하는 state
+  const [openMoreMenuFriendId, setOpenMoreMenuFriendId] = useState<string | null>(null);  
+  // const [isCancelClicked,setIsCancelClicked] = useState<Record<string, boolean>>({});
+  // const [isAcceptClicked,setIsAcceptClicked] = useState<Record<string, boolean>>({});
   const [isInitialized, setIsInitialized] = useState(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [dropdownPosition, setDropdownPosition] = useState({ x: 0, y: 0 });
-  
+  const [sortOption, setSortOption] = useState<'latest' | 'name'>('latest'); // 정렬 옵션 상태
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [toggleUpDown,setToggleUpDown] = useState<boolean>(false);
   // Redux store에서 필요한 상태를 꺼내옵니다.
   const {
     list: friends,
@@ -33,7 +38,31 @@ export default function FriendsContent() {
     loading,
     error,
   } = useSelector((state: RootState) => state.friends);
-  
+   // 친구 목록 정렬
+ 
+  const sortedFriends = friends
+  .filter((friend) => friend.status !== "block") // 차단된 친구 제외
+  .sort((a, b) => {
+    if (sortOption === "latest") {
+      // addedAt 값이 undefined일 경우 기본값으로 0을 사용
+      return (
+        (new Date(b.addedAt || 0).getTime() || 0) -
+        (new Date(a.addedAt || 0).getTime() || 0)
+      );
+    } else if (sortOption === "name") {
+      return (a.name || "").localeCompare(b.name || "");
+    }
+    return 0;
+  });
+  const handleSortChange = (option:'latest' | 'name') => {
+    const order = option === "name" ? "asc" : "desc"; // Default to ascending for names
+    setSortOption(option);
+    dispatch(fetchFriends({ sortBy: option, order }));
+    setIsMenuOpen(false); // 옵션 선택 후 메뉴 닫기
+  };
+  const toggleMenu = () => {
+    setIsMenuOpen((prev) => !prev); // 메뉴 열기/닫기 상태 토글
+  };
   // 로컬 상태 (새로운 친구 추가용)
   const [newFriendEmail, setNewFriendEmail] = useState<string>("");
   const [search, setSearch] = useState<string>("");
@@ -90,35 +119,36 @@ export default function FriendsContent() {
     y: rect.bottom + window.scrollY-20, // 버튼의 아래쪽 좌표 (스크롤 고려)
   });
 
-  setIsMoreClicked((prev) => ({
-    ...prev,
-    [friendId]: !prev[friendId], // 현재 값의 반대로
-  }));
+  if (openMoreMenuFriendId === friendId) {
+    setOpenMoreMenuFriendId(null);
+  } else {
+    setOpenMoreMenuFriendId(friendId);
+  }
   };
 
-  const toggleCancelMenu = (requestId: string, event: React.MouseEvent<HTMLDivElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect(); // 버튼의 위치 계산
-  setDropdownPosition({
-    x: rect.left-125, // 버튼의 왼쪽 좌표
-    y: rect.bottom + window.scrollY-20, // 버튼의 아래쪽 좌표 (스크롤 고려)
-  });
-    setIsCancelClicked((prev) => ({
-      ...prev,
-      [requestId]: !prev[requestId], // 현재 값의 반대로
-    }));
-  };
+  // const toggleCancelMenu = (requestId: string, event: React.MouseEvent<HTMLDivElement>) => {
+  //   const rect = event.currentTarget.getBoundingClientRect(); // 버튼의 위치 계산
+  // setDropdownPosition({
+  //   x: rect.left-125, // 버튼의 왼쪽 좌표
+  //   y: rect.bottom + window.scrollY-20, // 버튼의 아래쪽 좌표 (스크롤 고려)
+  // });
+  //   setIsCancelClicked((prev) => ({
+  //     ...prev,
+  //     [requestId]: !prev[requestId], // 현재 값의 반대로
+  //   }));
+  // };
 
-  const toggleAcceptMenu = (requestId: string, event: React.MouseEvent<HTMLDivElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect(); // 버튼의 위치 계산
-  setDropdownPosition({
-    x: rect.left-125, // 버튼의 왼쪽 좌표
-    y: rect.bottom + window.scrollY-20, // 버튼의 아래쪽 좌표 (스크롤 고려)
-  });
-    setIsAcceptClicked((prev) => ({
-      ...prev,
-      [requestId]: !prev[requestId], // 현재 값의 반대로
-    }));
-  };
+  // const toggleAcceptMenu = (requestId: string, event: React.MouseEvent<HTMLDivElement>) => {
+  //   const rect = event.currentTarget.getBoundingClientRect(); // 버튼의 위치 계산
+  // setDropdownPosition({
+  //   x: rect.left-125, // 버튼의 왼쪽 좌표
+  //   y: rect.bottom + window.scrollY-20, // 버튼의 아래쪽 좌표 (스크롤 고려)
+  // });
+  //   setIsAcceptClicked((prev) => ({
+  //     ...prev,
+  //     [requestId]: !prev[requestId], // 현재 값의 반대로
+  //   }));
+  // };
 
 
 
@@ -136,11 +166,11 @@ export default function FriendsContent() {
 
   useEffect(() => {
     // 컴포넌트가 마운트될 때, Thunk 액션을 디스패치해서 데이터 로드
-    dispatch(fetchFriends());
+    dispatch(fetchFriends({ sortBy: sortOption, order: sortOption === 'name' ? 'asc' : 'desc' }));
     dispatch(fetchReceivedRequests());
     dispatch(fetchSentRequests());
 
-  }, [dispatch]);
+  }, [dispatch, sortOption]);
 
   // 친구 추가 요청
   const handleAddFriend = async () => {
@@ -240,7 +270,7 @@ const handleBlockFriend = async (toUserId: string) => {
     }
 
     alert(t('Fbs'));
-    dispatch(fetchFriends());
+    //dispatch(fetchFriends());
   } catch (err) {
     console.error("Error blocking friend request:", err);
     alert(t('Ftbf'));
@@ -265,7 +295,7 @@ const handleUnblockFriend = async (toUserId: string) => {
     }
 
     alert(t('Fus'));
-    dispatch(fetchFriends());
+    //dispatch(fetchFriends());
   } catch (err) {
     console.error("Error unblocking friend request:", err);
     alert(t('Ftuf'));
@@ -289,7 +319,7 @@ const handleDeleteFriend = async (toUserId: string) => {
     alert("Friend removed successfully.");
 
     // 친구 목록 다시 불러오기
-    dispatch(fetchFriends());
+   // dispatch(fetchFriends());
   } catch (err) {
     console.error("Error removing friend:", err);
     alert("Error removing friend");
@@ -346,14 +376,34 @@ const generateChatRoom = () => {
   }, 1000); // 애니메이션 지속 시간에 맞게 설정 (예: 1초)
 }
 
-  // if (loading) {
-  //   return <p>Loading...</p>;
-  // }
 
-  // if (error) {
-  //   return <p>Error: {error}</p>;
-  // }
   if (!isInitialized) return null;
+
+  // 로딩 상태
+  if (loading) {
+    return (
+      <div className="p-8">
+        <Skeleton width="80%" height="30px" borderRadius="8px" />
+        <div className="mt-4">
+          <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-2"/>
+          <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-2"/>
+          <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-4"/>
+          <Skeleton width="100%" height="350px" borderRadius="12px" className="mb-2"/>
+        </div>
+      </div>
+    );
+  }
+
+  // 에러 상태
+  if (error) {
+    return (
+      <div className="p-8 text-red-500">
+        <p>{t("Error fetching friends data.")}</p>
+        <p>{t("Please try again later.")}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto p-8 rounded-lg h-full text-customBlue relative">
 
@@ -361,7 +411,7 @@ const generateChatRoom = () => {
       <h2 className="text-2xl font-bold mb-4">
         <DynamicText text={t('Friends')} />
       </h2>
-
+    
      {/** 검색 창 (디바운스 적용) */}
       <div className="w-full h-10 bg-customGray rounded-xl flex">
         <div className="p-2 flex items-center">
@@ -424,11 +474,60 @@ const generateChatRoom = () => {
 
       
       </div>
+      <div className="relative bg-black " style={{zIndex:'9999'}}>
+        {/* 메뉴를 여는 버튼 */}
+        <div className="right-0 absolute flex mt-3">
+          <div
+            className=" bg-trasparent text-customPurple text-xs"
+          >
+            {sortOption === 'latest' ? t('SortByLatest') : t('SortByName')}
+            
+          </div>
+          {isMenuOpen ? (
+            <Image
+            src="/SVG/up.svg"
+            alt="up"
+            width={15}
+            height={15}
+            priority
+            className="cursor-pointer hover:scale-125"
+            onClick={toggleMenu}
+          />
+          ):(
+            <Image
+            src="/SVG/down.svg"
+            alt="down"
+            width={15}
+            height={15}
+            priority
+            className="cursor-pointer hover:scale-125"
+            onClick={toggleMenu}
+          />
+          )}
+        </div>
 
+        {/* 드롭다운 메뉴 */}
+        {isMenuOpen && (
+          <div className="absolute right-0 mt-8 w-22 bg-white border border-gray-200 bg-transparent z-1000 text-customPurple text-xs">
+            <button
+              onClick={() => handleSortChange('latest')}
+              className={`block w-full text-left px-4 py-2 hover:bg-gray-100 ${sortOption === 'latest' ? 'bg-gray-100' : ''}`}
+            >
+              {t('SortByLatest')}
+            </button>
+            <button
+              onClick={() => handleSortChange('name')}
+              className={`block w-full text-left px-4 py-2 hover:bg-gray-100 ${sortOption === 'name' ? 'bg-gray-100' : ''}`}
+            >
+              {t('SortByName')}
+            </button>
+          </div>
+        )}
+      </div>
       {
         isClicked==='All' && 
         (
-          <div className="mt-4 max-h-[50vh] overflow-y-auto">
+          <div className="mt-10 max-h-[50vh] overflow-y-auto">
             {filteredFriends.filter(friend => friend.status !== 'block').length === 0 ? (
              <DynamicText className="text-gray-500" text={t('Yhnfy')}/>
             ) : (
@@ -467,7 +566,7 @@ const generateChatRoom = () => {
                       onClick={(event) => toggleMoreMenu(friend._id, event)}
                      />
                      {/* 차단, 차단 해제 버튼 추가 */}
-                     {isMoreClicked[friend._id]&&(
+                     {openMoreMenuFriendId === friend._id &&(
                        <div className=" z-50 absolute w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm"
                        style={{
                         top: 5, // 드롭다운의 Y축 위치
@@ -495,7 +594,7 @@ const generateChatRoom = () => {
       }
     
       {isClicked==='Request'&&(
-        <div className="mt-4 max-h-[50vh] overflow-y-auto"> 
+        <div className="mt-10 max-h-[50vh] overflow-y-auto"> 
           {filteredSentRequests.length === 0 ? (
             <DynamicText className="text-gray-500" text={t('Nsfr')}/>
           ) : (
@@ -530,10 +629,10 @@ const generateChatRoom = () => {
                         height={25}
                         priority
                         className="cursor-pointer"
-                       onClick={(event) => toggleCancelMenu(request._id,event)}
+                       onClick={(event) => toggleMoreMenu(request._id,event)}
                       />
                       {/* Cancel */}
-                      {isCancelClicked[request._id]&&(
+                      {openMoreMenuFriendId === request._id &&(
                         <div className=" z-50 absolute w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm"
                         style={{
                          top: 5, // 드롭다운의 Y축 위치
@@ -558,7 +657,7 @@ const generateChatRoom = () => {
         isClicked==='Pending' &&
         (
 
-          <div className="mt-4 max-h-[50vh] overflow-y-auto">
+          <div className="mt-10 max-h-[50vh] overflow-y-auto">
         
             {filteredReceivedRequests.length === 0 ? (
               <DynamicText className='text-gray-500' text={t('Nfrr')}/>
@@ -594,10 +693,10 @@ const generateChatRoom = () => {
                         height={25}
                         priority
                         className="cursor-pointer"
-                       onClick={(event) => toggleAcceptMenu(request._id,event)}
+                        onClick={(event) => toggleMoreMenu(request._id,event)}
                       />
                       {/* 수락 거절 추가 */}
-                      {isAcceptClicked[request._id]&&(
+                      {openMoreMenuFriendId === request._id &&(
                          <div className=" z-50 absolute w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm"
                          style={{
                           top: 5, // 드롭다운의 Y축 위치
@@ -628,9 +727,9 @@ const generateChatRoom = () => {
         isClicked==='Blocked' &&
         (
 
-          <div className="mt-4 max-h-[50vh] overflow-y-auto">
+          <div className="mt-10 max-h-[50vh] overflow-y-auto">
           {filteredFriends.filter(friend => friend.status === 'block').length === 0 ? (
-            <DynamicText className="text-gray-500" text={t('Yhnfy')}/>
+            <DynamicText className="text-gray-500" text={t('Tanbf')}/>
           ) : (
             <ul>
               {filteredFriends.filter(friend => friend.status === 'block').map((friend) => (
@@ -665,7 +764,7 @@ const generateChatRoom = () => {
                     onClick={(event) => toggleMoreMenu(friend._id, event)}
                    />
                    {/* 삭제, 차단 해제 버튼 추가 */}
-                   {isMoreClicked[friend._id]&&(
+                   {openMoreMenuFriendId === friend._id &&(
                      <div className=" z-50 absolute w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm"
                      style={{
                       top: 5, // 드롭다운의 Y축 위치

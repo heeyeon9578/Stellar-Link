@@ -92,7 +92,10 @@
     "Nfrr":"No friend requests received.",
     "Top":"Top",
     "Middle":"Middle",
-    "Bottom":"Bottom"
+    "Bottom":"Bottom",
+    "Tanbf":"There are no blocked friends.",
+    "SortByName":"Name",
+    "SortByLatest":"Latest"
    
 
 

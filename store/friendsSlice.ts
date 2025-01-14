@@ -53,11 +53,41 @@ const initialState: FriendsState = {
 // 실제 API 엔드포인트(/api/friends)를 호출해 친구 정보를 가져옵니다.
 // 응답이 정상(ok)이 아니면 에러를 던집니다.
 // 성공 시 JSON을 파싱해 Friend[] 형태로 반환합니다.
-export const fetchFriends = createAsyncThunk("friends/fetchFriends", async () => {
-  const response = await fetch("/api/friends");
-  if (!response.ok) throw new Error("Failed to fetch friends");
-  return (await response.json()) as Friend[];
-});
+export const fetchFriends = createAsyncThunk(
+  "friends/fetchFriends",
+  async (
+    { sortBy = "addedAt", order = "desc" }: { sortBy?: string; order?: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      // Validate sortBy and order
+      const validSortBy = ["addedAt", "name"];
+      const validOrder = ["asc", "desc"];
+
+      // Ensure sortBy and order are valid; fallback to defaults if not
+      if (!validSortBy.includes(sortBy)) {
+        sortBy = "addedAt";
+      }
+      if (!validOrder.includes(order)) {
+        order = "desc";
+      }
+
+      const response = await fetch(`/api/friends?sortBy=${sortBy}&order=${order}`);
+
+      if (!response.ok) {
+        // Throw a custom error message based on response status
+        const errorMessage = `Failed to fetch friends. Status: ${response.status}`;
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      // Ensure the error message is returned for better debugging
+      return rejectWithValue(error instanceof Error ? error.message : "Unknown error");
+    }
+  }
+);
 
 export const fetchReceivedRequests = createAsyncThunk("friends/fetchReceivedRequests", async () => {
   const response = await fetch("/api/friends-requests");
