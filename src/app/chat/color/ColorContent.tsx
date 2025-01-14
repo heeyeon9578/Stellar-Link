@@ -108,7 +108,7 @@ export default function ColorContent() {
   if (!isInitialized) return null;
 
   return (
-    <div className="mx-auto p-8 rounded-lg h-full text-customBlue">
+    <div className="mx-auto p-8 rounded-lg h-full text-customBlue ">
       <h2 className="text-2xl font-bold mb-4">
         <DynamicText text={t("Color")} />
       </h2>
@@ -117,11 +117,11 @@ export default function ColorContent() {
         {["top", "middle", "bottom"].map((section) => (
           <div key={section}>
             <DynamicText text={t(section.charAt(0).toUpperCase() + section.slice(1))} className="text-sm text-customPurple" />
-            <div className="flex">
+            <div className="flex gap-2 mt-2">
               {Object.keys(ThemeColors).map((key) => (
                 <div
                   key={key}
-                  className={`w-6 h-6 rounded-full cursor-pointer border border-white hover:scale-125`}
+                  className={`w-6 h-6 rounded-full cursor-pointer border border-white hover:scale-125 `}
                   style={{ backgroundColor: ThemeColors[key] }}
                   onClick={() => handleThemeChange(ThemeColors[key], section as "top" | "middle" | "bottom")}
                 ></div>
