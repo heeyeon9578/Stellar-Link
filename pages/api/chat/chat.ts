@@ -32,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const collection = db.collection("messages");
 
     const currentUserId = session.user.id;
-    console.log("Current User ID:", currentUserId);
+    //("Current User ID:", currentUserId);
 
     let filter: any = {
       participants: { $in: [new ObjectId(currentUserId)] },

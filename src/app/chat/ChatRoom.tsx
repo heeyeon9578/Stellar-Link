@@ -86,11 +86,11 @@ export default function Detail() {
   }, [searchParams, dispatch]);
 
   useEffect(() => {
-    console.log("Socket instance:", socket);
-    console.log("Socket connected:", socket.connected);
+    //console.log("Socket instance:", socket);
+    //console.log("Socket connected:", socket.connected);
   
     socket.on("connect", () => {
-      console.log("Socket connected");
+      //console.log("Socket connected");
     });
   
     socket.on("connect_error", (error) => {
@@ -98,7 +98,7 @@ export default function Detail() {
     });
   
     socket.on("disconnect", (reason) => {
-      console.log("Socket disconnected:", reason);
+      //console.log("Socket disconnected:", reason);
     });
   
     return () => {
@@ -135,32 +135,22 @@ export default function Detail() {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-     console.log(`
-      
-      
-      
-      
-      messages update for ChatRoom
-      
-      
-      
-      
-      `,messages )
+    
      //socket.emit("mark_as_read", { chatRoomId: chatRoomId, userId: session?.user.id });
   }, [messages]); // 메시지가 변경될 때마다 실행  
 
   useEffect(() => {
     if (chatRoomId && socket.connected) {
       socket.emit("join_room", chatRoomId);
-      console.log("Joining room:", chatRoomId);
+      //console.log("Joining room:", chatRoomId);
   
      // 메시지 읽음 상태 업데이트
      socket.on("update_read_status", ({ chatRoomId: updatedChatRoomId, userId }) => {
-      console.log(`
-        update_read_status
-        updatedChatRoomId: ${updatedChatRoomId}
-        userId: ${userId}
-      `);
+      // console.log(`
+      //   update_read_status
+      //   updatedChatRoomId: ${updatedChatRoomId}
+      //   userId: ${userId}
+      // `);
       
       if (updatedChatRoomId === chatRoomId) {
         // 모든 메시지에서 `readBy`에 userId를 추가
@@ -180,7 +170,7 @@ export default function Detail() {
     socket.on(
       "changed_color",
       (data: { chatRoomId: string; userId: string; color: string }) => {
-        console.log("Color change received:", data);
+        //console.log("Color change received:", data);
         // 현재 채팅룸과 동일한 경우에만 반영
         if (data.chatRoomId === chatRoomId) {
           setParticipantColors((prev) => ({
@@ -194,7 +184,7 @@ export default function Detail() {
      socket.on(
       "changed_textColor",
       (data: { chatRoomId: string; userId: string; color: string }) => {
-        console.log("Color change received:", data);
+       // console.log("Color change received:", data);
         // 현재 채팅룸과 동일한 경우에만 반영
         if (data.chatRoomId === chatRoomId) {
           setParticipantTextColors((prev) => ({
@@ -367,12 +357,7 @@ export default function Detail() {
       userId: session?.user.id.toString(), // userId도 문자열로 전송
       color,
     };
-    console.log(`
-      
-      data
-      
-      
-      `,data)
+   
     socket?.emit("change_color", data);
 
   };
@@ -385,12 +370,7 @@ export default function Detail() {
       userId: session?.user.id.toString(), // userId도 문자열로 전송
       color,
     };
-    console.log(`
-      
-      data
-      
-      
-      `,data)
+   
     socket?.emit("change_textColor", data);
 
   };

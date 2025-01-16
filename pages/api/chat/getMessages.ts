@@ -34,13 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // 채팅방에서 메시지 가져오기
     const chatRoom = await db.collection("messages").findOne({ _id: new ObjectId(chatRoomId) });
-    console.log(`
-
-
-      chatRoom
-      
-
-      `, chatRoom)
+   
 
     if (!chatRoom) {
       return res.status(404).json({ message: "Chat room not found" });

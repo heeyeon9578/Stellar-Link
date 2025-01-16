@@ -95,17 +95,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             return res.status(400).json({ message: "Friend's email is required." });
           }
   
-          console.log("Raw friendEmail:", friendEmail);
+         
   
           // Normalize friendEmail
           const normalizedFriendEmail = friendEmail.trim().toLowerCase();
-          console.log("Normalized friendEmail:", normalizedFriendEmail);
+         
           const allUsers = await db.collection("user_cred").find().toArray();
-          console.log("All Users in Database:", allUsers);
+        
           
   
           if (!requester) {
-            console.log("Requester not found with email:", requesterEmail);
+          
             return res.status(404).json({ message: "Requester information not found." });
           }
   
@@ -113,11 +113,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const friend = await db.collection("user_cred").findOne({ email: normalizedFriendEmail });
   
           if (!friend) {
-            console.log("Friend not found with email:", normalizedFriendEmail);
+           
             return res.status(404).json({ message: "User with this email does not exist." });
           }
   
-          console.log("Friend found:", friend);
+      
   
           // 중복 요청 방지
           const existingRequest = await db.collection("friend_requests").findOne({

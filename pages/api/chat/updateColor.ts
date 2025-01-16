@@ -75,7 +75,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       );
     }
 
-    console.log("색상 업데이트 성공:", result);
+    //console.log("색상 업데이트 성공:", result);
     return res.status(200).json({ message: "Color updated successfully." });
   } catch (error) {
     console.error("Error handling update color:", error);

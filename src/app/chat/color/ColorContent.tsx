@@ -36,17 +36,17 @@ export default function ColorContent() {
         section,
         color,
       };
-    console.log(`
+    // console.log(`
         
         
         
-        handleThemeChange
+    //     handleThemeChange
         
         
         
         
         
-        `,session.user.id,updatedTheme )
+    //     `,session.user.id,updatedTheme )
     // Emit the updated theme via WebSocket
     socket.emit("change_theme", {
       userId: session.user.id,

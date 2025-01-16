@@ -12,11 +12,11 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   const isChatPage = pathname?.startsWith('/chat')
   useEffect(() => {
-    console.log("Socket instance:", socket);
-    console.log("Socket connected:", socket.connected);
+    //console.log("Socket instance:", socket);
+    //console.log("Socket connected:", socket.connected);
   
     socket.on("connect", () => {
-      console.log("Socket connected");
+      //console.log("Socket connected");
     });
   
     socket.on("connect_error", (error) => {
@@ -24,7 +24,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     });
   
     socket.on("disconnect", (reason) => {
-      console.log("Socket disconnected:", reason);
+      //console.log("Socket disconnected:", reason);
     });
   
     return () => {

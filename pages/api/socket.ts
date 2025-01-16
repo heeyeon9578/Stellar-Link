@@ -30,14 +30,7 @@ let io: IOServer | undefined;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponseWithSocket) {
   if (!res.socket.server.io) {
-    console.log(`
-
-      
-      Socket.io server starting...
-      
-
-      
-      `);
+   
  
     io = new IOServer(res.socket.server, {
       cors: {
@@ -50,20 +43,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
     res.socket.server.io = io;
 
     io.on("connection", async (socket: Socket) => {
-      console.log(`
-
-        A user connected:
-        
-        
-        `, socket.id);
-      
+    
       socket.on("disconnect", () => {
-        console.log(`
-
-          User disconnected: 
-
-          
-          ${socket.id}`);
+     
       });
 
       const client = await connectDB;
@@ -84,13 +66,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
           console.error("Invalid ObjectId format");
           return;
         }
-        console.log(`
-          
-          change_color
-          chatRoomId:${chatRoomId}
-          userId:${userId}
-          color:${color}
-          `)
+     
         // 문서가 없으면 생성
         const result = await db.collection("participants").updateOne(
           { _id: new ObjectId(chatRoomId) },
@@ -127,7 +103,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
           );
         }
 
-        console.log("색상 업데이트 성공:", result);
+      
         io?.to(chatRoomId).emit("changed_color", data);
       });
       socket.on("change_textColor", async(data )=>{
@@ -136,13 +112,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
           console.error("Invalid ObjectId format");
           return;
         }
-        console.log(`
-          
-          change_color
-          chatRoomId:${chatRoomId}
-          userId:${userId}
-          color:${color}
-          `)
+     
         // 문서가 없으면 생성
         const result = await db.collection("participants").updateOne(
           { _id: new ObjectId(chatRoomId) },
@@ -179,7 +149,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
           );
         }
 
-        console.log("색상 업데이트 성공:", result);
+      
         io?.to(chatRoomId).emit("changed_textColor", data);
       });
       // Save theme to the database and broadcast changes
@@ -213,12 +183,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
           socket.emit("error", { message: "User not found in database" }); // 클라이언트로 에러 전송
           return;
         }
-        console.log(`
-
-          requester
-
-
-          `,requester)
+     
         const requesterId = requester._id?.toString() || "Unknown";
         const requesterName = requester.name?.toString() || "Unknown User";
         const requesterImage = requester.profileImage?.toString() || "/SVG/default-profile.svg";
@@ -265,7 +230,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
           readBy: [new ObjectId(requesterId)], // Add sender to `readBy`
         };
     
-        console.log("Message received:", message);
+      
           // 메시지 브로드캐스트
         //io?.to(data.chatRoomId).emit("receive_message", message);
         io?.emit("receive_message", message);

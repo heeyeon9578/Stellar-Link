@@ -32,7 +32,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
   document.documentElement.style.setProperty("--bottom-color", bottom);
 };
   return (
-    <div className="flex h-screen p-8 gap-4">
+    <div className="flex sm:flex-row flex-col h-screen p-8 gap-4">
       {/* 프로필 부분 */}
       <div className="flex-[0.7] border-2 border-customGray rounded-xl">
         <Profile></Profile>
@@ -44,7 +44,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
       </div>
 
       {/* 상세 부분 */}
-      <div className="flex-[5] border-2 border-customGray rounded-xl bg-white/90 backdrop-blur-lg p-4" >
+      <div className="flex-[5] border-2 border-customGray rounded-xl bg-white/90 backdrop-blur-lg p-4 hidden md:block" >
         <ChatRoom></ChatRoom>
       </div>
     </div>

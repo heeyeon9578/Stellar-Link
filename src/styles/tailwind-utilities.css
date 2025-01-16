@@ -3,14 +3,17 @@
 @tailwind utilities;
 
 /* 공통 스타일 정의 */
-.profile{
-  @apply flex flex-col w-full gap-1 items-center relative cursor-pointer;
-}
 
 .profile-circle {
-  @apply bg-white/15 w-[10vw] h-[10vw] between-lg-md:w-16 between-lg-md:h-16 lg:w-[4.5rem] lg:h-[4.5rem] rounded-full flex items-center justify-center;
+  @apply bg-white/15 w-[clamp(30px,10vw,60px)] aspect-square rounded-full flex items-center justify-center;
 }
 
 .focusDefault{
   @apply focus:outline-none focus:ring-2 focus:ring-customLightPurple focus:border-transparent;
+}
+
+@layer utilities {
+  .aspect-square {
+    aspect-ratio: 1 / 1;
+  }
 }

@@ -132,11 +132,11 @@ export default function ChatContent() {
   }
 }, [searchParams, dispatch]);
 useEffect(() => {
-  console.log("Socket instance:", socket);
-  console.log("Socket connected:", socket.connected);
+  //console.log("Socket instance:", socket);
+  //console.log("Socket connected:", socket.connected);
 
   socket.on("connect", () => {
-    console.log("Socket connected");
+    //console.log("Socket connected");
   });
 
   socket.on("connect_error", (error) => {
@@ -144,7 +144,7 @@ useEffect(() => {
   });
 
   socket.on("disconnect", (reason) => {
-    console.log("Socket disconnected:", reason);
+    //console.log("Socket disconnected:", reason);
   });
 
   return () => {
@@ -155,17 +155,7 @@ useEffect(() => {
 }, []);
 useEffect(() => {
   socket.on("receive_message", (message) => {
-    console.log(`
-      
-      
-      
-      
-      receive_message for ChatContent
-      
-      
-      
-      
-      `,message)
+   
       setData((prevData) => {
         // 업데이트된 채팅방을 찾기
         const updatedChatRoomIndex = prevData.findIndex(
@@ -227,16 +217,9 @@ useEffect(() => {
 
 // 새로운 이벤트 리스너 추가: `update_read_status`
 socket.on("update_read_status", ({ chatRoomId, userId }) => {
-  console.log(`update_read_status for ChatRoom: ${chatRoomId}, User: ${userId}`);
+  //console.log(`update_read_status for ChatRoom: ${chatRoomId}, User: ${userId}`);
   if (userId === session?.user.id) {
-    console.log(`
-      
-      
-      로그인한 사용자와 업데이트한 사용자가 같아서 읽음 표시 0으로 변경
-      
-      
-      
-      `);
+   
     setUnreadCounts((prevCounts) => {
       const updatedCounts = { ...prevCounts };
       updatedCounts[chatRoomId] = 0; // 읽음 처리
@@ -263,16 +246,7 @@ socket.on("update_read_status", ({ chatRoomId, userId }) => {
           acc[room._id] = room.unreadCount;
           return acc;
         }, {});
-        console.log(`
-          
-          
-          
-          
-          counts
-          
-          
-          
-          `,counts )
+       
         setUnreadCounts(counts);
       } catch (error) {
         console.error("Error fetching unread counts:", error);

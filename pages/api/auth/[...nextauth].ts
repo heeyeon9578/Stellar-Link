@@ -47,20 +47,20 @@ export const authOptions: AuthOptions = {
         const user = await db.collection("user_cred").findOne({ email: credentials.email });
 
         if (!user) {
-          console.log("해당 이메일은 없음");
+          //console.log("해당 이메일은 없음");
           return null;
         }
 
         const isValidPassword = await compare(credentials.password, user.password);
-        console.log(`isValidPassword: `, isValidPassword);
+        //console.log(`isValidPassword: `, isValidPassword);
 
         if (!isValidPassword) {
-          console.log("비밀번호 틀림");
+         // console.log("비밀번호 틀림");
           return null;
         }
 
         // 로그인 성공
-        console.log("로그인 성공", user);
+        //console.log("로그인 성공", user);
         return {
           id: user._id.toString(),
           name: user.name,
@@ -90,7 +90,7 @@ export const authOptions: AuthOptions = {
             createdAt: new Date(),
           };
           await db.collection("user_cred").insertOne(newUser);
-          console.log("소셜 로그인 사용자 저장 완료:", newUser);
+          //console.log("소셜 로그인 사용자 저장 완료:", newUser);
         }
         
         token.user = {

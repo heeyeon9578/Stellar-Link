@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import '../../../i18n';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
+import DynamicText from '../components/DynamicText';
 
 export default function Profile() {
   const router = useRouter();
@@ -62,7 +63,7 @@ export default function Profile() {
     }
     return (
       <div
-        className="profile"
+        className="flex flex-col w-full gap-1 items-center relative cursor-pointer"
         onClick={clickIcon} // 섹션 선택 상태 업데이트
       >
         {isSelected && (
@@ -72,29 +73,36 @@ export default function Profile() {
             width={6}
             height={60}
             priority
-            className="cursor-pointer absolute top-0 left-0"
+            className="cursor-pointer absolute top-2 left-0"
           />
         )}
-        <div className="profile-circle" >
-          { key !== 'profile'? (
-            <Image
-            src={svgSrc}
-            alt={label}
-            width={22.5}
-            height={22.5}
-            priority
-            className="cursor-pointer"
-          />
-          ):
-          (
-            <img
-            src={profileImage || '/SVG/default-profile.svg'}
-            alt="Profile"
-            className="w-full h-full rounded-full object-cover"
-          />
-          )}
+
+        <div className=' px-2'>
+          <div className="profile-circle" >
+            { key !== 'profile'? (
+              <Image
+              src={svgSrc}
+              alt={label}
+              width={22.5}
+              height={22.5}
+              priority
+              className="cursor-pointer"
+            />
+            ):
+            (
+              <img
+              src={profileImage || '/SVG/default-profile.svg'}
+              alt="Profile"
+              className="w-full h-full rounded-full object-cover"
+            />
+            )}
+          </div>
         </div>
-        <div lang="ko">{t(label)}</div>
+
+        <div className='w-16 overflow-hidden whitespace-nowrap text-ellipsis flex justify-center '>
+          <DynamicText className={label === session?.user?.name ? 'text-scroll' : ''} text={label === session?.user?.name ? session?.user?.name : t(label)}/>
+        </div>
+        
       </div>
     );
   };
@@ -102,23 +110,22 @@ export default function Profile() {
  if (!session) {
   return (
     <div className="w-full h-full flex justify-center items-center">
-      <p>{t('accessprofile')}</p>
+     
     </div>
   );
 }
 
   return (
-    <div className="w-full h-full"> 
-      <div className="w-full h-full flex flex-col justify-around items-center">
-        {/* 로고 */}
-        <Image
+    <div className="w-full h-full flex sm:flex-col flex-row justify-around items-center"> 
+       {/* 로고 */}
+       <Image
           src="/SVG/Logo.svg"
           alt="Logo"
           width={100}
           height={100}
           priority
           onClick={() => router.push('/')} // 로고 클릭 시 홈으로 이동
-          className="cursor-pointer mt-4"
+          className="cursor-pointer mt-4 "
         />
 
         {/* 프로필 섹션 */}
@@ -127,7 +134,6 @@ export default function Profile() {
         {renderProfileSection('chat', '/SVG/Chat.svg', 'Chat', '/chat')}
         {renderProfileSection('color', '/SVG/Color.svg', 'Color', '/chat/color')}
         {renderProfileSection('logout', '/SVG/Logout.svg', 'Logout', '/')}
-      </div>
     </div>
   );
 }

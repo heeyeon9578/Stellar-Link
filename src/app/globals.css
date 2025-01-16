@@ -82,3 +82,18 @@ body {
 .skeleton {
   display: inline-block;
 }
+
+.text-scroll {
+  position: relative;
+  display: inline-block;
+  animation: scroll-text 4s linear infinite;
+}
+
+@keyframes scroll-text {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
