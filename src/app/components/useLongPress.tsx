@@ -1,4 +1,5 @@
 // useLongPress.ts
+'use client';
 import { useState, useRef, useEffect, useCallback } from 'react';
 
 interface UseLongPressOptions {

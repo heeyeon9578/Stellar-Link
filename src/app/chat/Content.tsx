@@ -1,6 +1,7 @@
+'use client';
 import { usePathname } from 'next/navigation';
 import Chat from './ChatContent';
-import Profile from './profile/ProfileContent';
+import Profile from './Profile/ProfileContent'
 import Friends from './friends/FriendsContent';
 import Color from './color/ColorContent';
 
