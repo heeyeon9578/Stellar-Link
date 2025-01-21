@@ -27,9 +27,18 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
  // Set CSS variables for the theme
  const applyTheme = (top: string, middle: string, bottom: string) => {
-  document.documentElement.style.setProperty("--top-color", top);
-  document.documentElement.style.setProperty("--middle-color", middle);
-  document.documentElement.style.setProperty("--bottom-color", bottom);
+  if(typeof document !== undefined) {
+    document.documentElement.style.setProperty("--top-color", top);
+    document.documentElement.style.setProperty("--middle-color", middle);
+    document.documentElement.style.setProperty("--bottom-color", bottom);
+  }else{
+    console.log(`
+      
+      src/app/chat/layout.tsx 에서 document 없음
+      
+      `)
+  }
+  
 };
   return (
     <div className="flex sm:flex-row flex-col h-screen p-8 gap-4">

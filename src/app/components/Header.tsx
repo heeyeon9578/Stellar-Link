@@ -25,17 +25,26 @@ const Header: React.FC = () => {
   }, [i18n]);
   if (!isInitialized) return null;
   const toggleMenu = () => {
-    const menu = document.getElementById('mobile-menu');
-    if (menu) {
-      if (menu.classList.contains('hidden')) {
-        menu.classList.remove('hidden', 'animate__fadeOut');
-        menu.classList.add('animate__animated', 'animate__fadeIn');
-      } else {
-        menu.classList.remove('animate__fadeIn');
-        menu.classList.add('animate__animated', 'animate__fadeOut');
-        setTimeout(() => menu.classList.add('hidden'), 500); // 애니메이션 후 숨김
+    if(typeof document !== undefined) {
+      const menu = document.getElementById('mobile-menu');
+      if (menu) {
+        if (menu.classList.contains('hidden')) {
+          menu.classList.remove('hidden', 'animate__fadeOut');
+          menu.classList.add('animate__animated', 'animate__fadeIn');
+        } else {
+          menu.classList.remove('animate__fadeIn');
+          menu.classList.add('animate__animated', 'animate__fadeOut');
+          setTimeout(() => menu.classList.add('hidden'), 500); // 애니메이션 후 숨김
+        }
       }
+    }else{
+      console.log(`
+        
+        src/app/component/Header.tsx 에서 document 없음
+        
+        `)
     }
+    
   };
   const goToLogin = () => {
     router.push('/login'); // '/login' 페이지로 이동

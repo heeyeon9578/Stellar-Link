@@ -20,7 +20,7 @@ export function useLongPress(
 
   const startPress = useCallback(
     (e: React.MouseEvent | React.TouchEvent) => {
-      e.preventDefault();
+      //e.preventDefault();
       setPressing(true);
       // threshold 시간 이후 callback 실행
       timerRef.current = setTimeout(() => {
@@ -32,7 +32,7 @@ export function useLongPress(
 
   const endPress = useCallback(
     (e: React.MouseEvent | React.TouchEvent) => {
-      e.preventDefault();
+      //e.preventDefault();
       setPressing(false);
       // 아직 타이머가 살아있다면 취소
       if (timerRef.current) {

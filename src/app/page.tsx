@@ -40,13 +40,23 @@ export default function Home() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const section2Top = document.getElementById('section-2')?.offsetTop || 0; // 섹션 2의 상단 위치
-      const scrollPosition = window.scrollY + window.innerHeight / 2; // 현재 스크롤 위치 + 화면의 절반
-      if (scrollPosition >= section2Top) {
-        setInSection2(true); // 섹션 2에 도달하면 상태 업데이트
-      } else {
-        setInSection2(false); // 섹션 2 이전이면 상태 초기화
+      if(typeof document !== undefined) {
+        const section2Top = document.getElementById('section-2')?.offsetTop || 0; // 섹션 2의 상단 위치
+        const scrollPosition = window.scrollY + window.innerHeight / 2; // 현재 스크롤 위치 + 화면의 절반
+        if (scrollPosition >= section2Top) {
+          setInSection2(true); // 섹션 2에 도달하면 상태 업데이트
+        } else {
+          setInSection2(false); // 섹션 2 이전이면 상태 초기화
+        }
+      }else{
+        console.log(`
+          
+          src/app/page.tsx 에서 document 없음
+          
+          `)
       }
+      
+      
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -67,9 +77,12 @@ export default function Home() {
   }, [session]);
   // Set CSS variables for the theme
   const applyTheme = (top: string, middle: string, bottom: string) => {
-    document.documentElement.style.setProperty("--top-color", top);
-    document.documentElement.style.setProperty("--middle-color", middle);
-    document.documentElement.style.setProperty("--bottom-color", bottom);
+    if(typeof document !== undefined) {
+      document.documentElement.style.setProperty("--top-color", top);
+      document.documentElement.style.setProperty("--middle-color", middle);
+      document.documentElement.style.setProperty("--bottom-color", bottom);
+    }
+    
   };
 
   if (!isInitialized) return null;

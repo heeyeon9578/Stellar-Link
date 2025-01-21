@@ -24,9 +24,18 @@ export default function ColorContent() {
 
   // Set CSS variables for the theme
   const applyTheme = (top: string, middle: string, bottom: string) => {
-    document.documentElement.style.setProperty("--top-color", top);
-    document.documentElement.style.setProperty("--middle-color", middle);
-    document.documentElement.style.setProperty("--bottom-color", bottom);
+    if(typeof document !== undefined) {
+      document.documentElement.style.setProperty("--top-color", top);
+      document.documentElement.style.setProperty("--middle-color", middle);
+      document.documentElement.style.setProperty("--bottom-color", bottom);
+    }else{
+      console.log(`
+        
+        src/app/chat/color.tsx 에서 document 없음
+        
+        `)
+    }
+    
   };
 
   // Handle theme change
@@ -53,15 +62,17 @@ export default function ColorContent() {
       userId: session.user.id,
       ...updatedTheme,
     });
-
-   // Apply the theme locally
-  if (section === "top") {
-    document.documentElement.style.setProperty("--top-color", color);
-  } else if (section === "middle") {
-    document.documentElement.style.setProperty("--middle-color", color);
-  } else if (section === "bottom") {
-    document.documentElement.style.setProperty("--bottom-color", color);
-  }
+    if(typeof document !== undefined) {
+     // Apply the theme locally
+     if (section === "top") {
+      document.documentElement.style.setProperty("--top-color", color);
+    } else if (section === "middle") {
+      document.documentElement.style.setProperty("--middle-color", color);
+    } else if (section === "bottom") {
+      document.documentElement.style.setProperty("--bottom-color", color);
+    }
+    }
+  
   };
 
   useEffect(() => {
@@ -91,13 +102,16 @@ export default function ColorContent() {
     // Listen for theme updates from WebSocket
     socket.on("theme_updated", ({ userId, section, color }) => {
         if (session?.user?.id.toString() === userId.toString()) {
-        if (section === "top") {
-            document.documentElement.style.setProperty("--top-color", color);
-        } else if (section === "middle") {
-            document.documentElement.style.setProperty("--middle-color", color);
-        } else if (section === "bottom") {
-            document.documentElement.style.setProperty("--bottom-color", color);
-        }
+          if(typeof document !== undefined) {
+            if (section === "top") {
+              document.documentElement.style.setProperty("--top-color", color);
+            } else if (section === "middle") {
+                document.documentElement.style.setProperty("--middle-color", color);
+            } else if (section === "bottom") {
+                document.documentElement.style.setProperty("--bottom-color", color);
+            }
+          }
+        
         }
     });
 

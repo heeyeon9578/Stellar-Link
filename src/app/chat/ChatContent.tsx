@@ -117,7 +117,16 @@ export default function ChatContent() {
 
  const [editChatRoomName,setEditChatRoomName] = useState<string>("");
    useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside); // 클릭 감지 이벤트 등록
+    if(typeof document !== undefined) {
+      document.addEventListener("mousedown", handleClickOutside); // 클릭 감지 이벤트 등록
+    }else{
+      console.log(`
+        
+        src/app/chat/ChatContent.tsx 에서 document 없음
+        
+        `)
+    }
+    
     return () => {
       document.removeEventListener("mousedown", handleClickOutside); // 컴포넌트 언마운트 시 이벤트 제거
     };
