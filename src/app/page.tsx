@@ -81,6 +81,12 @@ export default function Home() {
       document.documentElement.style.setProperty("--top-color", top);
       document.documentElement.style.setProperty("--middle-color", middle);
       document.documentElement.style.setProperty("--bottom-color", bottom);
+    }else{
+      console.log(`
+        
+        src/app/page.tsx 에서 document 없음
+        
+        `)
     }
     
   };

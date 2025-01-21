@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useSession ,signIn} from 'next-auth/react';
 import { useTranslation } from 'react-i18next';
 import '../../../../i18n';
@@ -26,6 +26,8 @@ export default function ProfileContent() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [passwordConfirmVisible, setPasswordConfirmVisible] = useState(false);
   const [wantPasswordChange, setWantPasswordChange] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const isSocialLogin =
     session?.user?.provider && ['google', 'discord', 'github'].includes(session.user.provider);
 
@@ -184,6 +186,10 @@ export default function ProfileContent() {
       setIsSubmitting(false);
     }
   };
+  const handleImageChangeClick = () => {
+    // 파일 입력 요소가 존재하면 클릭을 트리거
+    fileInputRef.current?.click();
+  };
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const input = e.target.value;
       const maxLength = 10;
@@ -222,7 +228,7 @@ export default function ProfileContent() {
               height={13}
               priority
               className="cursor-pointer"
-              onClick={() => document.getElementById('fileInput')?.click()} // 클릭 시 파일 입력 클릭
+              onClick={handleImageChangeClick} // 클릭 시 파일 입력 클릭
             />
           </div>
         </div>
@@ -234,6 +240,7 @@ export default function ProfileContent() {
           accept="image/*"
           onChange={handleImageUpload}
           className="hidden" // 숨기기
+          ref={fileInputRef}  // ref 연결
         />
       </div>
 
