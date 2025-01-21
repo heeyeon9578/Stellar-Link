@@ -14,6 +14,7 @@ export default {
     extend: {
       screens: {
         'between-lg-md': { min: '720px', max: '1444px' },
+        'xs': {'min': '330px'}, // 최대 너비 504px 이하일 때 적용
       },
       colors: {
         background: "var(--background)",

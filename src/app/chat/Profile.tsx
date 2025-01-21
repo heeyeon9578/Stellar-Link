@@ -64,7 +64,7 @@ export default function Profile() {
     }
     return (
       <div
-        className="flex flex-col w-full gap-1 items-center relative cursor-pointer"
+        className="flex flex-col w-full items-center relative cursor-pointer "
         onClick={clickIcon} // 섹션 선택 상태 업데이트
       >
         {isSelected && (
@@ -72,35 +72,39 @@ export default function Profile() {
             src="/SVG/select.svg"
             alt="select"
             width={6}
-            height={60}
+            height={22.5}
             priority
-            className="cursor-pointer absolute top-2 left-0"
+            className=" cursor-pointer absolute top-2 left-0 hidden sm:block"
           />
         )}
 
-        <div className=' px-2'>
-          <div className="profile-circle" >
+        <div className=''>
+          <div 
+          className={`profile-circle
+            ${isSelected ? "border-2 border-customGray sm:border-none" : ""}`}
+          >
             { key !== 'profile'? (
-              <Image
+              <img
               src={svgSrc}
               alt={label}
-              width={22.5}
-              height={22.5}
-              priority
-              className="cursor-pointer"
+              // width={22.5}
+              // height={22.5}
+              // priority
+              className="cursor-pointer  xs:w-5 w-3"
             />
             ):
             (
               <img
               src={profileImage || '/SVG/default-profile.svg'}
               alt="Profile"
-              className="w-full h-full rounded-full object-cover"
+              className={`w-full h-full rounded-full object-cover 
+              `}
             />
             )}
           </div>
         </div>
 
-        <div className='w-16 overflow-hidden whitespace-nowrap text-ellipsis flex justify-center '>
+        <div className='overflow-hidden whitespace-nowrap text-ellipsis flex justify-center w-6 xs:w-10 sm:w-16 text-[7px] xs:text-[10px] sm:text-sm'>
           <DynamicText className={label === session?.user?.name ? 'text-scroll' : ''} text={label === session?.user?.name ? session?.user?.name : t(label)}/>
         </div>
         
@@ -117,16 +121,16 @@ export default function Profile() {
 }
 
   return (
-    <div className="w-full h-full flex sm:flex-col flex-row justify-around items-center"> 
+    <div className="w-full h-full flex sm:flex-col flex-row justify-around items-center p-2 sm:p-0 gap-1"> 
        {/* 로고 */}
-       <Image
+       <img
           src="/SVG/Logo.svg"
           alt="Logo"
-          width={100}
-          height={100}
-          priority
+          // width={100}
+          // height={100}
+          // priority
           onClick={() => router.push('/')} // 로고 클릭 시 홈으로 이동
-          className="cursor-pointer mt-4 "
+          className="cursor-pointer sm:mt-4 mt-0 sm:w-full w-[10vw]"
         />
 
         {/* 프로필 섹션 */}
