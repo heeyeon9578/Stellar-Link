@@ -7,11 +7,15 @@ import '../../i18n'
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import 'animate.css'; // animate.css 불러오기
-import Lottie from 'lottie-react'; // 올바른 컴포넌트 이름
+//import Lottie from 'lottie-react'; // 올바른 컴포넌트 이름
+import dynamic from 'next/dynamic';
 import chattingSVG from '../../public/json/chatting.json';
 import Rectangle from "./components/Rectangle";
 import DynamicText from "./components/DynamicText";
 import { useSession } from "next-auth/react";
+// Lottie 컴포넌트를 클라이언트에서만 렌더링하도록 설정
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
+
 export default function Home() {
   const { t,i18n } = useTranslation('common');
   const [isInitialized, setIsInitialized] = useState(false);
