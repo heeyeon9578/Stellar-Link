@@ -206,10 +206,10 @@ export default function ProfileContent() {
     };
 
   return (
-    <div className="mx-auto p-8 rounded-lg h-full text-customBlue relative ">
+    <div className="mx-auto md:p-8 p-4 rounded-lg h-full text-customBlue relative">
 
-      <h2 className="text-2xl font-bold mb-4">
-        <DynamicText text={t('Profile')} />
+      <h2 className="font-bold mb-4">
+        <DynamicText text={t('Profile')} className='md:text-2xl text-sm sm:text-xl'/>
       </h2>
 
       <div className="mb-4 text-center relative  flex justify-center">

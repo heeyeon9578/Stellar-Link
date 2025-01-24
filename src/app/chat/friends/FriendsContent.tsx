@@ -405,15 +405,15 @@ const generateChatRoom = () => {
   }
 
   return (
-    <div className="mx-auto p-8 rounded-lg h-full text-customBlue relative">
+    <div className="mx-auto md:p-8 p-4 rounded-lg h-full text-customBlue relative bg-blue-500">
 
       {/** 헤더 */}
-      <h2 className="text-2xl font-bold mb-4">
+      <h2 className="md:text-2xl text-sm sm:text-xl font-bold bg-green-500">
         <DynamicText text={t('Friends')} />
       </h2>
     
      {/** 검색 창 (디바운스 적용) */}
-      <div className="w-full h-10 bg-customGray rounded-xl flex">
+      <div className="w-full sm:h-10 h-7 bg-customGray sm:mt-4 mt-2 rounded-xl flex">
         <div className="p-2 flex items-center">
           <Image
             src="/SVG/search.svg"
@@ -424,25 +424,25 @@ const generateChatRoom = () => {
             className="cursor-pointer"
           />
         </div>
-        <div className="flex items-center text-sm w-full">
+        <div className="flex items-center w-[80%]">
           <input
             type="text"
             value={search}
             placeholder={t('Search')}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-[100%] text-black/45 border-customGray rounded-xl text-sm bg-transparent focus:outline-none focus:ring-0 focus:border-transparent"
+            className="w-[100%] text-black/45 border-0 text-[7px]  sm:text-sm bg-transparent focus:outline-none focus:ring-0 focus:border-transparent"
           />
         </div>
       </div>
 
       {/** 친구 추가 */}   
-      <div className="flex items-center justify-between mt-4 ">
+      <div className="flex items-center justify-between sm:mt-4 mt-2 bg-red-200">
         <input
           type="text"
           value={newFriendEmail}
           placeholder={t('EFE')}
           onChange={(e) => setNewFriendEmail(e.target.value)}
-         className="w-[90%] px-3 py-2 border-customGray rounded-xl text-sm text-customGray focus:border-transparent focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+         className="w-[90%] px-3 py-2 border-customGray rounded-xl text-[7px]  sm:text-sm text-customGray focus:border-transparent focus:outline-none focus:ring-2 focus:ring-customLightPurple"
         />
         <div className="w-[10%] flex items-center justify-end h-full" onClick={handleAddFriend}>
           <Image
@@ -458,7 +458,7 @@ const generateChatRoom = () => {
       </div>
 
       {/** 메뉴 */}   
-      <div className="w-full h-10 bg-customRectangle rounded-xl flex mt-4 text-customGray text-sm flex items-center justify-around p-2">
+      <div className="w-full h-10 bg-customRectangle rounded-xl flex sm:mt-4 mt-2 text-customGray text-sm flex items-center justify-around p-2">
 
         {menus.map((menu)=>(
           <Button
@@ -478,7 +478,7 @@ const generateChatRoom = () => {
       {/** 정렬 */}
       <div onClick={toggleMenu} className="relative bg-black cursor-pointer" style={{zIndex:'9999'}}>
         {/* 메뉴를 여는 버튼 */}
-        <div className="right-0 absolute flex mt-3">
+        <div className="right-0 absolute flex sm:mt-3 mt-2">
           <div
             className=" bg-trasparent text-customPurple text-xs"
           >
@@ -529,7 +529,7 @@ const generateChatRoom = () => {
       {
         isClicked==='All' && 
         (
-          <div className="mt-10 max-h-[50vh] overflow-y-auto">
+          <div className="sm:mt-10 mt-8 max-h-[60%] overflow-y-auto bg-red-500">
             {filteredFriends.filter(friend => friend.status !== 'block').length === 0 ? (
              <DynamicText className="text-gray-500" text={t('Yhnfy')}/>
             ) : (
