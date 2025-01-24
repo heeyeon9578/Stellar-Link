@@ -245,8 +245,8 @@ export default function ProfileContent() {
       </div>
 
 
-      <div className="mb-4" lang="ko">
-        <label className="block text-sm font-bold mb-2">
+      <div className="mb-4 " lang="ko">
+        <label className="block text-[10px] sm:text-sm font-bold mb-2">
           <DynamicText text={t('Name')} />
         </label>
         <input
@@ -254,21 +254,10 @@ export default function ProfileContent() {
           value={name}
           lang="ko"
           onChange={handleNameChange}
-         className="w-full text-customPurple px-3 py-2 border-customGray rounded-lg focus:outline-none focus:border-transparent focus:ring-2 focus:ring-customLightPurple"
+         className="w-full sm:h-10 h-8 text-[10px] sm:text-sm text-customPurple  border-customGray rounded-lg focus:outline-none focus:border-transparent focus:ring-2 focus:ring-customLightPurple"
         />
       </div>
 
-      {/* <div className="mb-4">
-        <label className="block text-sm font-bold mb-2">
-          <DynamicText text={t('Email')} />
-        </label>
-        <input
-          type="email"
-          value={session.user?.email || ''}
-          disabled
-          className="w-full px-3 py-2 border-customGray rounded-lg bg-customGray"
-        />
-      </div> */}
 
      {!isSocialLogin &&(
        <button
@@ -282,7 +271,7 @@ export default function ProfileContent() {
      
        onClick={() =>{setWantPasswordChange(!wantPasswordChange)}}
      >
-       <DynamicText text={t('ChangePassword')}></DynamicText>
+       <DynamicText className='text-[10px] sm:text-sm' text={t('ChangePassword')}></DynamicText>
      </button>
      
      )}
@@ -290,14 +279,14 @@ export default function ProfileContent() {
         <>
           <div className="mb-4 relative">
             <label className="block text-sm font-bold mb-2">
-              <DynamicText text={t('Password')} />
+              <DynamicText className='text-[10px] sm:text-sm' text={t('Password')} />
             </label>
             <div className="relative">
               <input
                 type={passwordVisible ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 border-customGray rounded-lg"
+                className="w-full text-[10px] sm:text-sm sm:h-10 h-8 border-customGray rounded-lg"
               />
               <button
                 type="button"
@@ -305,43 +294,43 @@ export default function ProfileContent() {
                 className="absolute inset-y-0 right-2 flex items-center text-customPurple text-xs md:text-sm bg-transparent hover:text-underline-offset-4"
               >
                
-                {passwordVisible ?<DynamicText text={t('Hide')} /> : <DynamicText text={t('Show')} />}
+                {passwordVisible ?<DynamicText text={t('Hide')} className='text-[10px] sm:text-sm'/> : <DynamicText text={t('Show')} className='text-[10px] sm:text-sm'/>}
               </button>
             </div>
-            {passwordError && <div className="text-xs text-red-500 mt-1">{passwordError}</div>}
+            {passwordError && <div className="text-[7px] sm:text-xs text-red-500 mt-1">{passwordError}</div>}
           </div>
 
           <div className="mb-4 relative">
             <label className="block text-sm font-bold mb-2">
-              <DynamicText text={t('PasswordConfirm')} />
+              <DynamicText className='text-[10px] sm:text-sm' text={t('PasswordConfirm')} />
             </label>
             <div className="relative">
               <input
                 type={passwordConfirmVisible ? 'text' : 'password'}
                 value={passwordConfirm}
                 onChange={(e) => setPasswordConfirm(e.target.value)}
-                className="w-full px-3 py-2 border-customGray rounded-lg"
+                className="w-full text-[10px] sm:text-sm sm:h-10 h-8 border-customGray rounded-lg"
               />
               <button
                 type="button"
                 onClick={() => setPasswordConfirmVisible(!passwordConfirmVisible)}
                 className="absolute inset-y-0 right-2 flex items-center text-customPurple text-xs md:text-sm bg-transparent hover:text-underline-offset-4"
               >
-                {passwordConfirmVisible ?<DynamicText text={t('Hide')} /> : <DynamicText text={t('Show')} />}
+                {passwordConfirmVisible ?<DynamicText className='text-[10px] sm:text-sm' text={t('Hide')} /> : <DynamicText className='text-[10px] sm:text-sm' text={t('Show')} />}
               </button>
             </div>
-            {passwordConfirmError && <div className="text-xs text-red-500 mt-1">{passwordConfirmError}</div>}
+            {passwordConfirmError && <div className="text-[7px] sm:text-xs text-red-500 mt-1">{passwordConfirmError}</div>}
           </div>
         </>
       )}
-      <div className="absolute bottom-2 w-full left-0">
+      <div className="absolute bottom-2 w-full left-0 ">
         <Button
           variant="primary"
           disabled={isSubmitting || (wantPasswordChange && !isFormValid)} // 모든 폼 유효성 검사에 통과해야만 활성화
-          className="animate__animated animate__zoomIn w-full"
+          className="animate__animated animate__zoomIn w-full sm:h-10 h-8"
           onClick={handleSubmit}
         >
-          <DynamicText text={t('Save')} />
+          <DynamicText text={t('Save')} className='text-[10px] sm:text-sm' />
         </Button>
       </div>
     </div>

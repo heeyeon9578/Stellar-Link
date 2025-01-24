@@ -200,24 +200,12 @@ export default function FriendsContent() {
 
       // 친구 요청을 보냈으니, 혹시 리스트가 업데이트되었을 수 있어 재조회
       dispatch(fetchSentRequests());
+      setOpenMoreMenuFriendId(null);
     } catch (err) {
       alert(t('failAddFriend'));
     }
   };
-  // const acceptAllRequests = async () => {
-  //   try {
-  //     // 모든 친구 요청을 수락
-  //     for (const request of tempData) {
-  //       await handleRequestAction(request._id.$oid.toString(), "accepted");
-  //     }
-
-  //     // 친구 리스트 갱신
-  //     dispatch(fetchFriends());
-  //   } catch (error) {
-  //     console.error("Error accepting all requests:", error);
-
-  //   }
-  // };
+ 
   
   // 친구 요청 수락/거절 (이것도 필요하다면 Slice에 Thunk로 옮길 수 있음)
   const handleRequestAction = async (fromUserId: string, action: "accepted" | "rejected") => {
@@ -244,8 +232,10 @@ export default function FriendsContent() {
       //alert(successMessage);
 
       // 요청 목록이 바뀌었으니 다시 요청을 디스패치해서 데이터 갱신
+      // 데이터 갱신
       dispatch(fetchReceivedRequests());
-      // dispatch(fetchFriends());
+      dispatch(fetchFriends({ sortBy: sortOption, order: sortOption === 'name' ? 'asc' : 'desc' }));
+      setOpenMoreMenuFriendId(null);
     } catch (err) {
       console.log(err)
       //alert(t('Fraorf'));
@@ -270,7 +260,8 @@ const handleBlockFriend = async (toUserId: string) => {
     }
 
     alert(t('Fbs'));
-    //dispatch(fetchFriends());
+    dispatch(fetchFriends({ sortBy: sortOption, order: sortOption === 'name' ? 'asc' : 'desc' }));
+    setOpenMoreMenuFriendId(null);
   } catch (err) {
     console.error("Error blocking friend request:", err);
     alert(t('Ftbf'));
@@ -295,7 +286,8 @@ const handleUnblockFriend = async (toUserId: string) => {
     }
 
     alert(t('Fus'));
-    //dispatch(fetchFriends());
+    dispatch(fetchFriends({ sortBy: sortOption, order: sortOption === 'name' ? 'asc' : 'desc' }));
+    setOpenMoreMenuFriendId(null);
   } catch (err) {
     console.error("Error unblocking friend request:", err);
     alert(t('Ftuf'));
@@ -319,7 +311,8 @@ const handleDeleteFriend = async (toUserId: string) => {
     alert("Friend removed successfully.");
 
     // 친구 목록 다시 불러오기
-   // dispatch(fetchFriends());
+   dispatch(fetchFriends({ sortBy: sortOption, order: sortOption === 'name' ? 'asc' : 'desc' }));
+   setOpenMoreMenuFriendId(null);
   } catch (err) {
     console.error("Error removing friend:", err);
     alert("Error removing friend");
@@ -360,6 +353,7 @@ const handleCancelRequest = async (toUserId: string) => {
     alert(t('Frcs'));
     // 보낸 요청 목록 새로고침
     dispatch(fetchSentRequests());
+    setOpenMoreMenuFriendId(null);
   } catch (err) {
     console.error("Error canceling friend request:", err);
     alert(t('Ecfr'));
@@ -405,15 +399,15 @@ const generateChatRoom = () => {
   }
 
   return (
-    <div className="mx-auto md:p-8 p-4 rounded-lg h-full text-customBlue relative bg-blue-500">
+    <div className="mx-auto md:p-8 p-4 rounded-lg h-full text-customBlue relative flex flex-col">
 
       {/** 헤더 */}
-      <h2 className="md:text-2xl text-sm sm:text-xl font-bold bg-green-500">
+      <h2 className="md:text-2xl text-sm sm:text-xl font-bold ">
         <DynamicText text={t('Friends')} />
       </h2>
     
      {/** 검색 창 (디바운스 적용) */}
-      <div className="w-full sm:h-10 h-7 bg-customGray sm:mt-4 mt-2 rounded-xl flex">
+      <div className="w-full sm:h-10 h-8 bg-customGray sm:mt-4 mt-2 rounded-xl flex">
         <div className="p-2 flex items-center">
           <Image
             src="/SVG/search.svg"
@@ -430,19 +424,19 @@ const generateChatRoom = () => {
             value={search}
             placeholder={t('Search')}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-[100%] text-black/45 border-0 text-[7px]  sm:text-sm bg-transparent focus:outline-none focus:ring-0 focus:border-transparent"
+            className="w-[100%] text-black/45 border-0 text-[10px] sm:text-sm bg-transparent focus:outline-none focus:ring-0 focus:border-transparent"
           />
         </div>
       </div>
 
       {/** 친구 추가 */}   
-      <div className="flex items-center justify-between sm:mt-4 mt-2 bg-red-200">
+      <div className="flex items-center sm:h-10 h-8 justify-between sm:mt-4 mt-2">
         <input
           type="text"
           value={newFriendEmail}
           placeholder={t('EFE')}
           onChange={(e) => setNewFriendEmail(e.target.value)}
-         className="w-[90%] px-3 py-2 border-customGray rounded-xl text-[7px]  sm:text-sm text-customGray focus:border-transparent focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+         className="w-[90%] h-full border-customGray rounded-xl text-[10px]  sm:text-sm text-customGray focus:border-transparent focus:outline-none focus:ring-2 focus:ring-customLightPurple"
         />
         <div className="w-[10%] flex items-center justify-end h-full" onClick={handleAddFriend}>
           <Image
@@ -458,17 +452,17 @@ const generateChatRoom = () => {
       </div>
 
       {/** 메뉴 */}   
-      <div className="w-full h-10 bg-customRectangle rounded-xl flex sm:mt-4 mt-2 text-customGray text-sm flex items-center justify-around p-2">
+      <div className="w-full sm:h-10 h-8 bg-customRectangle rounded-xl flex sm:mt-4 mt-2 text-customGray flex items-center justify-around p-2">
 
         {menus.map((menu)=>(
           <Button
           key={menu.name}
           variant={isClicked===menu.name ? 'primary':"main"}
           size="sm"
-          className={isClicked===menu.name? "text-white w-full h-8" :"text-customGray w-full h-8"}
+          className={isClicked===menu.name? "text-white w-full sm:h-8 h-6" :"text-customGray w-full sm:h-8 h-6"}
           onClick={menu.onClick}
         >
-          <DynamicText text={t(menu.name)} />
+          <DynamicText text={t(menu.name)} className="text-[10px] sm:text-sm"/>
         </Button>
         ))}
 
@@ -480,7 +474,7 @@ const generateChatRoom = () => {
         {/* 메뉴를 여는 버튼 */}
         <div className="right-0 absolute flex sm:mt-3 mt-2">
           <div
-            className=" bg-trasparent text-customPurple text-xs"
+            className=" bg-trasparent text-customPurple text-[10px] sm:text-xs"
           >
             {sortOption === 'latest' ? t('SortByLatest') : t('SortByName')}
             
@@ -510,7 +504,7 @@ const generateChatRoom = () => {
 
         {/* 드롭다운 메뉴 */}
         {isMenuOpen && (
-          <div className="absolute right-0 mt-8 w-22 bg-white border border-gray-200 bg-transparent z-1000 text-customPurple text-xs">
+          <div className="absolute right-0 mt-8 w-22 bg-white border border-gray-200 bg-transparent z-1000 text-customPurple text-[10px] sm:text-sm">
             <button
               onClick={() => handleSortChange('latest')}
               className={`block w-full text-left px-4 py-2 hover:bg-gray-100 ${sortOption === 'latest' ? 'bg-gray-100' : ''}`}
@@ -529,9 +523,9 @@ const generateChatRoom = () => {
       {
         isClicked==='All' && 
         (
-          <div className="sm:mt-10 mt-8 max-h-[60%] overflow-y-auto bg-red-500">
+          <div className="sm:mt-10 mt-8 max-h-[100%] overflow-y-auto">
             {filteredFriends.filter(friend => friend.status !== 'block').length === 0 ? (
-             <DynamicText className="text-gray-500" text={t('Yhnfy')}/>
+             <DynamicText className="text-gray-500 text-[10px] sm:text-sm" text={t('Yhnfy')}/>
             ) : (
               <ul>
                 {filteredFriends
@@ -543,33 +537,33 @@ const generateChatRoom = () => {
                      <img
                        src={friend.profileImage || "/SVG/default-profile.svg"}
                        alt={`${friend.name}'s profile`}
-                       className="w-[50px] h-[50px] rounded-full mr-2 object-cover" 
+                       className="sm:w-[50px] sm:h-[50px] w-[30px] h-[30px] rounded-full mr-2 object-cover" 
                      />
 
                      <div>
                        <div className="font-bold text-customPurple">
-                       <DynamicText text={friend.name} /> 
+                       <DynamicText text={friend.name} className="text-[10px] sm:text-sm"/> 
                        </div>
 
-                       <div className="text-customGray text-xs">
+                       <div className="text-customGray text-[7px] sm:text-xs">
                          {friend.email}
                        </div>
                      </div>
                    </div>
 
                    <div className="relative ">
-                     <Image
+                     <img
                        src="/SVG/more.svg"
                        alt="more"
-                       width={25}
-                       height={25}
-                       priority
-                       className="cursor-pointer"
+                      //  width={25}
+                      //  height={25}
+                      //  priority
+                       className="cursor-pointer sm:w-[25px] sm:h-[25px] w-[15px] h-[15px]"
                       onClick={(event) => toggleMoreMenu(friend._id, event)}
                      />
                      {/* 차단, 차단 해제 버튼 추가 */}
                      {openMoreMenuFriendId === friend._id &&(
-                       <div className=" z-50 absolute w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm"
+                       <div className=" z-50 absolute sm:w-[80px] sm:h-[68px] w-[60px] h-[40px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-[10px] sm:text-sm"
                        style={{
                         top: 5, // 드롭다운의 Y축 위치
                         right: 30, // 드롭다운의 X축 위치
@@ -596,9 +590,9 @@ const generateChatRoom = () => {
       }
     
       {isClicked==='Request'&&(
-        <div className="mt-10 max-h-[50vh] overflow-y-auto"> 
+        <div className="sm:mt-10 mt-8  max-h-[100%] overflow-y-auto"> 
           {filteredSentRequests.length === 0 ? (
-            <DynamicText className="text-gray-500" text={t('Nsfr')}/>
+            <DynamicText className="text-gray-500 text-[10px] sm:text-sm" text={t('Nsfr')}/>
           ) : (
             <ul>
               {filteredSentRequests.map((request) => (
@@ -609,33 +603,33 @@ const generateChatRoom = () => {
                       <img
                         src={request.toUserDetails.profileImage || "/SVG/default-profile.svg"}
                         alt={`${request.toUserDetails.name}'s profile`}
-                        className="w-[50px] h-[50px] rounded-full mr-2 object-cover" 
+                        className="sm:w-[50px] sm:h-[50px] w-[30px] h-[30px] rounded-full mr-2 object-cover" 
                       />
 
                       <div>
-                        <div className="text-black font-bold">
-                          {request.toUserDetails.name}
-                        </div>
+                      <div className="font-bold text-customPurple">
+                       <DynamicText text={request.toUserDetails.name} className="text-[10px] sm:text-sm"/> 
+                       </div>
 
-                        <div className="text-customGray text-xs">
-                          {request.toUserDetails.email}
-                        </div>
+                       <div className="text-customGray text-[7px] sm:text-xs">
+                       {request.toUserDetails.email}
+                       </div>
                       </div>
                     </div>
 
                     <div className="relative ">
-                      <Image
+                      <img
                         src="/SVG/more.svg"
                         alt="more"
-                        width={25}
-                        height={25}
-                        priority
-                        className="cursor-pointer"
+                        // width={25}
+                        // height={25}
+                        // priority
+                        className="cursor-pointer sm:w-[25px] sm:h-[25px] w-[15px] h-[15px]"
                        onClick={(event) => toggleMoreMenu(request._id,event)}
                       />
                       {/* Cancel */}
                       {openMoreMenuFriendId === request._id &&(
-                        <div className=" z-50 absolute w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm"
+                        <div className=" z-50 absolute sm:w-[80px] sm:h-[68px] w-[60px] h-[40px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-[10px] sm:text-sm"
                         style={{
                          top: 5, // 드롭다운의 Y축 위치
                          right: 30, // 드롭다운의 X축 위치
@@ -659,10 +653,10 @@ const generateChatRoom = () => {
         isClicked==='Pending' &&
         (
 
-          <div className="mt-10 max-h-[50vh] overflow-y-auto">
+          <div className="sm:mt-10 mt-8 max-h-[100%] overflow-y-auto">
         
             {filteredReceivedRequests.length === 0 ? (
-              <DynamicText className='text-gray-500' text={t('Nfrr')}/>
+              <DynamicText className='text-gray-500 text-[10px] sm:text-sm' text={t('Nfrr')}/>
             ) : (
               <ul>
                 {filteredReceivedRequests.map((request) => (
@@ -673,33 +667,34 @@ const generateChatRoom = () => {
                       <img
                         src={request.fromUserDetails.profileImage || "/SVG/default-profile.svg"}
                         alt={`${request.fromUserDetails.name}'s profile`}
-                        className="w-[50px] h-[50px] rounded-full mr-2 object-cover" 
+                        className="sm:w-[50px] sm:h-[50px] w-[30px] h-[30px]  rounded-full mr-2 object-cover" 
                       />
 
                       <div>
-                        <div className="text-black font-bold">
-                          {request.fromUserDetails.name}
-                        </div>
+               
+                        <div className="font-bold text-customPurple">
+                       <DynamicText text={request.fromUserDetails.name} className="text-[10px] sm:text-sm"/> 
+                       </div>
 
-                        <div className="text-customGray text-xs">
-                          {request.fromUserDetails.email}
-                        </div>
+                       <div className="text-customGray text-[7px] sm:text-xs">
+                       {request.fromUserDetails.email}
+                       </div>
                       </div>
                     </div>
 
                     <div className="relative ">
-                      <Image
+                      <img
                         src="/SVG/more.svg"
                         alt="more"
-                        width={25}
-                        height={25}
-                        priority
-                        className="cursor-pointer"
+                        // width={25}
+                        // height={25}
+                        // priority
+                        className="cursor-pointer sm:w-[25px] sm:h-[25px] w-[15px] h-[15px]"
                         onClick={(event) => toggleMoreMenu(request._id,event)}
                       />
                       {/* 수락 거절 추가 */}
                       {openMoreMenuFriendId === request._id &&(
-                         <div className=" z-50 absolute w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm"
+                         <div className=" z-50 absolute sm:w-[80px] sm:h-[68px] w-[60px] h-[40px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-[10px] sm:text-sm"
                          style={{
                           top: 5, // 드롭다운의 Y축 위치
                           right: 30, // 드롭다운의 X축 위치
@@ -729,9 +724,9 @@ const generateChatRoom = () => {
         isClicked==='Blocked' &&
         (
 
-          <div className="mt-10 max-h-[50vh] overflow-y-auto">
+          <div className="sm:mt-10 mt-8  max-h-[100%] overflow-y-auto">
           {filteredFriends.filter(friend => friend.status === 'block').length === 0 ? (
-            <DynamicText className="text-gray-500" text={t('Tanbf')}/>
+            <DynamicText className="text-gray-500 text-[10px] sm:text-sm" text={t('Tanbf')}/>
           ) : (
             <ul>
               {filteredFriends.filter(friend => friend.status === 'block').map((friend) => (
@@ -741,33 +736,34 @@ const generateChatRoom = () => {
                    <img
                      src={friend.profileImage || "/SVG/default-profile.svg"}
                      alt={`${friend.name}'s profile`}
-                     className="w-[50px] h-[50px] rounded-full mr-2 object-cover" 
+                     className="sm:w-[50px] sm:h-[50px] w-[30px] h-[30px] rounded-full mr-2 object-cover" 
                    />
 
                    <div>
-                     <div className="text-black font-bold">
-                       {friend.name}
-                     </div>
+                      <div className="font-bold text-customPurple">
+                       <DynamicText text={friend.name} className="text-[10px] sm:text-sm"/> 
+                       </div>
 
-                     <div className="text-customGray text-xs">
+                       <div className="text-customGray text-[7px] sm:text-xs">
                        {friend.email}
-                     </div>
+                       </div>
+                    
                    </div>
                  </div>
 
                  <div className="relative ">
-                   <Image
+                   <img
                      src="/SVG/more.svg"
                      alt="more"
-                     width={25}
-                     height={25}
-                     priority
-                     className="cursor-pointer"
+                    //  width={25}
+                    //  height={25}
+                    //  priority
+                     className="cursor-pointer sm:w-[25px] sm:h-[25px] w-[15px] h-[15px]"
                     onClick={(event) => toggleMoreMenu(friend._id, event)}
                    />
                    {/* 삭제, 차단 해제 버튼 추가 */}
                    {openMoreMenuFriendId === friend._id &&(
-                     <div className=" z-50 absolute w-[80px] h-[68px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-sm"
+                     <div className=" z-50 absolute sm:w-[80px] sm:h-[68px] w-[60px] h-[40px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-[10px] sm:text-sm"
                      style={{
                       top: 5, // 드롭다운의 Y축 위치
                       right: 30, // 드롭다운의 X축 위치
