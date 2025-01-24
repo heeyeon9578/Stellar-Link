@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface ButtonProps {
   children: React.ReactNode;
@@ -23,6 +23,7 @@ const Button: React.FC<ButtonProps> = ({
   className = '',
 }) => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   const baseStyles = `relative inline-flex items-center justify-center font-medium rounded focusDefault
                     disabled:opacity-50 disabled:cursor-not-allowed font-sans overflow-hidden`;
@@ -60,19 +61,44 @@ const Button: React.FC<ButtonProps> = ({
   const classes = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (loading || disabled) return; // 로딩 중일 때는 마우스 효과 차단
+    if (loading || disabled || isTouchDevice) return; // 터치 기기에서는 무시
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
     setPosition({ x, y });
   };
-  
-
-  const handleMouseLeave = () => {
-    if (loading || disabled) return; // 로딩 중일 때는 원래 위치로 복구 차단
-    setPosition({ x: 0, y: 0 }); // 원래 위치로 복구
+  useEffect(() => {
+  const checkTouchDevice = () => {
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
   };
+ 
+  checkTouchDevice();
+}, []);
 
+useEffect(()=>{
+ console.log(`
+  
+  
+  isTouchDevice : ${isTouchDevice}
+  
+  
+  `)
+},[isTouchDevice])
+const handleMouseLeave = () => {
+  if (loading || disabled || isTouchDevice) return; // 터치 기기에서는 무시
+  setPosition({ x: 0, y: 0 });
+};
+const handleTouchStart = () => {
+  if (isTouchDevice) {
+    setPosition({ x: 0, y: 0 }); // 터치 시작 시 위치 초기화
+  }
+};
+
+const handleTouchEnd = () => {
+  if (isTouchDevice) {
+    setPosition({ x: 0, y: 0 }); // 터치 종료 시 위치 초기화
+  }
+};
   return (
     <button
       type={type}
@@ -80,6 +106,8 @@ const Button: React.FC<ButtonProps> = ({
       disabled={disabled || loading} // 로딩 중일 때 비활성화
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
       className={classes}
     >
         {loading ? (
@@ -88,12 +116,16 @@ const Button: React.FC<ButtonProps> = ({
           </div>
         ):(
           <span
-          className="relative z-10 hover:text-transparent  hover:!bg-gradient-to-r hover:!from-customPurple hover:!to-customLightPurple hover:bg-clip-text  bg-clip-text"
-          style={{
-            transform: `translate(${position.x}px, ${position.y}px)`, // 텍스트 이동
-            transition: 'transform 0.1s ease-out',
-            animationDuration: '4s' 
-          }}
+          className={`relative z-10 hover:text-transparent hover:!bg-gradient-to-r hover:!from-customPurple hover:!to-customLightPurple hover:bg-clip-text bg-clip-text`}
+          style={
+            !isTouchDevice
+              ? {
+                  transform: `translate(${position.x}px, ${position.y}px)`,
+                  transition: 'transform 0.1s ease-out',
+                  animationDuration: '4s',
+                }
+              : {}
+          }
         >
           {children}
         </span>

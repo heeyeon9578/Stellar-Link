@@ -121,10 +121,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   
           // 중복 요청 방지
           const existingRequest = await db.collection("friend_requests").findOne({
-            fromUserEmail: requester.email,
-            toUserEmail: friend.email,
+            fromUserId: new ObjectId(requester._id),
+            toUserId: new ObjectId(friend._id),
             status: "pending",
           });
+
+          console.log(`
+            
+           
+            
+            `,existingRequest);
           
           if (existingRequest) {
             return res.status(400).json({ message: "Friend request already sent." });

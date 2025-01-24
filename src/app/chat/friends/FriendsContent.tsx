@@ -376,14 +376,12 @@ const generateChatRoom = () => {
   // 로딩 상태
   if (loading) {
     return (
-      <div className="p-8">
-        <Skeleton width="80%" height="30px" borderRadius="8px" />
-        <div className="mt-4">
-          <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-2"/>
-          <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-2"/>
-          <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-4"/>
-          <Skeleton width="100%" height="350px" borderRadius="12px" className="mb-2"/>
-        </div>
+      <div className="mx-auto md:p-8 p-4 rounded-lg h-full text-customBlue relative flex flex-col">
+        <Skeleton width="80%" height="30px" borderRadius="8px" className="mb-2"/>
+        <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-2"/>
+        <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-2"/>
+        <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-4"/>
+        <Skeleton width="100%" height="350px" borderRadius="12px" className="mb-2"/>
       </div>
     );
   }

@@ -13,14 +13,9 @@ export default function Profile() {
   const { t, i18n } = useTranslation('common');
   const [isInitialized, setIsInitialized] = useState(false);
   const [selectedSection, setSelectedSection] = useState<string | null>(null); // 선택된 섹션 관리
-  const { data: session, status } = useSession();
+  const { data: session, } = useSession();
   const profileImage = session?.user?.profileImage || '';
   const pathname = usePathname();
-
-  const isProfilePage = pathname?.startsWith('/chat/profile');
-  const isFriendPage = pathname?.startsWith('/chat/friends');
-  const isChatPage = pathname===('/chat')
-  const isColorPage = pathname?.startsWith('/chat/color')
   
   useEffect(() => {
     if (pathname?.startsWith('/chat/profile')) {
@@ -90,7 +85,7 @@ export default function Profile() {
               // width={22.5}
               // height={22.5}
               // priority
-              className="cursor-pointer  xs:w-5 w-3"
+              className="cursor-pointer  xs:w-5 xs:h-5 h-3 w-3"
             />
             ):
             (
