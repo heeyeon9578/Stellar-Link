@@ -33,18 +33,21 @@ const Button: React.FC<ButtonProps> = ({
     primary: `
               bg-gradient-to-r from-customLightPurple to-customPurple text-white
               rounded-custom shadow-custom 
-              hover:from-white hover:to-white 
+              ${!isTouchDevice && `hover:from-white hover:to-white transition-all duration-300 delay-100` }
               
-              disabled:from-customLightPurple-300 disabled:to-customPurple-500 
-              disabled:hover:from-customLightPurple-300 disabled:hover:to-customPurple-500 
-              transition-all duration-300 delay-100
+              
+              disabled:from-customLightPurple-300 
+              disabled:to-customPurple-500 
+              disabled:hover:from-customLightPurple-300 
+              disabled:hover:to-customPurple-500 
+              
             `,
     main: `
             bg-transparent 
-            hover:underline hover:decoration-customPurple
-             hover:text-underline-offset-4
-           
-            transition-all duration-300
+            
+            
+            ${!isTouchDevice && `hover:underline hover:decoration-customPurple hover:text-underline-offset-4 transition-all duration-300`}
+            
           `,
     danger: `bg-red-500 text-white rounded-custom shadow-custom 
              disabled:bg-red-300 disabled:hover:bg-red-300
@@ -116,7 +119,7 @@ const handleTouchEnd = () => {
           </div>
         ):(
           <span
-          className={`relative z-10 hover:text-transparent hover:!bg-gradient-to-r hover:!from-customPurple hover:!to-customLightPurple hover:bg-clip-text bg-clip-text`}
+          className={`relative z-10 ${!isTouchDevice && `hover:text-transparent hover:!bg-gradient-to-r hover:!from-customPurple hover:!to-customLightPurple hover:bg-clip-text bg-clip-text`}`}
           style={
             !isTouchDevice
               ? {
