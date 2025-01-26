@@ -437,13 +437,13 @@ const generateChatRoom = () => {
          className="w-[90%] h-full border-customGray rounded-xl text-[10px]  sm:text-sm text-customGray focus:border-transparent focus:outline-none focus:ring-2 focus:ring-customLightPurple"
         />
         <div className="w-[10%] flex items-center justify-end h-full" onClick={handleAddFriend}>
-          <Image
+          <img
             src="/SVG/add.svg"
             alt="add"
-            width={25}
-            height={25}
-            priority
-            className={`cursor-pointer ${isAnimating ? 'animate__animated animate__flip' : ''}`} // 애니메이션 클래스 추가
+            // width={25}
+            // height={25}
+            // priority
+            className={`cursor-pointer sm:w-[25px] sm:h-[25px] w-[15px] h-[15px] ${isAnimating ? 'animate__animated animate__flip' : ''}`} // 애니메이션 클래스 추가
               onClick={generateChatRoom}
           />
         </div>

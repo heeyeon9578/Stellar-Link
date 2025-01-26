@@ -100,7 +100,7 @@ export default function ChatRoomItem({
     key={chatRoom._id}
     {...longPressEvents}
       
-      className="p-2 cursor-pointer rounded-xl mb-2 bg-white/50 h-[80px]"
+      className="sm:p-2 p-1 cursor-pointer rounded-xl mb-2 bg-white/50"
       onClick={(e) => {
         // 메뉴가 안 떠있고, 방 이름 수정 중이 아닐 때에만 클릭 진입
         if (!menuVisible && !editChatRoomName) {
@@ -111,12 +111,13 @@ export default function ChatRoomItem({
       }}
       onContextMenu={(e) => handleContextMenu(e, chatRoom._id)}
     >
+      {/* 우클릭 (or 컨텍스트) 메뉴 */}
       <div className="z-100">
-        {/* 우클릭 (or 컨텍스트) 메뉴 */}
+        
         {menuVisible && currentContextMenuChatRoomId === chatRoom._id && (
           <ul
             ref={popupRef}
-            className="absolute bg-white/80 text-xs shadow-md list-none p-2 rounded-xl z-100"
+            className="absolute bg-white/80 text-[10px] sm:text-xs shadow-md list-none sm:p-2 p-1 rounded-xl z-100"
             style={{
               top: menuPosition.y - 50,
               left: menuPosition.x - 150,
@@ -124,19 +125,19 @@ export default function ChatRoomItem({
             }}
           >
             <li
-              className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+              className="sm:px-4 sm:py-2 px-2 py-1 cursor-pointer hover:bg-gray-100"
               onClick={() => handleEditChatRoomName(chatRoom._id)}
             >
               <DynamicText text={t('EditName')} />
             </li>
             <li
-              className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+              className="sm:px-4 sm:py-2 px-2 py-1 cursor-pointer hover:bg-gray-100"
               onClick={() => handleInviteChatRoom(chatRoom._id)}
             >
               <DynamicText text={t('InviteFriends')} />
             </li>
             <li
-              className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-red-500"
+              className="sm:px-4 sm:py-2 px-2 py-1 cursor-pointer hover:bg-gray-100 text-red-500"
               onClick={() => handelExitChatRoom(chatRoom._id)}
             >
               <DynamicText text={t('Exit')} />
@@ -145,71 +146,70 @@ export default function ChatRoomItem({
         )}
       </div>
 
-      {/* 친구 이름과 날짜 */}
-      <div className="flex justify-between relative">
-        {/* 방 제목 수정 중이라면 우측 상단에 confirm/cancel 버튼 */}
-        {editChatRoomName === chatRoom._id && (
-          <div className="absolute flex top-9 right-7">
-            <Image
-              src="/SVG/confirm.svg"
-              alt="confirm"
-              width={15}
-              height={15}
-              priority
-              className={`cursor-pointer ${isAnimating ? 'animate__animated animate__flip' : ''}`}
-              onClick={() => {
-                fetchEditChatRoomName(chatRoom._id);
-              }}
-            />
-            <Image
-              src="/SVG/cancelChange.svg"
-              alt="cancelChange"
-              width={15}
-              height={15}
-              priority
-              className={`cursor-pointer ${isAnimating ? 'animate__animated animate__flip' : ''}`}
-              onClick={cancelEditChatRoom}
-            />
-          </div>
-        )}
+      {/* 목록 내부 */}
+      <div className="flex justify-between relative ">
 
-        <ul className="w-[50%] h-[70px]">
+        {/** 사진, 이름, 방제목, 몇명인지, 마지막 메시지 */}
+        <ul className="w-[70%]">
           {chatRoom.participants.length === 1 ? (
             // (1) 한 명일 때
-            <li className="flex text-sm flex-col h-[70px]">
+            <li className="flex text-sm flex-col">
               <img
                 src={chatRoom.participants[0].profileImage}
                 alt={chatRoom.participants[0].name}
                 width={30}
                 height={30}
-                className="rounded-full w-8 h-8 mr-2 border border-white object-cover"
+                className="rounded-full sm:w-8 sm:h-8 w-6 h-6 mr-2 border border-white object-cover"
               />
-              <div className="flex flex-col text-customPurple text-sm">
+              <div className="flex flex-col text-customPurple">
                 {/* 방 이름 or participant 이름 */}
-                <div className="flex flex-nowrap h-[20px] text-sm text-customPurple overflow-hidden whitespace-nowrap text-ellipsis">
+                <div className="flex flex-nowrap text-customPurple overflow-hidden whitespace-nowrap text-ellipsis">
                   {editChatRoomName === chatRoom._id ? (
-                    <>
+                    <div className=' w-full flex'>
                       <input
                         type="text"
                         value={title}
                         lang="ko"
                         onChange={(e) => setTitle(e.target.value)}
-                        className="w-full h-3 text-xs text-customPurple px-3 py-2 border-customGray rounded-lg 
+                        className="w-[80%] h-2 sm:h-3 text-[10px] sm:text-xs text-customPurple border-customGray rounded-lg 
                                    focus:outline-none focus:ring-0 focus:border-customLightPurple"
                       />
-                    </>
+
+                      <div className=" flex">
+                        <Image
+                          src="/SVG/confirm.svg"
+                          alt="confirm"
+                          width={15}
+                          height={15}
+                          priority
+                          className={`cursor-pointer ${isAnimating ? 'animate__animated animate__flip' : ''}`}
+                          onClick={() => {
+                            fetchEditChatRoomName(chatRoom._id);
+                          }}
+                        />
+                        <Image
+                          src="/SVG/cancelChange.svg"
+                          alt="cancelChange"
+                          width={15}
+                          height={15}
+                          priority
+                          className={`cursor-pointer ${isAnimating ? 'animate__animated animate__flip' : ''}`}
+                          onClick={cancelEditChatRoom}
+                        />
+                      </div>
+                    </div>
                   ) : (
                     <>
                       {!chatRoom.title && (
-                        <DynamicText text={chatRoom.participants[0].name} />
+                        <DynamicText text={chatRoom.participants[0].name} className='sm:text-sm text-xs'/>
                       )}
-                      {chatRoom.title && <DynamicText text={chatRoom.title} />}
+                      {chatRoom.title && <DynamicText text={chatRoom.title} className='sm:text-sm text-xs'/>}
                     </>
                   )}
                 </div>
 
                 {/* 마지막 메시지 */}
-                <div className="text-xs text-gray-500 overflow-hidden text-ellipsis h-[18px]">
+                <div className="sm:text-xs text-[10px] text-gray-500 overflow-hidden text-ellipsis h-[18px]">
                   {chatRoom.messages.length > 0 ? (
                     <DynamicText
                       className=""
@@ -223,7 +223,7 @@ export default function ChatRoomItem({
             </li>
           ) : (
             // (2) 여러 명일 때
-            <div className="h-[70px]">
+            <div className="">
               {/* 참여자 프로필 이미지 표시 (겹침) */}
               <div className="relative flex">
                 {chatRoom.participants.map((participant, index) => (
@@ -238,28 +238,51 @@ export default function ChatRoomItem({
                     <img
                       src={participant.profileImage}
                       alt={participant.name}
-                      className="w-8 h-8 rounded-full border border-white object-cover"
+                      className="sm:w-8 sm:h-8 w-6 h-6 rounded-full border border-white object-cover"
                     />
                   </div>
                 ))}
               </div>
 
               {/* 참여자 이름 or 방 제목 */}
-              <div className="mt-8 flex h-[20px] text-sm text-customPurple flex-wrap 
+              <div className="sm:mt-8 mt-6 flex h-[20px] text-sm text-customPurple flex-wrap 
                               overflow-hidden whitespace-nowrap text-ellipsis"
               >
                 <div className="flex">
                   {editChatRoomName === chatRoom._id ? (
-                    <>
+                    <div className='w-full flex'>
                       <input
                         type="text"
                         value={title}
                         lang="ko"
                         onChange={(e) => setTitle(e.target.value)}
-                        className="w-full h-4 text-xs text-customPurple px-3 py-2 border-customGray 
+                        className="w-[80%] h-2 sm:h-3 text-[10px] sm:text-xs text-customPurple border-customGray 
                                    rounded-lg focus:outline-none focus:ring-0 focus:border-customLightPurple"
                       />
-                    </>
+
+                      <div className=" flex">
+                        <Image
+                          src="/SVG/confirm.svg"
+                          alt="confirm"
+                          width={15}
+                          height={15}
+                          priority
+                          className={`cursor-pointer ${isAnimating ? 'animate__animated animate__flip' : ''}`}
+                          onClick={() => {
+                            fetchEditChatRoomName(chatRoom._id);
+                          }}
+                        />
+                        <Image
+                          src="/SVG/cancelChange.svg"
+                          alt="cancelChange"
+                          width={15}
+                          height={15}
+                          priority
+                          className={`cursor-pointer ${isAnimating ? 'animate__animated animate__flip' : ''}`}
+                          onClick={cancelEditChatRoom}
+                        />
+                      </div>
+                    </div>
                   ) : (
                     <>
                       {/* 방에 title이 없으면, 참가자들 이름을 보여줌 */}
@@ -276,21 +299,21 @@ export default function ChatRoomItem({
                       )}
                       {/* 방 title이 있으면 표시 */}
                       {chatRoom.title && (
-                        <div className="mr-2 text-customPurple">
-                          <DynamicText text={chatRoom.title} />
+                        <div className="sm:mr-2 mr-1 text-customPurple">
+                          <DynamicText text={chatRoom.title} className='text-xs sm:text-sm'/>
                         </div>
                       )}
                     </>
                   )}
                 </div>
                 {/* 인원수 */}
-                <div className="text-xs text-gray-500">
+                <div className="text-[10px] sm:text-xs text-gray-500">
                   <DynamicText text={String(chatRoom.participants.length)} />
                 </div>
               </div>
 
               {/* 마지막 메세지 */}
-              <div className="text-xs text-gray-500 overflow-hidden text-ellipsis h-[18px]">
+              <div className="text-[10px] sm:text-xs text-gray-500 overflow-hidden text-ellipsis h-[18px]">
                 {chatRoom.messages.length > 0 ? (
                   <DynamicText
                     text={`${chatRoom.messages[chatRoom.messages.length - 1].senderInfo.name}: ${chatRoom.messages[chatRoom.messages.length - 1].text}`}
@@ -302,7 +325,7 @@ export default function ChatRoomItem({
 
               {/* 안 읽은 메시지 수 표시 */}
               {unreadCount > 0 && (
-                <span className="absolute bottom-0 right-0 bg-customLightPurple text-white text-xs rounded-full px-2 py-1">
+                <span className="absolute bottom-0 right-0 bg-customLightPurple text-white text-[10px] sm:text-xs rounded-full px-2 py-1">
                   {unreadCount}
                 </span>
               )}
@@ -311,7 +334,7 @@ export default function ChatRoomItem({
         </ul>
 
         {/* 날짜/시간 */}
-        <div className="text-xs flex-nowrap text-gray-500 w-[60px] flex justify-end">
+        <div className="sm:text-xs text-[10px] flex-nowrap text-gray-500 w-[60px] flex justify-end">
           {chatRoom.messages.length > 0 ? (
             (() => {
               const messageDate = new Date(

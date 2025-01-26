@@ -680,14 +680,13 @@ if (!isInitialized) return null;
   if (loading || isLoading) {
  
     return (
-      <div className="p-8">
-        <Skeleton width="80%" height="30px" borderRadius="8px" />
-        <div className="mt-4">
-          <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-2"/>
-          <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-2"/>
-          <Skeleton width="100%" height="350px" borderRadius="12px" className="mb-2"/>
-        </div>
-      </div>
+      <div className="mx-auto md:p-8 p-4 rounded-lg h-full text-customBlue relative flex flex-col">
+      <Skeleton width="80%" height="30px" borderRadius="8px" className="mb-2"/>
+      <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-2"/>
+      <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-2"/>
+      <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-4"/>
+      <Skeleton width="100%" height="350px" borderRadius="12px" className="mb-2"/>
+    </div>
     );
   }
 
@@ -695,7 +694,7 @@ if (!isInitialized) return null;
   if (error) {
    
     return (
-      <div className="p-8 text-red-500">
+      <div className="md:p-8 p-4 text-red-500">
         <p>{t("Effd")}</p>
         <p>{t("Ptal")}</p>
       </div>
@@ -704,29 +703,31 @@ if (!isInitialized) return null;
 
 
   return (
-    <div className="mx-auto p-8 rounded-lg h-full text-customBlue relative">
+    <div className="mx-auto md:p-8 p-4 rounded-lg h-full text-customBlue relative flex flex-col">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold mb-4">
-          <DynamicText text={t('Chat')} />
+
+        <h2 className="md:text-2xl text-sm sm:text-xl font-bold mb-4">
+          <DynamicText text={t('Chat')}/>
         </h2>
+
        {isGenerateChatRoom ? (
-         <Image
+         <img
          src="/SVG/cancel.svg"
          alt="cancel"
-         width={25}
-         height={25}
-         priority
-         className={`cursor-pointer hover:scale-125 ${isAnimating ? 'animate__animated animate__flip' : ''}`} // 애니메이션 클래스 추가
+        //  width={25}
+        //  height={25}
+        //  priority
+         className={`cursor-pointer hover:scale-125 sm:w-[25px] sm:h-[25px] w-[15px] h-[15px] ${isAnimating ? 'animate__animated animate__flip' : ''}`} // 애니메이션 클래스 추가
          onClick={generateChatRoom}
        />
        ):(
-        <Image
+        <img
         src="/SVG/add.svg"
         alt="add"
-        width={25}
-        height={25}
-        priority
-        className={`cursor-pointer hover:scale-125 ${isAnimating ? 'animate__animated animate__flip' : ''}`} // 애니메이션 클래스 추가
+        // width={25}
+        // height={25}
+        // priority
+        className={`cursor-pointer hover:scale-125 sm:w-[25px] sm:h-[25px] w-[15px] h-[15px] ${isAnimating ? 'animate__animated animate__flip' : ''}`} // 애니메이션 클래스 추가
         onClick={generateChatRoom}
       />
        )}
@@ -734,7 +735,7 @@ if (!isInitialized) return null;
       {isGenerateChatRoom ? (
         <>  
         {/** 검색 창 (디바운스 적용) */}
-        <div className="w-full h-10 bg-customGray rounded-xl flex">
+        <div className="w-full sm:h-10 h-8 bg-customGray rounded-xl flex ">
           <div className="p-2 flex items-center">
             <Image
               src="/SVG/search.svg"
@@ -751,16 +752,16 @@ if (!isInitialized) return null;
               value={search}
               placeholder={t('Search')}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-[100%] text-black/45 border-customGray rounded-xl text-sm bg-transparent focus:outline-none focus:ring-0 focus:border-transparent"
+              className="w-[100%] text-black/45 border-0 text-[10px] sm:text-sm bg-transparent focus:outline-none focus:ring-0 focus:border-transparent"
             />
           </div>
         </div>
         {/** 정렬 */}
-        <div onClick={toggleMenu} className="relative bg-black cursor-pointer" style={{zIndex:'9999'}}>
+        <div onClick={toggleMenu} className="relative cursor-pointer" style={{zIndex:'9999'}}>
           {/* 메뉴를 여는 버튼 */}
-          <div className="right-0 absolute flex mt-3">
+          <div className="right-0 absolute flex sm:mt-3 mt-2">
             <div
-              className=" bg-trasparent text-customPurple text-xs"
+              className=" bg-trasparent text-customPurple text-[10px] sm:text-xs"
             >
               {sortOption === 'latest' ? t('SortByLatest') : t('SortByName')}
 
@@ -790,7 +791,7 @@ if (!isInitialized) return null;
 
           {/* 드롭다운 메뉴 */}
           {isMenuOpen && (
-            <div className="absolute right-0 mt-8 w-22 bg-white border border-gray-200 bg-transparent z-1000 text-customPurple text-xs">
+            <div className="absolute right-0 mt-8 w-22 bg-white border border-gray-200 bg-transparent z-1000 text-customPurple text-[10px] sm:text-sm">
               <button
                 onClick={() => handleSortChange('latest')}
                 className={`block w-full text-left px-4 py-2 hover:bg-gray-100 ${sortOption === 'latest' ? 'bg-gray-100' : ''}`}
@@ -807,9 +808,9 @@ if (!isInitialized) return null;
           )}
         </div>
         {/** 친구 목록 */}
-          <div className="mt-8 max-h-[50vh] overflow-y-auto">
+          <div className="sm:mt-10 sm:mt-8 mt-6 max-h-[100%] overflow-y-auto">
             {filteredFriends.length === 0 ? (
-              <DynamicText text={t('Yhnfy')}/>
+              <DynamicText className="text-gray-500 text-[10px] sm:text-sm" text={t('Yhnfy')}/>
           
             ) : (
               <ul>
@@ -827,15 +828,15 @@ if (!isInitialized) return null;
                      <img
                        src={friend.profileImage || "/SVG/default-profile.svg"}
                        alt={`${friend.name}'s profile`}
-                       className="w-[50px] h-[50px] rounded-full mr-2 object-cover" 
+                       className="sm:w-[50px] sm:h-[50px] w-[30px] h-[30px] rounded-full mr-2 object-cover" 
                      />
 
                      <div>
                        <div className="text-customPurple font-bold">
-                         <DynamicText text={friend.name}/>
+                       <DynamicText text={friend.name} className="text-[10px] sm:text-sm"/> 
                        </div>
 
-                       <div className="text-customGray text-xs">
+                       <div className="text-customGray text-[7px] sm:text-xs">
                          {friend.email}
                        </div>
                      </div>
@@ -848,34 +849,35 @@ if (!isInitialized) return null;
             )}
 
           </div>
-
-          <div className="mb-4" lang="ko">
-            <label className="block text-sm font-bold mb-2">
-              <DynamicText text={t('Title')} />
+            {/** 방 이름 적는 칸 */}
+          <div className="mb-4 " lang="ko">
+            <label className="block text-sm font-bold sm:mb-2">
+              <DynamicText text={t('Title')} className="text-[10px]  sm:text-sm"/>
             </label>
             <input
               type="text"
               value={title}
               lang="ko"
               onChange={(e) => setTitle(e.target.value)}
-             className="w-full text-customPurple px-3 py-2 border-customGray rounded-lg focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+             className="w-full sm:h-10 h-8 text-[10px] sm:text-sm text-customPurple border-customGray rounded-lg focus:border-transparent focus:outline-none focus:ring-2 focus:ring-customLightPurple"
             />
           </div>
-
-          <div className="absolute bottom-2 w-full left-0">
+            {/** 방 생성 버튼 */}
+          <div className="absolute bottom-1 sm:bottom-2 w-full left-0">
             <Button
               variant="primary"
               disabled={selectedFriends.length===0} // 한명이라도 선택되었을때
-              className="animate__animated animate__zoomIn w-full"
+              className="animate__animated animate__zoomIn w-full sm:h-8 h-6"
               onClick={handleGenerateRoom}
             >
-              <DynamicText text={t('GenerateRoom')} />
+              <DynamicText text={t('GenerateRoom')} className="text-[10px] sm:text-sm"/>
             </Button>
           </div>
         </>
         ):(
-        <div className="h-full w-full">
-             <div className="w-full h-10 bg-customGray rounded-xl flex">
+        <div className="h-full w-full flex flex-col">
+          {/** 검색 */}
+             <div className="w-full sm:h-10 h-8 bg-customGray rounded-xl flex">
               <div className="p-2 flex items-center">
                 <Image
                   src="/SVG/search.svg"
@@ -893,28 +895,29 @@ if (!isInitialized) return null;
                   lang="ko"
                   placeholder={t('Search')}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-[100%] text-black/45 border-customGray rounded-xl text-sm bg-transparent focus:outline-none focus:ring-0 focus:border-transparent"
+                  className="w-[100%] text-black/45 border-0 text-[10px] sm:text-sm bg-transparent focus:outline-none focus:ring-0 focus:border-transparent"
                 />
               </div>
             </div>
 
-            <div className="w-full h-10 bg-customRectangle rounded-xl flex mt-4 text-customGray text-sm items-center justify-around p-2">
+          {/** 메뉴 */}
+            <div className="w-full sm:h-10 h-8 bg-customRectangle rounded-xl flex sm:mt-4 mt-2 text-customGray items-center justify-around p-2">
               {menus.map((menu) => (
                 <Button
                   key={menu.name}
                   variant={isClicked === menu.name ? 'primary' : "main"}
                   size="sm"
-                  className={isClicked === menu.name ? "text-white w-full h-8" : "text-customGray w-full h-8"}
+                  className={isClicked === menu.name ? "text-white w-full sm:h-8 h-6" : "text-customGray w-full sm:h-8 h-6"}
                   onClick={menu.onClick}
                 >
-                  <DynamicText text={t(menu.name)} />
+                  <DynamicText text={t(menu.name)} className="text-[10px] sm:text-sm"/>
                 </Button>
               ))}
             </div>
 
-            <div className="mt-4 h-[70%] overflow-y-auto">
+            <div className="mt-4 h-[100%] overflow-y-auto">
                 {filteredData.length === 0 ? (
-                 <DynamicText text={t('Ncf')} className="text-gray-500"/>
+                 <DynamicText text={t('Ncf')} className="text-gray-500 text-[10px] sm:text-sm"/>
                 ) : (
                   filteredData.map((chatRoom) => {
                     // unreadCounts[chatRoom._id] 가 있다면, 
