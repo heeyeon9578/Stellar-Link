@@ -703,7 +703,7 @@ if (!isInitialized) return null;
 
 
   return (
-    <div className="mx-auto md:p-8 p-4 rounded-lg h-full text-customBlue relative flex flex-col">
+    <div className="mx-auto md:p-8 p-4 rounded-lg h-[100%] text-customBlue relative flex flex-col">
       <div className="flex justify-between items-center">
 
         <h2 className="md:text-2xl text-sm sm:text-xl font-bold mb-4">
@@ -875,7 +875,7 @@ if (!isInitialized) return null;
           </div>
         </>
         ):(
-        <div className="h-full w-full flex flex-col">
+        <div className="h-[90%] w-full flex flex-col">
           {/** 검색 */}
              <div className="w-full sm:h-10 h-8 bg-customGray rounded-xl flex">
               <div className="p-2 flex items-center">
@@ -915,7 +915,7 @@ if (!isInitialized) return null;
               ))}
             </div>
 
-            <div className="mt-4 h-[100%] overflow-y-auto">
+            <div className="mt-4 max-h-[100%] overflow-y-auto ">
                 {filteredData.length === 0 ? (
                  <DynamicText text={t('Ncf')} className="text-gray-500 text-[10px] sm:text-sm"/>
                 ) : (

@@ -402,7 +402,7 @@ export default function Detail() {
   if (!isInitialized) return null;
 
   return (
-    <div className="w-full h-full text-black">
+    <div className="w-full h-full text-black ">
       
       {chatRoomId ?(
         <div className='flex h-full flex-col'>

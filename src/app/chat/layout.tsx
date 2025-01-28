@@ -47,10 +47,9 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         <Profile></Profile>
       </div>
 
-      {/* 선택한 부분 */}
-      <div className="sm:flex-[3] flex-[5] border-2 border-customGray rounded-xl bg-white/90 backdrop-blur-lg md:p-4 sm:h-[100%] h-[80%]">
-       <Content></Content>
-      </div>
+
+      <Content></Content>
+      
 
       {/* 상세 부분 */}
       <div className="flex-[5] border-2 border-customGray rounded-xl bg-white/90 backdrop-blur-lg p-4 hidden md:block h-[100%]" >
