@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponseW
  
     io = new IOServer(res.socket.server, {
       cors: {
-        origin: "http://localhost:3000", // 클라이언트 URL
+        origin:process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000", // 클라이언트 URL
         methods: ["GET", "POST"],
         credentials: true, // 쿠키 인증을 사용하는 경우 설정 필요
       },

@@ -245,10 +245,10 @@ export default function ChatRoomItem({
               </div>
 
               {/* 참여자 이름 or 방 제목 */}
-              <div className="sm:mt-8 mt-6 flex h-[20px] text-sm text-customPurple flex-wrap 
+              <div className="sm:mt-8 mt-6 flex h-[20px] w-full max-w-[100%] text-sm text-customPurple 
                               overflow-hidden whitespace-nowrap text-ellipsis"
               >
-                <div className="flex">
+                <div className="flex  max-w-[90%]">
                   {editChatRoomName === chatRoom._id ? (
                     <div className='w-full flex'>
                       <input
@@ -284,18 +284,23 @@ export default function ChatRoomItem({
                       </div>
                     </div>
                   ) : (
-                    <>
+                    <div className='flex '>
                       {/* 방에 title이 없으면, 참가자들 이름을 보여줌 */}
                       {!chatRoom.title && (
-                        <>
+                        <div className='flex flex-wrap 
+                              overflow-hidden whitespace-nowrap text-ellipsis items-center'>
                           {chatRoom.participants.map((p, idx) => (
-                            <span key={p.id}>
-                              {idx === chatRoom.participants.length - 1
-                                ? p.name
-                                : p.name + ','}
-                            </span>
+                            <span key={p.id} className='text-xs sm:text-sm'>
+                            {idx === chatRoom.participants.length - 1 ? (
+                              <DynamicText text={p.name} className='text-xs sm:text-sm' />
+                            ) : (
+                              <>
+                                <DynamicText text={p.name+','} className='text-xs sm:text-sm' /> {' '}
+                              </>
+                            )}
+                          </span>
                           ))}
-                        </>
+                        </div>
                       )}
                       {/* 방 title이 있으면 표시 */}
                       {chatRoom.title && (
@@ -303,7 +308,7 @@ export default function ChatRoomItem({
                           <DynamicText text={chatRoom.title} className='text-xs sm:text-sm'/>
                         </div>
                       )}
-                    </>
+                    </div>
                   )}
                 </div>
                 {/* 인원수 */}

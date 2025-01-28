@@ -1,3 +1,12 @@
+/**
+ * 채팅방
+ * 참여 인원 10명까지만 프로필 이미지 표시
+ * 타이틀이 존재할 경우, 타이틀 표기 / 존재하지 않을 경우 참여자 이름표기
+ * 채팅방 본인의 메세지 텍스트 색상, 말풍선 색상을 변경할 수 있음 (서버에 데이터 저장)
+ * 파일 첨부 기능을 통해 사진, pdf 등을 메세지에 첨부 가능
+ * 웹소켓을 통해 실시간-양방향 통신
+ */
+
 'use client';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
@@ -41,6 +50,14 @@ export default function Detail() {
   const [participantColors, setParticipantColors] = useState<{ [userId: string]: string }>({});
   const [participantTextColors, setParticipantTextColors] = useState<{ [userId: string]: string }>({});
   const [isColorChange, setIsColorChange] = useState<boolean>(false);
+  // 최대 표시할 참여자 수
+  const MAX_DISPLAY = 10;
+  
+  // 전체 참여자 수
+  const totalParticipants = chatRoomInfo?.participants.length || 0;
+  
+  // 슬라이스된 참여자 배열
+  const displayedParticipants = chatRoomInfo?.participants.slice(0, MAX_DISPLAY) || [];
 
   const colorClasses: Record<string, string> = {
     customRectangle: "bg-customRectangle",
@@ -402,32 +419,33 @@ export default function Detail() {
   if (!isInitialized) return null;
 
   return (
-    <div className="w-full h-full text-black ">
+    <div className="w-full h-full text-black p-2 md:p-0">
       
       {chatRoomId ?(
-        <div className='flex h-full flex-col'>
+        <div className='flex h-full flex-col '>
 
           {/** 타이틀 섹션 */}
            
           <div className="h-[15%] ">
             {/** 뒤로가기 버튼 */}
-            <div className="flex justify-start mb-2 ">
-              <Image
+            <div className="flex justify-start sm:mb-2 mb-1 ">
+              <img
                 src="/SVG/back.svg"
                 alt="back"
-                width={30}
-                height={30}
-                priority
-                className={`cursor-pointer hover:scale-125 ${isAnimatingFileAdd ? 'animate__animated animate__headShake' : ''}`}
+                // width={30}
+                // height={30}
+                // priority
+                className={`cursor-pointer sm:h-[30px] sm:w-[30px] h-[15px] w-[15px] hover:scale-125 ${isAnimatingFileAdd ? 'animate__animated animate__headShake' : ''}`}
                 onClick={handleGoToBack}
               />
             </div>
-            <div className='relative h-[50px]'>
+            <div className='relative '>
               {chatRoomInfo?.title? (
-              <div className=''>
+                
+              <div className=''>{/** 타이틀이 존재할때 */}
 
-                <div className="relative flex">
-                 {chatRoomInfo?.participants.map((participant, index) => (
+                <div className="relative flex ">
+                 {displayedParticipants.map((participant, index) => (
                     <div
                      key={participant.id}
                      className="absolute"
@@ -439,7 +457,7 @@ export default function Detail() {
                      <img
                        src={participant.profileImage}
                        alt={participant.name}
-                       className="w-8 h-8 rounded-full border border-white object-cover"
+                       className="sm:w-8 sm:h-8 h-6 w-6 rounded-full border border-white object-cover"
                      />
                     </div>
 
@@ -447,97 +465,116 @@ export default function Detail() {
                 
                 </div>
 
-                <div className='flex mt-8'>
-                  <div className='text-sm text-customPurple'><DynamicText text={chatRoomInfo?.title}/></div>
-                  <div className='text-sm text-gray-500'>({chatRoomInfo?.participants.length || 0})</div>
+                <div className='flex sm:mt-8 mt-6'>
+                  <div className='sm:text-sm text-xs text-customPurple'><DynamicText text={chatRoomInfo?.title}/></div>
+                  <div className='sm:text-sm text-xs text-gray-500'>({chatRoomInfo?.participants.length || 0})</div>
                 </div>
 
               </div>
 
                 ):(
-                <div>
-                  <div className="relative flex ml-[22px]">
-                    {chatRoomInfo?.participants.map((participant, index) => (
+                <div className=''>{/** 타이틀이 존재하지 않을때 */}
+                  <div className="relative flex">
+                    {displayedParticipants.map((participant, index) => (
                       <div
                         key={participant.id}
                         className="absolute"
                         style={{
                           left: `${index * 20}px`, // 겹치는 간격 조정
-                          zIndex: chatRoomInfo?.participants.length - index, // z-index로 겹침 순서 조정
+                          zIndex: totalParticipants - index, // z-index로 겹침 순서 조정
                         }}
                       >
                         <img
                         src={participant.profileImage}
                         alt={participant.name}
-                        className="w-8 h-8 rounded-full border border-white object-cover"
+                        className="sm:w-8 sm:h-8 h-6 w-6 rounded-full border border-white object-cover"
                         />
                       </div>
                     ))}
                   </div>
-                  <div className='text-sm text-gray-500'>({chatRoomInfo?.participants.length || 0})</div>
+
+                  <div className='flex sm:mt-8 mt-6  max-w-[80%] h-[15px] sm:h-[23px] overflow-hidden whitespace-nowrap text-ellipsis'>
+                    <div className='flex max-w-[90%] overflow-hidden whitespace-nowrap text-ellipsis flex-wrap '>
+                      {chatRoomInfo?.participants.map((p, idx) => (
+                      <span key={p.id} className='text-xs sm:text-sm text-customPurple '>
+                      {idx === chatRoomInfo.participants.length - 1 ? (
+                        <DynamicText text={p.name} className='text-xs sm:text-sm' />
+                      ) : (
+                        <>
+                          <DynamicText text={p.name+','} className='text-xs sm:text-sm' /> {' '}
+                        </>
+                      )}
+                    </span>
+                    ))}
+                    </div>
+                    <div className='sm:text-sm text-xs text-gray-500'>({chatRoomInfo?.participants.length || 0})</div>
+                  </div>
+                
+
+                  
+
                 </div>
               )}
-              <div className='absolute bottom-0 right-2 flex flex-col items-end '>
+              <div className='absolute bottom-0 right-2 flex flex-col items-end'>
                 
-              {
-                isColorChange && 
-                <>
-                <div className='flex mb-1'>
-                {['black','blue500', 'green500', 'yellow500', 'pink500', 'customPurple'].map((color, idx) => (
-                <div
-                  key={idx}
-                  className={`w-6 h-6 ${colorClasses[color]} mr-1 rounded-full cursor-pointer border border-white hover:scale-125 hover:animate__animated hover:animate__bounce`}
-                  onClick={() => handleTextColorChange(color)}
-                ></div>
-                ))}
-                <Image
-                  src="/SVG/text.svg"
-                  alt="text"
-                  width={24}
-                  height={24}
-                  priority
-                  
-                  className=""
-                />
-              </div>
-                <div className='flex mb-1'>
-                  {['customRectangle','blue200', 'green200', 'yellow200', 'pink200', 'purple200'].map((color, idx) => (
-                  <div
-                    key={idx}
-                    className={`w-6 h-6  mr-1 ${colorClasses[color]} rounded-full cursor-pointer border border-white hover:scale-125 hover:animate__animated hover:animate__bounce`}
-                    onClick={() => handleColorChange(color)}
-                  ></div>
-                  ))}
-                  <Image
-                    src="/SVG/colorChange.svg"
-                    alt="colorChange"
-                    width={24}
-                    height={24}
-                    priority
-                    
-                    className=""
-                  />
-                </div>
-                </>
-              }
-               <Image
+              
+               <img
                     src="/SVG/more.svg"
                     alt="colorChange"
-                    width={30}
-                    height={30}
-                    priority
+                    // width={30}
+                    // height={30}
+                    // priority
                     onClick={()=>{setIsColorChange(!isColorChange)}}
-                    className="cursor-pointer hover:scale-125"
+                    className="cursor-pointer hover:scale-125 w-[20px] h-[20px] sm:w-[30px] sm:h-[30px]"
                   />
+                  {
+                    isColorChange && 
+                    <div className='absolute bg-white top-6 sm:top-8 right-2 sm:right-4 rounded-custom-myChat p-2'>
+                      <div className='flex mb-1'>
+                      {['black','blue500', 'green500', 'yellow500', 'pink500', 'customPurple'].map((color, idx) => (
+                      <div
+                        key={idx}
+                        className={`sm:w-6 sm:h-6 h-4 w-4 ${colorClasses[color]} mr-1 rounded-full cursor-pointer border border-white hover:scale-125 hover:animate__animated hover:animate__bounce`}
+                        onClick={() => handleTextColorChange(color)}
+                      ></div>
+                      ))}
+                      <img
+                        src="/SVG/text.svg"
+                        alt="text"
+                        // width={24}
+                        // height={24}
+                        // priority
+
+                        className="w-[15px] h-[15px] sm:w-[24px] sm:h-[24px]"
+                      />
+                      </div>
+                      <div className='flex mb-1'>
+                      {['customRectangle','blue200', 'green200', 'yellow200', 'pink200', 'purple200'].map((color, idx) => (
+                      <div
+                        key={idx}
+                        className={`sm:w-6 sm:h-6 h-4 w-4  mr-1 ${colorClasses[color]} rounded-full cursor-pointer border border-white hover:scale-125 hover:animate__animated hover:animate__bounce`}
+                        onClick={() => handleColorChange(color)}
+                      ></div>
+                      ))}
+                      <img
+                        src="/SVG/colorChange.svg"
+                        alt="colorChange"
+                        // width={24}
+                        // height={24}
+                        // priority
+
+                         className="w-[15px] h-[15px] sm:w-[24px] sm:h-[24px]"
+                      />
+                      </div>
+                    </div>
+                  }
               </div>
             </div>
-            
-       
-            
+
           </div>
 
           {/** 채팅 섹션 */}
-          <div className="h-[90%] overflow-y-auto">
+          <div className="h-[90%] overflow-y-auto sm:mt-2 mt-1">
             {messages.map((msg,index) => {
                const messageColor = participantColors[msg.requesterId] || "customRectangle"; // 기본 색상 설정
                const messageTextColor = participantTextColors[msg.requesterId] || "customPurple"; // 기본 색상 설정

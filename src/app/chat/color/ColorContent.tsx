@@ -2,11 +2,10 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "next-auth/react";
-import io from "socket.io-client";
+import socket from "@/socketIns"; // 위에서 만든 socket.ts 경로
 import "../../../../i18n";
 import DynamicText from "../../../app/components/DynamicText";
 
-const socket = io("http://localhost:3000", { path: "/api/socket" });
 
 export default function ColorContent() {
   const { t, i18n } = useTranslation("common");

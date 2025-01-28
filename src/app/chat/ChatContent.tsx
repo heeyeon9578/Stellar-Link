@@ -823,7 +823,7 @@ if (!isInitialized) return null;
                       type="checkbox"
                       checked={selectedFriends.includes(friend._id)}
                       onChange={() => handleCheckboxChange(friend._id)}
-                      className="appearance-none checked:bg-customLightPurple checked:border-customLightPurple mr-2 focus:outline-none rounded-full focus:ring-2 focus:ring-customLightPurple focus:border-transparent"
+                      className="appearance-none checked:bg-customLightPurple checked:border-customLightPurple mr-2 focus:outline-none  focus:ring-2 focus:ring-customLightPurple focus:border-transparent"
                     /> 
                      <img
                        src={friend.profileImage || "/SVG/default-profile.svg"}
