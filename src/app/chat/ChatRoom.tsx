@@ -606,24 +606,24 @@ export default function Detail() {
               return (
                 <div key={msg.id}>
                 {isUser ? (
-                <div key={msg.id} className={`flex mb-4 justify-end ${
+                <div key={msg.id} className={`flex mb-2 sm:mb-4 justify-end  ${
                   animatedMessageIndex === index ? "animate__animated animate__fadeInUp" : ""
                 }`}>
                  
                   
-                  <div className="flex flex-col items-end ">
-                    <DynamicText className={`text-sm ${dynamicTextClass}`} text={msg.requesterName}/>
+                  <div className="flex flex-col items-end  sm:mr-2 mr-1">
+                    <DynamicText className={`text-xs sm:text-sm ${dynamicTextClass}`} text={msg.requesterName}/>
                     <div className='flex items-end'>
                       <div className='flex flex-col items-end'>
                         {/** 안 읽은 사람 수 표시 */}
                         {unreadCount > 0 && (
-                          <div className="text-xs text-customLightPurple">
+                          <div className="text-[10px] sm:text-xs text-customLightPurple">
                             {unreadCount}
                           </div>
                         )}
-                         <div className="text-xs text-gray-400">{formattedDate}</div>
+                         <div className="text-[10px] sm:text-xs text-gray-400">{formattedDate}</div>
                       </div>
-                        <span className={`ml-2 text-xs text-gray-500 bg-${messageColor} rounded-custom-myChat max-w-[300px] p-2 flex-wrap`}>
+                        <span className={`ml-1 sm:ml-2 text-[10px] sm:text-xs text-gray-500 bg-${messageColor} rounded-custom-myChat max-w-[140px] sm:max-w-[300px] p-1 sm:p-2 flex-wrap`}>
                         {msg.file? (
                             <>
                              {msg.file.type.startsWith("image/") ? (
@@ -658,25 +658,25 @@ export default function Detail() {
                   <img
                     src={msg.requesterImage || "/SVG/default-profile.svg"}
                     alt="Profile"
-                    className={`w-[30px] h-[30px] object-cover rounded-full object-cover mr-2 border border-2 ${dynamicBorderClass}`}
+                    className={`sm:w-[30px] sm:h-[30px] w-[20px] h-[20px] object-cover rounded-full object-cover mr-1 sm:mr-2 border border-2 ${dynamicBorderClass}`}
                   />
                   {/* 채팅 끝에 위치한 더미 div */}
                   <div ref={messagesEndRef}></div>
 
                 </div>
                 ):(
-                  <div key={msg.id} className={`flex mb-4 ${
+                  <div key={msg.id} className={`flex mb-2 sm:mb-4 ${
                     animatedMessageIndex === index ? "animate__animated animate__fadeInUp" : ""
                   }`}>
                   <img
                     src={msg.requesterImage || "/SVG/default-profile.svg"}
                     alt="Profile"
-                    className={`w-[30px] h-[30px] rounded-full object-cover mr-2 border border-2 ${dynamicBorderClass}`}
+                    className={`sm:w-[30px] sm:h-[30px] w-[20px] h-[20px] rounded-full object-cover mr-1 sm:mr-2 border border-2 ${dynamicBorderClass}`}
                   />
                   <div className="flex flex-col">
-                    <DynamicText className={`text-sm ${dynamicTextClass}`} text={msg.requesterName}/>
+                    <DynamicText className={`text-xs sm:text-sm ${dynamicTextClass}`} text={msg.requesterName}/>
                     <div className='flex items-end'>
-                        <div className={`text-xs text-gray-500 bg-${messageColor} max-w-[300px] p-2 flex-wrap rounded-custom-otherChat`}>
+                        <div className={`text-[10px] sm:text-xs text-gray-500 bg-${messageColor} max-w-[140px]  sm:max-w-[300px] p-1 sm:p-2 flex-wrap rounded-custom-otherChat`}>
                           {msg.file? (
                             <>
                              {msg.file.type.startsWith("image/") ? (
@@ -705,13 +705,13 @@ export default function Detail() {
                           )}
                           
                         </div>
-                        <div className='flex flex-col ml-2'>
+                        <div className='flex flex-col ml-1 sm:ml-2'>
                         {unreadCount > 0 && (
-                          <div className="text-xs text-customLightPurple">
+                          <div className="text-[10px] sm:text-xs text-customLightPurple">
                             {unreadCount}
                           </div>
                         )}
-                      <div className=" text-xs text-gray-400">{formattedDate}</div>
+                      <div className="text-[10px] sm:text-xs text-gray-400">{formattedDate}</div>
                         </div>
                     </div>
                   </div>
@@ -728,15 +728,15 @@ export default function Detail() {
           {/** 전송 섹션 */}
           <div className="flex w-full items-center">
              {/** 첨부 버튼 */}
-              <div className="flex w-[10%] justify-center">
+              <div className="flex w-[10%] sm:w-[10%] justify-center items-center">
                 <label htmlFor="fileInput" className="cursor-pointer">
-                  <Image
+                  <img
                     src="/SVG/clip.svg"
                     alt="clip"
-                    width={15}
-                    height={15}
-                    priority
-                    className="cursor-pointer hover:scale-125"
+                    // width={15}
+                    // height={15}
+                    // priority
+                    className="cursor-pointer hover:scale-125 w-[12px] h-[12px] sm:w-[15px] sm:h-[15px]"
                   />
                 </label>
                 <input
@@ -762,18 +762,18 @@ export default function Detail() {
                 }}
                 onCompositionStart={() => (isComposingRef.current = true)}
                 onCompositionEnd={() => (isComposingRef.current = false)}
-                className={selectedFile? `w-full px-3 py-1 border-customGray rounded-xl text-sm text-gray-500 bg-gray-300 focus:outline-none focus:ring-2 focus:border-transparent focus:ring-customLightPurple`:
-                    `w-full px-3 py-1 border-customGray rounded-xl text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-customLightPurple focus:border-transparent`}
+                className={selectedFile? `w-full h-4 sm:h-8 border-customGray rounded-xl text-xs sm:text-sm text-gray-500 bg-gray-300 focus:outline-none focus:ring-2 focus:border-transparent focus:ring-customLightPurple`:
+                    `w-full border-customGray h-4  sm:h-8 rounded-xl text-xs sm:text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-customLightPurple focus:border-transparent`}
               />
               {selectedFile &&(
                 <div className='absolute top-2 right-2' onClick={deleteFile}>
-                <Image
+                <img
                   src="/SVG/fileCancel.svg"
                   alt="fileCancel"
-                  width={15}
-                  height={15}
-                  priority
-                  className="cursor-pointer"
+                  // width={15}
+                  // height={15}
+                  // priority
+                  className="cursor-pointer w-[12px] h-[12px] sm:w-[15px] sm:h-[15px]"
                 />
               </div>
               )}
@@ -783,13 +783,13 @@ export default function Detail() {
               
             {/** 전송 버튼 */}
             <div className="flex w-[10%] justify-center">
-              <Image
+              <img
                 src="/SVG/send.svg"
                 alt="send"
-                width={20}
-                height={20}
-                priority
-                className={`cursor-pointer hover:scale-125 ${isAnimating ? 'animate__animated animate__headShake' : ''}`}
+                // width={20}
+                // height={20}
+                // priority
+                className={`cursor-pointer hover:scale-125 w-[12px] h-[12px] sm:w-[15px] sm:h-[15px] ${isAnimating ? 'animate__animated animate__headShake' : ''}`}
                 onClick={handleSendMessage}
               />
             </div>

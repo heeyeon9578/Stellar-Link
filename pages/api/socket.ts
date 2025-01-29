@@ -2,8 +2,6 @@ import { Server as IOServer, Socket } from "socket.io";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Server as HTTPServer } from "http";
 import { connectDB } from "@/util/database";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]";
 import { ObjectId } from "mongodb";
 
 type NextApiResponseWithSocket = NextApiResponse & {
