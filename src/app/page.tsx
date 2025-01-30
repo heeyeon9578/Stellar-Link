@@ -105,7 +105,7 @@ export default function Home() {
 
           {/* Intro 텍스트 (뒤쪽 레이어) */}
           <div
-            className="absolute inset-0  items-center justify-cente z-0 pointer-events-none "
+            className="absolute inset-0  items-center justify-cente z-0 pointer-events-none bg-transparent"
           >
             <div
               className={`text-lg sm:text-xl md:text-2xl lg:text-4xl font-bold text-white px-4 mt-4 sm:mt-0 animate__animated ${animation1}`}
