@@ -431,6 +431,7 @@ const generateChatRoom = () => {
       <div className="flex items-center sm:h-10 h-8 justify-between sm:mt-4 mt-2">
         <input
           type="text"
+          lang="ko"
           value={newFriendEmail}
           placeholder={t('EFE')}
           onChange={(e) => setNewFriendEmail(e.target.value)}
@@ -502,7 +503,7 @@ const generateChatRoom = () => {
 
         {/* 드롭다운 메뉴 */}
         {isMenuOpen && (
-          <div className="absolute right-0 mt-8 w-22 bg-white border border-gray-200 bg-transparent z-1000 text-customPurple text-[10px] sm:text-sm">
+          <div className="absolute right-0 mt-8 w-22 bg-white border border-gray-200 bg-transparent z-1000 text-customPurple text-[10px] sm:text-xs">
             <button
               onClick={() => handleSortChange('latest')}
               className={`block w-full text-left px-4 py-2 hover:bg-gray-100 ${sortOption === 'latest' ? 'bg-gray-100' : ''}`}

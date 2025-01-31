@@ -97,7 +97,9 @@
     "SortByName":"Name",
     "SortByLatest":"Latest",
     "Effd":"Error fetching friends data.",
-    "Ptal":"Please try again later."
+    "Ptal":"Please try again later.",
+    "Setting":"Setting",
+    "Language":"Language"
    
 
 

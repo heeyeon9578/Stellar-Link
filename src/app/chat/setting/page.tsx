@@ -1,5 +1,5 @@
 'use client';
-export default function color(){
+export default function setting(){
     return(
         <>
        

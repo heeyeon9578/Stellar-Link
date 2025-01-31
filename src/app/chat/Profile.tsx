@@ -24,8 +24,8 @@ export default function Profile() {
       setSelectedSection('friends');
     } else if (pathname === '/chat') {
       setSelectedSection('chat');
-    } else if (pathname?.startsWith('/chat/color')) {
-      setSelectedSection('color');
+    } else if (pathname?.startsWith('/chat/setting')) {
+      setSelectedSection('setting');
     } else {
       setSelectedSection(null); // 기본값 설정 (선택 없음)
     }
@@ -132,7 +132,7 @@ export default function Profile() {
         {renderProfileSection('profile', profileImage||'/SVG/Friends.svg',session.user?.name || t('Profile'), '/chat/profile')}
         {renderProfileSection('friends', '/SVG/Friends.svg', 'Friends', '/chat/friends')}
         {renderProfileSection('chat', '/SVG/Chat.svg', 'Chat', '/chat')}
-        {renderProfileSection('color', '/SVG/Color.svg', 'Color', '/chat/color')}
+        {renderProfileSection('setting', '/SVG/setting.svg', 'Setting', '/chat/setting')}
         {renderProfileSection('logout', '/SVG/Logout.svg', 'Logout', '/')}
     </div>
   );
