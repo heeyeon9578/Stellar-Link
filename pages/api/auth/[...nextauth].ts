@@ -75,6 +75,10 @@ export const authOptions: AuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30일
   },
   callbacks: {
+    redirect: async ({ url, baseUrl }) => {
+      // 로그인 후 항상 "/chat"으로 리디렉션
+      return `${baseUrl}/chat`;
+    },
     jwt: async ({ token, user, account }) => {
       if (user && account) {
         const db = (await connectDB).db("StellarLink");
