@@ -115,8 +115,8 @@ export default function LoginPage() {
     className="h-screen flex items-center justify-center animate__animated animate__fadeIn"
     style={{ animationDuration: '2s' }}
     >
-      <Rectangle 
-        className="md:w-[620px] w-[80%]  md:rounded-[40px] rounded-[20px] bg-transparent border border-white border-2 md:border-4 opacity-100 flex flex-col"
+      <Rectangle  
+        className="md:w-[620px] w-[90%]  md:rounded-[40px] rounded-[20px] bg-transparent border border-white border-2 md:border-4 opacity-100 flex flex-col"
         classNameBg="md:rounded-[40px] rounded-[30px] opacity-0"
       >
 

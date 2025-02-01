@@ -19,10 +19,7 @@ import { useLongPress } from '@/app/components/useLongPress';  // 위에서 만�
 import ChatRoomItem from "./ChatRoomItem";
 import {
   setChatRoomId,
-  setChatRoomInfo,
-  setMessages,
-  addMessage,
-  setInput,
+  setLoading
 } from "../../../store/chatSlice";
 interface participant{
   name:string;
@@ -69,20 +66,15 @@ interface Friend {
   addedAt?: string;
 }
 
-interface UseLongPressOptions {
-  threshold?: number; // 길게 눌러야 하는 최소 시간 (ms)
-}
-
 
 export default function ChatContent() {
-  const { data: session, status } = useSession();
+  const { data: session} = useSession();
   const dispatch = useAppDispatch();
   const { t,i18n } = useTranslation('common');
   const [search, setSearch] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
   const [isClicked, setIsClicked] = useState<'All' | 'Personal' | 'Teams' >('All');
   const [data, setData] = useState<ChatRoom[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isError, setIsError] = useState<string | null>(null);
   const router = useRouter();
   const [sortOption, setSortOption] = useState<'latest' | 'name'>('latest'); // 정렬 옵션 상태
@@ -96,7 +88,11 @@ export default function ChatContent() {
     { name: t('Teams'), onClick: () => setIsClicked('Teams') },
    
   ];
+  const {
+   
+    isLoading,
   
+  } = useSelector((state: RootState) => state.chat);
   const {
     list: friends,
     loading,
@@ -330,7 +326,7 @@ useEffect(() => {
   // 데이터 가져오기
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
+      dispatch(setLoading(true)); // Redux에서 로딩 상태 관리
       setIsError(null);
       try {
         const response = await fetch(`/api/chat/chat?type=${isClicked}`);
@@ -341,9 +337,9 @@ useEffect(() => {
         setData(result);
       } catch (error: unknown) {
         console.error(error);
-        setIsError(error instanceof Error ? error.message : 'Unknown error');
+        setIsError(error instanceof Error ? error.message : "Unknown error");
       } finally {
-        setIsLoading(false);
+        dispatch(setLoading(false)); // Redux에서 로딩 상태 관리
       }
     };
     fetchData();

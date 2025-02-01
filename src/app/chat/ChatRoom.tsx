@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import '../../../i18n';
 import 'animate.css';
 import DynamicText from '../components/DynamicText';
+import Skeleton from "@/app/components/Skeleton"; // 스켈레톤 컴포넌트 가져오기
 import { useRouter } from 'next/navigation';
 import {
   setChatRoomId,
@@ -26,8 +27,14 @@ import {
   setMessages,
   addMessage,
   setInput,
+  //setLoading
 } from "../../../store/chatSlice";
 
+// const {
+   
+//   isLoading,
+
+// } = useSelector((state: RootState) => state.chat);
 
 export default function Detail() {
   const { t,i18n } = useTranslation('common');
@@ -417,6 +424,19 @@ export default function Detail() {
   }, [i18n]);
 
   if (!isInitialized) return null;
+  // // 로딩 상태
+  // if ( isLoading) {
+ 
+  //   return (
+  //     <div className="mx-auto md:p-8 p-4 rounded-lg h-full text-customBlue relative flex flex-col">
+  //     <Skeleton width="80%" height="30px" borderRadius="8px" className="mb-2"/>
+  //     <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-2"/>
+  //     <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-2"/>
+  //     <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-4"/>
+  //     <Skeleton width="100%" height="350px" borderRadius="12px" className="mb-2"/>
+  //   </div>
+  //   );
+  // }
 
   return (
     <div className="w-full h-full text-black p-2 md:p-0">

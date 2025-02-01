@@ -35,8 +35,10 @@ interface ChatRoomInfo{
 interface ChatState {
   chatRoomId: string | null;
   messages: Message[];
+  isLoading: boolean;
   chatRoomInfo:ChatRoomInfo | null; // 초기 상태에서 null 가능
   input: string;
+  error: string | null;
 }
 
 // 초기 상태 설정
@@ -44,7 +46,9 @@ const initialState: ChatState = {
   chatRoomId: null,
   messages: [],
   chatRoomInfo:null,
+  isLoading:false,
   input: "",
+  error: null,
 };
 
 // Slice 생성
@@ -67,6 +71,9 @@ const chatSlice = createSlice({
     setInput(state, action: PayloadAction<string>) {
       state.input = action.payload;
     },
+    setLoading(state, action: PayloadAction<boolean>) {
+      state.isLoading = action.payload;
+    },
     clearChat(state) {
       state.chatRoomId = null;
       state.chatRoomInfo = null;
@@ -77,6 +84,6 @@ const chatSlice = createSlice({
 });
 
 // 액션 및 리듀서 내보내기
-export const { setChatRoomId,setChatRoomInfo, setMessages, addMessage, setInput, clearChat } =
+export const { setChatRoomId,setChatRoomInfo, setMessages,setLoading, addMessage, setInput, clearChat } =
   chatSlice.actions;
 export default chatSlice.reducer;
