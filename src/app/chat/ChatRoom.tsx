@@ -30,11 +30,6 @@ import {
   //setLoading
 } from "../../../store/chatSlice";
 
-// const {
-   
-//   isLoading,
-
-// } = useSelector((state: RootState) => state.chat);
 
 export default function Detail() {
   const { t,i18n } = useTranslation('common');
@@ -45,6 +40,7 @@ export default function Detail() {
   const messages = useSelector((state: RootState) => state.chat.messages);
   const input = useSelector((state: RootState) => state.chat.input);
   const chatRoomInfo = useSelector((state: RootState) => state.chat.chatRoomInfo);
+  const isLoading = useSelector((state: RootState) => state.chat.isLoading);
   const router = useRouter();
   const { data: session, status } = useSession();
   const [isInitialized, setIsInitialized] = useState(false);
@@ -424,19 +420,67 @@ export default function Detail() {
   }, [i18n]);
 
   if (!isInitialized) return null;
-  // // 로딩 상태
-  // if ( isLoading) {
+  // 로딩 상태
+  //채팅방 아이디가 있을 때 (채팅방 입장했을 경우)
+  if (isLoading && chatRoomId) {
+    return (
+      <div className="w-full h-full text-black p-2 md:p-0">
+        <div className="flex h-full flex-col ">
+          {/** 🔹 채팅방 헤더 로딩 */}
+          <div className="h-[15%] flex flex-col justify-between">
+            <div className="flex justify-start sm:mb-2 mb-1">
+              {/* <Skeleton width="30px" height="30px" borderRadius="50%" className="mr-2" /> */}
+            </div>
+            <div className="relative flex">
+              {[...Array(5)].map((_, index) => (
+                <Skeleton
+                  key={index}
+                  width="32px"
+                  height="32px"
+                  borderRadius="50%"
+                  className="absolute border border-white object-cover"
+                  style={{ left: `${index * 20}px`, zIndex: 10 - index }}
+                />
+              ))}
+            </div>
+            <Skeleton width="50%" height="20px" className="mt-4" />
+          </div>
+  
+          {/** 🔹 메시지 리스트 로딩 */}
+          <div className="h-[90%] overflow-y-auto sm:mt-2 mt-1">
+            {[...Array(5)].map((_, index) => (
+              <div key={index} className="flex mb-2 sm:mb-4">
+                <Skeleton width="30px" height="30px" borderRadius="50%" className="mr-2" />
+                <div className="flex flex-col">
+                  <Skeleton width="80px" height="12px" className="mb-1" />
+                  <Skeleton width={`${Math.random() * 40 + 60}%`} height="20px" className="rounded-lg" />
+                </div>
+              </div>
+            ))}
+          </div>
+  
+          {/** 🔹 입력창 로딩 */}
+          <div className="flex w-full items-center">
+            <Skeleton width="10%" height="100%" className="mr-2" />
+            <Skeleton width="80%" height="40px" className="rounded-xl" />
+            <Skeleton width="10%" height="100%"  className="ml-2" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 채팅방 아이디가 없을 때 (채팅방 입장 안하고 로고 상태일 경우)
+  if ( isLoading && !chatRoomId) {
  
-  //   return (
-  //     <div className="mx-auto md:p-8 p-4 rounded-lg h-full text-customBlue relative flex flex-col">
-  //     <Skeleton width="80%" height="30px" borderRadius="8px" className="mb-2"/>
-  //     <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-2"/>
-  //     <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-2"/>
-  //     <Skeleton width="100%" height="50px" borderRadius="12px" className="mb-4"/>
-  //     <Skeleton width="100%" height="350px" borderRadius="12px" className="mb-2"/>
-  //   </div>
-  //   );
-  // }
+    return (
+      <div className="w-full h-full text-black p-2 md:p-0">
+        <div className='w-full h-full flex items-center justify-center'>
+          <Skeleton width="100%" height="350px" borderRadius="12px" className="mb-2"/>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full text-black p-2 md:p-0">
@@ -798,8 +842,6 @@ export default function Detail() {
               </div>
               )}
             </div>
-              
-           
               
             {/** 전송 버튼 */}
             <div className="flex w-[10%] justify-center">
