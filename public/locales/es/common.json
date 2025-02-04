@@ -50,5 +50,7 @@
     "EFE": "Introduce el correo electrónico del amigo",
     "All": "Todos",
     "Setting": "Configuración",
-    "Language":"Idioma"
+    "Language":"Idioma",
+    "SessionCheck":"La sesión no está disponible. Redirigiendo a la página de inicio de sesión.",
+    "LogoutMsg":"¿Estás seguro de que quieres cerrar sesión?"
 }

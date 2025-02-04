@@ -99,7 +99,9 @@
     "Effd":"Error fetching friends data.",
     "Ptal":"Please try again later.",
     "Setting":"Setting",
-    "Language":"Language"
+    "Language":"Language",
+    "SessionCheck":"The session is not available. Redirecting to the login page.",
+    "LogoutMsg":"Are you sure you want to log out?"
    
 
 

@@ -68,7 +68,7 @@ interface Friend {
 
 
 export default function ChatContent() {
-  const { data: session} = useSession();
+  const { data: session, status, update } = useSession();
   const dispatch = useAppDispatch();
   const { t,i18n } = useTranslation('common');
   const [search, setSearch] = useState<string>("");
@@ -127,6 +127,20 @@ export default function ChatContent() {
       document.removeEventListener("mousedown", handleClickOutside); // 컴포넌트 언마운트 시 이벤트 제거
     };
   }, []);
+
+   useEffect(() => {
+      if (status === "unauthenticated") {
+        alert(t('SessionCheck'));
+        router.push('/'); // 세션이 없으면 홈으로 리디렉션
+      }
+    }, [status, router]);
+  
+    useEffect(() => {
+      if (status === "authenticated") {
+        setIsInitialized(true);
+      }
+    }, [status]);
+
  // URL 파라미터에서 chatRoomId 가져오기
  useEffect(() => {
   const id = searchParams?.get("chatRoomId");

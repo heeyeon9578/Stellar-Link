@@ -6,10 +6,11 @@ import '../../../../i18n';
 import Button from '@/app/components/Button';
 import DynamicText from '../../../app/components/DynamicText';
 import Image from 'next/image';
-
+import { useRouter } from 'next/navigation';
 
 export default function ProfileContent() {
   const { data: session, status, update } = useSession();
+  const router = useRouter();
   const { t, i18n } = useTranslation('common');
   const [isInitialized, setIsInitialized] = useState(false);
   const [file, setFile] = useState<File | null>(null); // 업로드할 파일 객체
@@ -27,6 +28,19 @@ export default function ProfileContent() {
   const [passwordConfirmVisible, setPasswordConfirmVisible] = useState(false);
   const [wantPasswordChange, setWantPasswordChange] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      alert(t('SessionCheck'));
+      router.push('/'); // 세션이 없으면 홈으로 리디렉션
+    }
+  }, [status, router]);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      setIsInitialized(true);
+    }
+  }, [status]);
 
   const isSocialLogin =
     session?.user?.provider && ['google', 'discord', 'github'].includes(session.user.provider);

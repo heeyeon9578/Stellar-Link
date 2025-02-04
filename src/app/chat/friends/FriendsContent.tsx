@@ -13,10 +13,12 @@ import DynamicText from '../../../app/components/DynamicText';
 import { useRouter } from 'next/navigation';
 import 'animate.css';
 import Skeleton from "@/app/components/Skeleton"; // 스켈레톤 컴포넌트 가져오기
+import { useSession } from "next-auth/react";
 
 export default function FriendsContent() {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { data: session,status } = useSession();
   const { t,i18n } = useTranslation('common');
   const [isClicked, setIsClicked] = useState<'All'|'Request'|'Pending'|'Blocked'>('All');
   // const [isMoreClicked,setIsMoreClicked] = useState<Record<string, boolean>>({});
@@ -40,20 +42,6 @@ export default function FriendsContent() {
   } = useSelector((state: RootState) => state.friends);
    // 친구 목록 정렬
  
-  const sortedFriends = friends
-  .filter((friend) => friend.status !== "block") // 차단된 친구 제외
-  .sort((a, b) => {
-    if (sortOption === "latest") {
-      // addedAt 값이 undefined일 경우 기본값으로 0을 사용
-      return (
-        (new Date(b.addedAt || 0).getTime() || 0) -
-        (new Date(a.addedAt || 0).getTime() || 0)
-      );
-    } else if (sortOption === "name") {
-      return (a.name || "").localeCompare(b.name || "");
-    }
-    return 0;
-  });
   const handleSortChange = (option:'latest' | 'name') => {
     const order = option === "name" ? "asc" : "desc"; // Default to ascending for names
     setSortOption(option);
@@ -68,6 +56,19 @@ export default function FriendsContent() {
   const [search, setSearch] = useState<string>("");
   // 디바운싱된 검색어 (일정 시간 지연 후 최종 반영)
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      alert(t('SessionCheck'));
+      router.push('/'); // 세션이 없으면 홈으로 리디렉션
+    }
+  }, [status, router]);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      setIsInitialized(true);
+    }
+  }, [status]);
 
   // 0.3초(300ms) 디바운스: search 값이 변경될 때마다 타이머를 재설정
   useEffect(() => {

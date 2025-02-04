@@ -7,10 +7,12 @@ import "../../../../i18n";
 import DynamicText from "../../components/DynamicText";
 import Image from 'next/image';
 import Skeleton from "@/app/components/Skeleton"; // 스켈레톤 컴포넌트 가져오기
+import { useRouter } from 'next/navigation';
 
 export default function ColorContent() {
   const { t, i18n } = useTranslation("common");
-  const { data: session } = useSession();
+  const { data: session,status, update  } = useSession();
+  const router = useRouter();
   const [isInitialized, setIsInitialized] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language || "en");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,6 +34,19 @@ useEffect(() => {
   }
 }, []);
 
+useEffect(() => {
+    if (status === "unauthenticated") {
+      alert(t('SessionCheck'));
+      router.push('/'); // 세션이 없으면 홈으로 리디렉션
+    }
+  }, [status, router]);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      setIsInitialized(true);
+    }
+  }, [status]);
+  
 // 언어 변경 핸들러
 const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
   const newLang = event.target.value;

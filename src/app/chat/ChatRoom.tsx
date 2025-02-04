@@ -94,6 +94,18 @@ export default function Detail() {
     customPurple: "text-customPurple",
   };
  
+   useEffect(() => {
+     if (status === "unauthenticated") {
+       alert(t('SessionCheck'));
+       router.push('/'); // 세션이 없으면 홈으로 리디렉션
+     }
+   }, [status, router]);
+ 
+   useEffect(() => {
+     if (status === "authenticated") {
+       setIsInitialized(true);
+     }
+   }, [status]);
   
   // URL 파라미터에서 chatRoomId 가져오기
   useEffect(() => {

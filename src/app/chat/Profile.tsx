@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import '../../../i18n';
 import Image from 'next/image';
-import { useSession } from 'next-auth/react';
+import { useSession ,signOut} from 'next-auth/react';
 import DynamicText from '../components/DynamicText';
 
 export default function Profile() {
@@ -16,7 +16,14 @@ export default function Profile() {
   const { data: session, } = useSession();
   const profileImage = session?.user?.profileImage || '';
   const pathname = usePathname();
-  
+  // 🔹 로그아웃 처리 함수
+  const handleLogout = async () => {
+    const confirmLogout = window.confirm(t("LogoutMsg"));
+    if (confirmLogout) {
+      await signOut({ redirect: true, callbackUrl: '/' }); // 로그아웃 후 홈으로 리디렉트
+    }
+  };
+
   useEffect(() => {
     if (pathname?.startsWith('/chat/profile')) {
       setSelectedSection('profile');
@@ -50,12 +57,17 @@ export default function Profile() {
     key: string,
     svgSrc: string,
     label: string,
-    navigateTo: string
+    navigateTo: string,
+    onClick?: () => void
   ) => {
     const isSelected = selectedSection === key; // 현재 섹션이 선택된 상태인지 확인
     const clickIcon = () =>{
-      setSelectedSection(key);
-      router.push(navigateTo);
+      if (onClick) {
+        onClick(); // 로그아웃 버튼의 경우 실행
+      } else {
+        setSelectedSection(key);
+        router.push(navigateTo);
+      }
     }
     return (
       <div
@@ -133,7 +145,7 @@ export default function Profile() {
         {renderProfileSection('friends', '/SVG/Friends.svg', 'Friends', '/chat/friends')}
         {renderProfileSection('chat', '/SVG/Chat.svg', 'Chat', '/chat')}
         {renderProfileSection('setting', '/SVG/setting.svg', 'Setting', '/chat/setting')}
-        {renderProfileSection('logout', '/SVG/Logout.svg', 'Logout', '/')}
+        {renderProfileSection('logout', '/SVG/Logout.svg', 'Logout', '/', handleLogout)}
     </div>
   );
 }
