@@ -7,7 +7,21 @@
   --middle-color: #02025B;
   --bottom-color: #030391;
 }
+/* 전체 페이지에서 텍스트 선택 방지 */
+* {
+  -webkit-user-select: none; /* Safari, Chrome */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* IE */
+  user-select: none;         /* 표준 */
+}
 
+/* 입력창에서는 선택 허용 */
+input, textarea {
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+}
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
