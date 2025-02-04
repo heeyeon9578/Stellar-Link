@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState,useRef } from "react";
+import { useEffect, useState,useRef,Suspense } from "react";
 import { useSession } from 'next-auth/react';
 import { useTranslation } from 'react-i18next';
 import '../../../i18n';
@@ -79,6 +79,8 @@ export default function ChatContent() {
   const router = useRouter();
   const [sortOption, setSortOption] = useState<'latest' | 'name'>('latest'); // 정렬 옵션 상태
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
+
   const messages = useSelector((state: RootState) => state.chat.messages);
   const [isInitialized, setIsInitialized] = useState(false);
   const searchParams = useSearchParams();
@@ -129,11 +131,13 @@ export default function ChatContent() {
   }, []);
 
    useEffect(() => {
-      if (status === "unauthenticated") {
+      if (status === "unauthenticated"&& !redirecting) {
         alert(t('SessionCheck'));
+        setRedirecting(true); // 무한 루프 방지
+
         router.push('/'); // 세션이 없으면 홈으로 리디렉션
       }
-    }, [status, router]);
+    }, [status,redirecting, router]);
   
     useEffect(() => {
       if (status === "authenticated") {
@@ -723,7 +727,8 @@ if (!isInitialized) return null;
 
 
   return (
-    <div className="mx-auto md:p-8 p-4 rounded-lg h-[100%] text-customBlue relative flex flex-col">
+    <Suspense fallback={<div>Loading...</div>}>
+      <div className="mx-auto md:p-8 p-4 rounded-lg h-[100%] text-customBlue relative flex flex-col">
       <div className="flex justify-between items-center">
 
         <h2 className="md:text-2xl text-sm sm:text-xl font-bold mb-4">
@@ -974,6 +979,8 @@ if (!isInitialized) return null;
               </div>
         </div>
         )}
-    </div>
+      </div>
+    </Suspense>
+    
   );
 }

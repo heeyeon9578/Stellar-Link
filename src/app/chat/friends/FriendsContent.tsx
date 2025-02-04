@@ -1,6 +1,6 @@
 // FriendsContent.tsx
 'use client';
-import { useEffect, useState } from "react";
+import { useEffect, useState,Suspense } from "react";
 import { useTranslation } from 'react-i18next';
 import '../../../../i18n';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,6 +20,8 @@ export default function FriendsContent() {
   const dispatch = useAppDispatch();
   const { data: session,status } = useSession();
   const { t,i18n } = useTranslation('common');
+  const [redirecting, setRedirecting] = useState(false);
+
   const [isClicked, setIsClicked] = useState<'All'|'Request'|'Pending'|'Blocked'>('All');
   // const [isMoreClicked,setIsMoreClicked] = useState<Record<string, boolean>>({});
   // 더보기 메뉴가 열려 있는 친구의 ID만 저장하는 state
@@ -58,8 +60,9 @@ export default function FriendsContent() {
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
 
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (status === "unauthenticated"&& !redirecting) {
       alert(t('SessionCheck'));
+      setRedirecting(true); // 무한 루프 방지
       router.push('/'); // 세션이 없으면 홈으로 리디렉션
     }
   }, [status, router]);
@@ -398,399 +401,402 @@ const generateChatRoom = () => {
   }
 
   return (
-    <div className="mx-auto md:p-8 p-4 rounded-lg h-full text-customBlue relative flex flex-col">
+    <Suspense>
+      <div className="mx-auto md:p-8 p-4 rounded-lg h-full text-customBlue relative flex flex-col">
 
-      {/** 헤더 */}
-      <h2 className="md:text-2xl text-sm sm:text-xl font-bold ">
-        <DynamicText text={t('Friends')} />
-      </h2>
-    
-     {/** 검색 창 (디바운스 적용) */}
-      <div className="w-full sm:h-10 h-8 bg-customGray sm:mt-4 mt-2 rounded-xl flex">
-        <div className="p-2 flex items-center">
-          <Image
-            src="/SVG/search.svg"
-            alt="search"
-            width={11}
-            height={11}
-            priority
-            className="cursor-pointer"
-          />
-        </div>
-        <div className="flex items-center w-[80%]">
-          <input
-            type="text"
-            value={search}
-            placeholder={t('Search')}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-[100%] text-black/45 border-0 text-[10px] sm:text-sm bg-transparent focus:outline-none focus:ring-0 focus:border-transparent"
-          />
-        </div>
-      </div>
+{/** 헤더 */}
+<h2 className="md:text-2xl text-sm sm:text-xl font-bold ">
+  <DynamicText text={t('Friends')} />
+</h2>
 
-      {/** 친구 추가 */}   
-      <div className="flex items-center sm:h-10 h-8 justify-between sm:mt-4 mt-2">
-        <input
-          type="text"
-          lang="ko"
-          value={newFriendEmail}
-          placeholder={t('EFE')}
-          onChange={(e) => setNewFriendEmail(e.target.value)}
-         className="w-[90%] h-full border-customGray rounded-xl text-[10px]  sm:text-sm text-customGray focus:border-transparent focus:outline-none focus:ring-2 focus:ring-customLightPurple"
-        />
-        <div className="w-[10%] flex items-center justify-end h-full" onClick={handleAddFriend}>
-          <img
-            src="/SVG/add.svg"
-            alt="add"
-            // width={25}
-            // height={25}
-            // priority
-            className={`cursor-pointer sm:w-[25px] sm:h-[25px] w-[15px] h-[15px] ${isAnimating ? 'animate__animated animate__flip' : ''}`} // 애니메이션 클래스 추가
-              onClick={generateChatRoom}
-          />
-        </div>
-      </div>
+{/** 검색 창 (디바운스 적용) */}
+<div className="w-full sm:h-10 h-8 bg-customGray sm:mt-4 mt-2 rounded-xl flex">
+  <div className="p-2 flex items-center">
+    <Image
+      src="/SVG/search.svg"
+      alt="search"
+      width={11}
+      height={11}
+      priority
+      className="cursor-pointer"
+    />
+  </div>
+  <div className="flex items-center w-[80%]">
+    <input
+      type="text"
+      value={search}
+      placeholder={t('Search')}
+      onChange={(e) => setSearch(e.target.value)}
+      className="w-[100%] text-black/45 border-0 text-[10px] sm:text-sm bg-transparent focus:outline-none focus:ring-0 focus:border-transparent"
+    />
+  </div>
+</div>
 
-      {/** 메뉴 */}   
-      <div className="w-full sm:h-10 h-8 bg-customRectangle rounded-xl flex sm:mt-4 mt-2 text-customGray flex items-center justify-around p-2">
+{/** 친구 추가 */}   
+<div className="flex items-center sm:h-10 h-8 justify-between sm:mt-4 mt-2">
+  <input
+    type="text"
+    lang="ko"
+    value={newFriendEmail}
+    placeholder={t('EFE')}
+    onChange={(e) => setNewFriendEmail(e.target.value)}
+   className="w-[90%] h-full border-customGray rounded-xl text-[10px]  sm:text-sm text-customGray focus:border-transparent focus:outline-none focus:ring-2 focus:ring-customLightPurple"
+  />
+  <div className="w-[10%] flex items-center justify-end h-full" onClick={handleAddFriend}>
+    <img
+      src="/SVG/add.svg"
+      alt="add"
+      // width={25}
+      // height={25}
+      // priority
+      className={`cursor-pointer sm:w-[25px] sm:h-[25px] w-[15px] h-[15px] ${isAnimating ? 'animate__animated animate__flip' : ''}`} // 애니메이션 클래스 추가
+        onClick={generateChatRoom}
+    />
+  </div>
+</div>
 
-        {menus.map((menu)=>(
-          <Button
-          key={menu.name}
-          variant={isClicked===menu.name ? 'primary':"main"}
-          size="sm"
-          className={isClicked===menu.name? "text-white w-full sm:h-8 h-6" :"text-customGray w-full sm:h-8 h-6"}
-          onClick={menu.onClick}
-        >
-          <DynamicText text={t(menu.name)} className="text-[10px] sm:text-sm"/>
-        </Button>
-        ))}
+{/** 메뉴 */}   
+<div className="w-full sm:h-10 h-8 bg-customRectangle rounded-xl flex sm:mt-4 mt-2 text-customGray flex items-center justify-around p-2">
 
-      
-      </div>
+  {menus.map((menu)=>(
+    <Button
+    key={menu.name}
+    variant={isClicked===menu.name ? 'primary':"main"}
+    size="sm"
+    className={isClicked===menu.name? "text-white w-full sm:h-8 h-6" :"text-customGray w-full sm:h-8 h-6"}
+    onClick={menu.onClick}
+  >
+    <DynamicText text={t(menu.name)} className="text-[10px] sm:text-sm"/>
+  </Button>
+  ))}
 
-      {/** 정렬 */}
-      <div onClick={toggleMenu} className="relative bg-black cursor-pointer" style={{zIndex:'9999'}}>
-        {/* 메뉴를 여는 버튼 */}
-        <div className="right-0 absolute flex sm:mt-3 mt-2">
-          <div
-            className=" bg-trasparent text-customPurple text-[10px] sm:text-xs"
-          >
-            {sortOption === 'latest' ? t('SortByLatest') : t('SortByName')}
-            
-          </div>
-          {isMenuOpen ? (
-            <Image
-            src="/SVG/up.svg"
-            alt="up"
-            width={15}
-            height={15}
-            priority
-            className="cursor-pointer hover:scale-125"
-            
-          />
-          ):(
-            <Image
-            src="/SVG/down.svg"
-            alt="down"
-            width={15}
-            height={15}
-            priority
-            className="cursor-pointer hover:scale-125"
-           
-          />
-          )}
-        </div>
 
-        {/* 드롭다운 메뉴 */}
-        {isMenuOpen && (
-          <div className="absolute right-0 mt-8 w-22 bg-white border border-gray-200 bg-transparent z-1000 text-customPurple text-[10px] sm:text-xs">
-            <button
-              onClick={() => handleSortChange('latest')}
-              className={`block w-full text-left px-4 py-2 hover:bg-gray-100 ${sortOption === 'latest' ? 'bg-gray-100' : ''}`}
-            >
-              {t('SortByLatest')}
-            </button>
-            <button
-              onClick={() => handleSortChange('name')}
-              className={`block w-full text-left px-4 py-2 hover:bg-gray-100 ${sortOption === 'name' ? 'bg-gray-100' : ''}`}
-            >
-              {t('SortByName')}
-            </button>
-          </div>
-        )}
-      </div>
-      {
-        isClicked==='All' && 
-        (
-          <div className="sm:mt-10 mt-8 max-h-[100%] overflow-y-auto">
-            {filteredFriends.filter(friend => friend.status !== 'block').length === 0 ? (
-             <DynamicText className="text-gray-500 text-[10px] sm:text-sm" text={t('Yhnfy')}/>
-            ) : (
-              <ul>
-                {filteredFriends
-                .filter(friend => friend.status !== 'block')
-                .map((friend)  => (
-                  <li key={friend._id} className="flex mb-4 justify-between">
+</div>
 
-                   <div className="flex cursor-pointer" onClick={()=>{startChat(friend._id)}}>
-                     <img
-                       src={friend.profileImage || "/SVG/default-profile.svg"}
-                       alt={`${friend.name}'s profile`}
-                       className="sm:w-[50px] sm:h-[50px] w-[30px] h-[30px] rounded-full mr-2 object-cover" 
-                     />
-
-                     <div>
-                       <div className="font-bold text-customPurple">
-                       <DynamicText text={friend.name} className="text-[10px] sm:text-sm"/> 
-                       </div>
-
-                       <div className="text-customGray text-[7px] sm:text-xs">
-                         {friend.email}
-                       </div>
-                     </div>
-                   </div>
-
-                   <div className="relative ">
-                     <img
-                       src="/SVG/more.svg"
-                       alt="more"
-                      //  width={25}
-                      //  height={25}
-                      //  priority
-                       className="cursor-pointer sm:w-[25px] sm:h-[25px] w-[15px] h-[15px]"
-                      onClick={(event) => toggleMoreMenu(friend._id, event)}
-                     />
-                     {/* 차단, 차단 해제 버튼 추가 */}
-                     {openMoreMenuFriendId === friend._id &&(
-                       <div className=" z-50 absolute sm:w-[80px] sm:h-[68px] w-[60px] h-[40px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-[10px] sm:text-sm"
-                       style={{
-                        top: 5, // 드롭다운의 Y축 위치
-                        right: 30, // 드롭다운의 X축 위치
-                      }}
-                       >
-                         <button onClick={() => handleBlockFriend(friend._id)} className="text-red-500">
-                          <DynamicText text={t('Block')}/>
-                         </button>
-                         <button onClick={() => handleDeleteFriend(friend._id)} >
-                           <DynamicText text={t('Delete')}/>
-                         </button>
-                         
-                       </div>
-                     )}
-                   
-                   </div>
-                 </li>
-                ))}
-              </ul>
-            )}
-
-          </div>
-        )
-      }
-    
-      {isClicked==='Request'&&(
-        <div className="sm:mt-10 mt-8  max-h-[100%] overflow-y-auto"> 
-          {filteredSentRequests.length === 0 ? (
-            <DynamicText className="text-gray-500 text-[10px] sm:text-sm" text={t('Nsfr')}/>
-          ) : (
-            <ul>
-              {filteredSentRequests.map((request) => (
-                
-                <li key={request._id} className="flex mb-4 justify-between">
-                
-                  <div className="flex">
-                      <img
-                        src={request.toUserDetails.profileImage || "/SVG/default-profile.svg"}
-                        alt={`${request.toUserDetails.name}'s profile`}
-                        className="sm:w-[50px] sm:h-[50px] w-[30px] h-[30px] rounded-full mr-2 object-cover" 
-                      />
-
-                      <div>
-                      <div className="font-bold text-customPurple">
-                       <DynamicText text={request.toUserDetails.name} className="text-[10px] sm:text-sm"/> 
-                       </div>
-
-                       <div className="text-customGray text-[7px] sm:text-xs">
-                       {request.toUserDetails.email}
-                       </div>
-                      </div>
-                    </div>
-
-                    <div className="relative ">
-                      <img
-                        src="/SVG/more.svg"
-                        alt="more"
-                        // width={25}
-                        // height={25}
-                        // priority
-                        className="cursor-pointer sm:w-[25px] sm:h-[25px] w-[15px] h-[15px]"
-                       onClick={(event) => toggleMoreMenu(request._id,event)}
-                      />
-                      {/* Cancel */}
-                      {openMoreMenuFriendId === request._id &&(
-                        <div className=" z-50 absolute sm:w-[80px] sm:h-[68px] w-[60px] h-[40px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-[10px] sm:text-sm"
-                        style={{
-                         top: 5, // 드롭다운의 Y축 위치
-                         right: 30, // 드롭다운의 X축 위치
-                       }}
-                        >
-                          <button onClick={() => handleCancelRequest(request.toUserDetails._id)} className="text-red-500">
-                            <DynamicText text={t('Cancel')}/>
-                          </button>
-                        </div>
-                      )}
-                    
-                    </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      ) }
-
-      {
-        isClicked==='Pending' &&
-        (
-
-          <div className="sm:mt-10 mt-8 max-h-[100%] overflow-y-auto">
-        
-            {filteredReceivedRequests.length === 0 ? (
-              <DynamicText className='text-gray-500 text-[10px] sm:text-sm' text={t('Nfrr')}/>
-            ) : (
-              <ul>
-                {filteredReceivedRequests.map((request) => (
-                  <li key={request._id} className="flex mb-4 justify-between">
-              
-
-                    <div className="flex">
-                      <img
-                        src={request.fromUserDetails.profileImage || "/SVG/default-profile.svg"}
-                        alt={`${request.fromUserDetails.name}'s profile`}
-                        className="sm:w-[50px] sm:h-[50px] w-[30px] h-[30px]  rounded-full mr-2 object-cover" 
-                      />
-
-                      <div>
-               
-                        <div className="font-bold text-customPurple">
-                       <DynamicText text={request.fromUserDetails.name} className="text-[10px] sm:text-sm"/> 
-                       </div>
-
-                       <div className="text-customGray text-[7px] sm:text-xs">
-                       {request.fromUserDetails.email}
-                       </div>
-                      </div>
-                    </div>
-
-                    <div className="relative ">
-                      <img
-                        src="/SVG/more.svg"
-                        alt="more"
-                        // width={25}
-                        // height={25}
-                        // priority
-                        className="cursor-pointer sm:w-[25px] sm:h-[25px] w-[15px] h-[15px]"
-                        onClick={(event) => toggleMoreMenu(request._id,event)}
-                      />
-                      {/* 수락 거절 추가 */}
-                      {openMoreMenuFriendId === request._id &&(
-                         <div className=" z-50 absolute sm:w-[80px] sm:h-[68px] w-[60px] h-[40px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-[10px] sm:text-sm"
-                         style={{
-                          top: 5, // 드롭다운의 Y축 위치
-                          right: 30, // 드롭다운의 X축 위치
-                        }}
-                         >
-                          <button onClick={() => handleRequestAction(request.fromUserDetails._id, "accepted")} className="text-red-500">
-                            <DynamicText text={t('Accept')}/>
-                          </button>
-                          <button onClick={() => handleRequestAction(request.fromUserDetails._id, "rejected")}>
-                            <DynamicText text={t('Reject')}/>
-                          </button>
-                          
-                        </div>
-                      )}
-                    
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-
-          </div>
-        )
-      }
-      
-      {
-        isClicked==='Blocked' &&
-        (
-
-          <div className="sm:mt-10 mt-8  max-h-[100%] overflow-y-auto">
-          {filteredFriends.filter(friend => friend.status === 'block').length === 0 ? (
-            <DynamicText className="text-gray-500 text-[10px] sm:text-sm" text={t('Tanbf')}/>
-          ) : (
-            <ul>
-              {filteredFriends.filter(friend => friend.status === 'block').map((friend) => (
-                 <li key={friend._id} className="flex mb-4 justify-between">
-
-                 <div className="flex">
-                   <img
-                     src={friend.profileImage || "/SVG/default-profile.svg"}
-                     alt={`${friend.name}'s profile`}
-                     className="sm:w-[50px] sm:h-[50px] w-[30px] h-[30px] rounded-full mr-2 object-cover" 
-                   />
-
-                   <div>
-                      <div className="font-bold text-customPurple">
-                       <DynamicText text={friend.name} className="text-[10px] sm:text-sm"/> 
-                       </div>
-
-                       <div className="text-customGray text-[7px] sm:text-xs">
-                       {friend.email}
-                       </div>
-                    
-                   </div>
-                 </div>
-
-                 <div className="relative ">
-                   <img
-                     src="/SVG/more.svg"
-                     alt="more"
-                    //  width={25}
-                    //  height={25}
-                    //  priority
-                     className="cursor-pointer sm:w-[25px] sm:h-[25px] w-[15px] h-[15px]"
-                    onClick={(event) => toggleMoreMenu(friend._id, event)}
-                   />
-                   {/* 삭제, 차단 해제 버튼 추가 */}
-                   {openMoreMenuFriendId === friend._id &&(
-                     <div className=" z-50 absolute sm:w-[80px] sm:h-[68px] w-[60px] h-[40px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-[10px] sm:text-sm"
-                     style={{
-                      top: 5, // 드롭다운의 Y축 위치
-                      right: 30, // 드롭다운의 X축 위치
-                    }}
-                     >
-                       <button onClick={() => handleUnblockFriend(friend._id)} className="text-red-500">
-                        <DynamicText text={t('Unblock')}/>
-                       </button>
-                       <button onClick={() => handleDeleteFriend(friend._id)} >
-                         <DynamicText text={t('Delete')}/>
-                       </button>
-                   
-                     </div>
-                   )}
-                 
-                 </div>
-               </li>
-              ))}
-            </ul>
-          )}
-
-        </div>
-        )
-      }
-      
-
+{/** 정렬 */}
+<div onClick={toggleMenu} className="relative bg-black cursor-pointer" style={{zIndex:'9999'}}>
+  {/* 메뉴를 여는 버튼 */}
+  <div className="right-0 absolute flex sm:mt-3 mt-2">
+    <div
+      className=" bg-trasparent text-customPurple text-[10px] sm:text-xs"
+    >
+      {sortOption === 'latest' ? t('SortByLatest') : t('SortByName')}
       
     </div>
+    {isMenuOpen ? (
+      <Image
+      src="/SVG/up.svg"
+      alt="up"
+      width={15}
+      height={15}
+      priority
+      className="cursor-pointer hover:scale-125"
+      
+    />
+    ):(
+      <Image
+      src="/SVG/down.svg"
+      alt="down"
+      width={15}
+      height={15}
+      priority
+      className="cursor-pointer hover:scale-125"
+     
+    />
+    )}
+  </div>
+
+  {/* 드롭다운 메뉴 */}
+  {isMenuOpen && (
+    <div className="absolute right-0 mt-8 w-22 bg-white border border-gray-200 bg-transparent z-1000 text-customPurple text-[10px] sm:text-xs">
+      <button
+        onClick={() => handleSortChange('latest')}
+        className={`block w-full text-left px-4 py-2 hover:bg-gray-100 ${sortOption === 'latest' ? 'bg-gray-100' : ''}`}
+      >
+        {t('SortByLatest')}
+      </button>
+      <button
+        onClick={() => handleSortChange('name')}
+        className={`block w-full text-left px-4 py-2 hover:bg-gray-100 ${sortOption === 'name' ? 'bg-gray-100' : ''}`}
+      >
+        {t('SortByName')}
+      </button>
+    </div>
+  )}
+</div>
+{
+  isClicked==='All' && 
+  (
+    <div className="sm:mt-10 mt-8 max-h-[100%] overflow-y-auto">
+      {filteredFriends.filter(friend => friend.status !== 'block').length === 0 ? (
+       <DynamicText className="text-gray-500 text-[10px] sm:text-sm" text={t('Yhnfy')}/>
+      ) : (
+        <ul>
+          {filteredFriends
+          .filter(friend => friend.status !== 'block')
+          .map((friend)  => (
+            <li key={friend._id} className="flex mb-4 justify-between">
+
+             <div className="flex cursor-pointer" onClick={()=>{startChat(friend._id)}}>
+               <img
+                 src={friend.profileImage || "/SVG/default-profile.svg"}
+                 alt={`${friend.name}'s profile`}
+                 className="sm:w-[50px] sm:h-[50px] w-[30px] h-[30px] rounded-full mr-2 object-cover" 
+               />
+
+               <div>
+                 <div className="font-bold text-customPurple">
+                 <DynamicText text={friend.name} className="text-[10px] sm:text-sm"/> 
+                 </div>
+
+                 <div className="text-customGray text-[7px] sm:text-xs">
+                   {friend.email}
+                 </div>
+               </div>
+             </div>
+
+             <div className="relative ">
+               <img
+                 src="/SVG/more.svg"
+                 alt="more"
+                //  width={25}
+                //  height={25}
+                //  priority
+                 className="cursor-pointer sm:w-[25px] sm:h-[25px] w-[15px] h-[15px]"
+                onClick={(event) => toggleMoreMenu(friend._id, event)}
+               />
+               {/* 차단, 차단 해제 버튼 추가 */}
+               {openMoreMenuFriendId === friend._id &&(
+                 <div className=" z-50 absolute sm:w-[80px] sm:h-[68px] w-[60px] h-[40px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-[10px] sm:text-sm"
+                 style={{
+                  top: 5, // 드롭다운의 Y축 위치
+                  right: 30, // 드롭다운의 X축 위치
+                }}
+                 >
+                   <button onClick={() => handleBlockFriend(friend._id)} className="text-red-500">
+                    <DynamicText text={t('Block')}/>
+                   </button>
+                   <button onClick={() => handleDeleteFriend(friend._id)} >
+                     <DynamicText text={t('Delete')}/>
+                   </button>
+                   
+                 </div>
+               )}
+             
+             </div>
+           </li>
+          ))}
+        </ul>
+      )}
+
+    </div>
+  )
+}
+
+{isClicked==='Request'&&(
+  <div className="sm:mt-10 mt-8  max-h-[100%] overflow-y-auto"> 
+    {filteredSentRequests.length === 0 ? (
+      <DynamicText className="text-gray-500 text-[10px] sm:text-sm" text={t('Nsfr')}/>
+    ) : (
+      <ul>
+        {filteredSentRequests.map((request) => (
+          
+          <li key={request._id} className="flex mb-4 justify-between">
+          
+            <div className="flex">
+                <img
+                  src={request.toUserDetails.profileImage || "/SVG/default-profile.svg"}
+                  alt={`${request.toUserDetails.name}'s profile`}
+                  className="sm:w-[50px] sm:h-[50px] w-[30px] h-[30px] rounded-full mr-2 object-cover" 
+                />
+
+                <div>
+                <div className="font-bold text-customPurple">
+                 <DynamicText text={request.toUserDetails.name} className="text-[10px] sm:text-sm"/> 
+                 </div>
+
+                 <div className="text-customGray text-[7px] sm:text-xs">
+                 {request.toUserDetails.email}
+                 </div>
+                </div>
+              </div>
+
+              <div className="relative ">
+                <img
+                  src="/SVG/more.svg"
+                  alt="more"
+                  // width={25}
+                  // height={25}
+                  // priority
+                  className="cursor-pointer sm:w-[25px] sm:h-[25px] w-[15px] h-[15px]"
+                 onClick={(event) => toggleMoreMenu(request._id,event)}
+                />
+                {/* Cancel */}
+                {openMoreMenuFriendId === request._id &&(
+                  <div className=" z-50 absolute sm:w-[80px] sm:h-[68px] w-[60px] h-[40px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-[10px] sm:text-sm"
+                  style={{
+                   top: 5, // 드롭다운의 Y축 위치
+                   right: 30, // 드롭다운의 X축 위치
+                 }}
+                  >
+                    <button onClick={() => handleCancelRequest(request.toUserDetails._id)} className="text-red-500">
+                      <DynamicText text={t('Cancel')}/>
+                    </button>
+                  </div>
+                )}
+              
+              </div>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+) }
+
+{
+  isClicked==='Pending' &&
+  (
+
+    <div className="sm:mt-10 mt-8 max-h-[100%] overflow-y-auto">
+  
+      {filteredReceivedRequests.length === 0 ? (
+        <DynamicText className='text-gray-500 text-[10px] sm:text-sm' text={t('Nfrr')}/>
+      ) : (
+        <ul>
+          {filteredReceivedRequests.map((request) => (
+            <li key={request._id} className="flex mb-4 justify-between">
+        
+
+              <div className="flex">
+                <img
+                  src={request.fromUserDetails.profileImage || "/SVG/default-profile.svg"}
+                  alt={`${request.fromUserDetails.name}'s profile`}
+                  className="sm:w-[50px] sm:h-[50px] w-[30px] h-[30px]  rounded-full mr-2 object-cover" 
+                />
+
+                <div>
+         
+                  <div className="font-bold text-customPurple">
+                 <DynamicText text={request.fromUserDetails.name} className="text-[10px] sm:text-sm"/> 
+                 </div>
+
+                 <div className="text-customGray text-[7px] sm:text-xs">
+                 {request.fromUserDetails.email}
+                 </div>
+                </div>
+              </div>
+
+              <div className="relative ">
+                <img
+                  src="/SVG/more.svg"
+                  alt="more"
+                  // width={25}
+                  // height={25}
+                  // priority
+                  className="cursor-pointer sm:w-[25px] sm:h-[25px] w-[15px] h-[15px]"
+                  onClick={(event) => toggleMoreMenu(request._id,event)}
+                />
+                {/* 수락 거절 추가 */}
+                {openMoreMenuFriendId === request._id &&(
+                   <div className=" z-50 absolute sm:w-[80px] sm:h-[68px] w-[60px] h-[40px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-[10px] sm:text-sm"
+                   style={{
+                    top: 5, // 드롭다운의 Y축 위치
+                    right: 30, // 드롭다운의 X축 위치
+                  }}
+                   >
+                    <button onClick={() => handleRequestAction(request.fromUserDetails._id, "accepted")} className="text-red-500">
+                      <DynamicText text={t('Accept')}/>
+                    </button>
+                    <button onClick={() => handleRequestAction(request.fromUserDetails._id, "rejected")}>
+                      <DynamicText text={t('Reject')}/>
+                    </button>
+                    
+                  </div>
+                )}
+              
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+    </div>
+  )
+}
+
+{
+  isClicked==='Blocked' &&
+  (
+
+    <div className="sm:mt-10 mt-8  max-h-[100%] overflow-y-auto">
+    {filteredFriends.filter(friend => friend.status === 'block').length === 0 ? (
+      <DynamicText className="text-gray-500 text-[10px] sm:text-sm" text={t('Tanbf')}/>
+    ) : (
+      <ul>
+        {filteredFriends.filter(friend => friend.status === 'block').map((friend) => (
+           <li key={friend._id} className="flex mb-4 justify-between">
+
+           <div className="flex">
+             <img
+               src={friend.profileImage || "/SVG/default-profile.svg"}
+               alt={`${friend.name}'s profile`}
+               className="sm:w-[50px] sm:h-[50px] w-[30px] h-[30px] rounded-full mr-2 object-cover" 
+             />
+
+             <div>
+                <div className="font-bold text-customPurple">
+                 <DynamicText text={friend.name} className="text-[10px] sm:text-sm"/> 
+                 </div>
+
+                 <div className="text-customGray text-[7px] sm:text-xs">
+                 {friend.email}
+                 </div>
+              
+             </div>
+           </div>
+
+           <div className="relative ">
+             <img
+               src="/SVG/more.svg"
+               alt="more"
+              //  width={25}
+              //  height={25}
+              //  priority
+               className="cursor-pointer sm:w-[25px] sm:h-[25px] w-[15px] h-[15px]"
+              onClick={(event) => toggleMoreMenu(friend._id, event)}
+             />
+             {/* 삭제, 차단 해제 버튼 추가 */}
+             {openMoreMenuFriendId === friend._id &&(
+               <div className=" z-50 absolute sm:w-[80px] sm:h-[68px] w-[60px] h-[40px] bg-customRectangle rounded-md flex flex-col justify-center text-black text-[10px] sm:text-sm"
+               style={{
+                top: 5, // 드롭다운의 Y축 위치
+                right: 30, // 드롭다운의 X축 위치
+              }}
+               >
+                 <button onClick={() => handleUnblockFriend(friend._id)} className="text-red-500">
+                  <DynamicText text={t('Unblock')}/>
+                 </button>
+                 <button onClick={() => handleDeleteFriend(friend._id)} >
+                   <DynamicText text={t('Delete')}/>
+                 </button>
+             
+               </div>
+             )}
+           
+           </div>
+         </li>
+        ))}
+      </ul>
+    )}
+
+  </div>
+  )
+}
+
+
+
+      </div>
+    </Suspense>
+    
   );
 }

@@ -1,6 +1,8 @@
 // Content.tsx
 'use client';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { Suspense} from 'react';
+
 import Chat from './ChatContent';
 import Profile from './profile/ProfileContent';
 import Friends from './friends/FriendsContent';
@@ -11,6 +13,7 @@ import useIsMobile from '../components/useIsMobile'; // 커스텀 훅 임포트
 export default function Content() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  
   const chatRoomId = searchParams?.get('chatRoomId');
   const isMobile = useIsMobile(); // 화면 크기 상태 가져오기
 
@@ -38,9 +41,12 @@ export default function Content() {
   };
 
   return (
-    <div className={commonClasses}>
-      {/* 선택한 부분 */}
-      {renderContent()}
-    </div>
+    <Suspense fallback={<div>Loading...</div>}>
+      <div className={commonClasses}>
+        {/* 선택한 부분 */}
+        {renderContent()}
+      </div>
+    </Suspense>
+    
   );
 }

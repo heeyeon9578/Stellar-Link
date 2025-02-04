@@ -11,7 +11,7 @@
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
-import { useEffect ,useRef, useState} from 'react';
+import { useEffect ,useRef, useState,Suspense} from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../../store/store";
 import socket from "@/socketIns"; // 위에서 만든 socket.ts 경로
@@ -50,6 +50,8 @@ export default function Detail() {
   const [animatedMessageIndex, setAnimatedMessageIndex] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [selectedColor,setSelectedColor] = useState<string>('');
+  const [redirecting, setRedirecting] = useState(false);
+
   const [participantColors, setParticipantColors] = useState<{ [userId: string]: string }>({});
   const [participantTextColors, setParticipantTextColors] = useState<{ [userId: string]: string }>({});
   const [isColorChange, setIsColorChange] = useState<boolean>(false);
@@ -95,8 +97,9 @@ export default function Detail() {
   };
  
    useEffect(() => {
-     if (status === "unauthenticated") {
+     if (status === "unauthenticated"&& !redirecting) {
        alert(t('SessionCheck'));
+       setRedirecting(true); // 무한 루프 방지
        router.push('/'); // 세션이 없으면 홈으로 리디렉션
      }
    }, [status, router]);
@@ -495,7 +498,8 @@ export default function Detail() {
   }
 
   return (
-    <div className="w-full h-full text-black p-2 md:p-0">
+    <Suspense fallback={<div>Loading...</div>}>
+      <div className="w-full h-full text-black p-2 md:p-0">
       
       {chatRoomId ?(
         <div className='flex h-full flex-col '>
@@ -649,21 +653,25 @@ export default function Detail() {
 
           </div>
 
-          {/** 채팅 섹션 */}
-          <div className="h-[90%] overflow-y-auto sm:mt-2 mt-1">
-            {messages.map((msg,index) => {
-               const messageColor = participantColors[msg.requesterId] || "customRectangle"; // 기본 색상 설정
-               const messageTextColor = participantTextColors[msg.requesterId] || "customPurple"; // 기본 색상 설정
-
+         {/** 채팅 섹션 */}
+        <div className="h-[90%] overflow-y-auto sm:mt-2 mt-1">
+          {/** 🔹 중복된 메시지 제거 */}
+          {(() => {
+            const uniqueMessages = Array.from(new Map(messages.map(msg => [msg.id, msg])).values());
+            return uniqueMessages.map((msg, index) => {
+              const messageColor = participantColors[msg.requesterId] || "customRectangle"; // 기본 색상 설정
+              const messageTextColor = participantTextColors[msg.requesterId] || "customPurple"; // 기본 색상 설정
+            
               const dynamicBorderClass = borderClasses[messageColor] || "border-customRectangle";
               const dynamicTextClass = textColorClasses[messageTextColor] || "text-customPurple";
-
+            
               // 메시지 날짜 포맷 처리
               const messageDate = new Date(msg.createdAt);
               const today = new Date();
               const isUser = msg.requesterId === session?.user.id.toString();
-              const participantCount = chatRoomInfo?.participants.length ||0;
-              const unreadCount =  participantCount- (msg.readBy?.length || 0);
+              const participantCount = chatRoomInfo?.participants.length || 0;
+              const unreadCount = participantCount - (msg.readBy?.length || 0);
+            
               // 오늘 날짜인지 확인
               const isToday =
                 messageDate.getFullYear() === today.getFullYear() &&
@@ -679,127 +687,132 @@ export default function Detail() {
                   }).format(messageDate)
                 : `${messageDate.getMonth() + 1}${t('month')} ${messageDate.getDate()}${t('day')}`;
                 
-              return (
-                <div key={msg.id}>
-                {isUser ? (
-                <div key={msg.id} className={`flex mb-2 sm:mb-4 justify-end  ${
-                  animatedMessageIndex === index ? "animate__animated animate__fadeInUp" : ""
-                }`}>
-                 
-                  
-                  <div className="flex flex-col items-end  sm:mr-2 mr-1">
-                    <DynamicText className={`text-xs sm:text-sm ${dynamicTextClass}`} text={msg.requesterName}/>
-                    <div className='flex items-end'>
-                      <div className='flex flex-col items-end'>
-                        {/** 안 읽은 사람 수 표시 */}
-                        {unreadCount > 0 && (
-                          <div className="text-[10px] sm:text-xs text-customLightPurple">
-                            {unreadCount}
-                          </div>
-                        )}
-                         <div className="text-[10px] sm:text-xs text-gray-400">{formattedDate}</div>
-                      </div>
-                        <span className={`ml-1 sm:ml-2 text-[10px] sm:text-xs text-gray-500 bg-${messageColor} rounded-custom-myChat max-w-[140px] sm:max-w-[300px] p-1 sm:p-2 flex-wrap`}>
-                        {msg.file? (
-                            <>
-                             {msg.file.type.startsWith("image/") ? (
-                                // 이미지 파일
-                                <img
-                                  src={msg.file.url}
-                                  alt={msg.file.name}
-                                  className="max-w-full rounded-lg"
-                                />
-                              ) : (
-                                // 일반 파일 (다운로드 링크 제공)
-                                <a
-                                  href={msg.file.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-blue-500 underline"
-                                >
-                                  {msg.file.name}
-                                </a>
-                              )}
-                            </>
-                          ):(
-                            <>
-                            {msg.text || "No message"}
-                            </>
-                          )}
-                        </span>
-                        
-                    </div>
-                    
-                  </div>
-                  <img
-                    src={msg.requesterImage || "/SVG/default-profile.svg"}
-                    alt="Profile"
-                    className={`sm:w-[30px] sm:h-[30px] w-[20px] h-[20px] object-cover rounded-full object-cover mr-1 sm:mr-2 border border-2 ${dynamicBorderClass}`}
-                  />
-                  {/* 채팅 끝에 위치한 더미 div */}
-                  <div ref={messagesEndRef}></div>
-
-                </div>
-                ):(
-                  <div key={msg.id} className={`flex mb-2 sm:mb-4 ${
+                return (
+                  <div key={msg.id}>
+                  {isUser ? (
+                  <div key={msg.id} className={`flex mb-2 sm:mb-4 justify-end  ${
                     animatedMessageIndex === index ? "animate__animated animate__fadeInUp" : ""
                   }`}>
-                  <img
-                    src={msg.requesterImage || "/SVG/default-profile.svg"}
-                    alt="Profile"
-                    className={`sm:w-[30px] sm:h-[30px] w-[20px] h-[20px] rounded-full object-cover mr-1 sm:mr-2 border border-2 ${dynamicBorderClass}`}
-                  />
-                  <div className="flex flex-col">
-                    <DynamicText className={`text-xs sm:text-sm ${dynamicTextClass}`} text={msg.requesterName}/>
-                    <div className='flex items-end'>
-                        <div className={`text-[10px] sm:text-xs text-gray-500 bg-${messageColor} max-w-[140px]  sm:max-w-[300px] p-1 sm:p-2 flex-wrap rounded-custom-otherChat`}>
-                          {msg.file? (
-                            <>
-                             {msg.file.type.startsWith("image/") ? (
-                                // 이미지 파일
-                                <img
-                                  src={msg.file.url}
-                                  alt={msg.file.name}
-                                  className="max-w-full rounded-lg"
-                                />
-                              ) : (
-                                // 일반 파일 (다운로드 링크 제공)
-                                <a
-                                  href={msg.file.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-blue-500 underline"
-                                >
-                                  {msg.file.name}
-                                </a>
-                              )}
-                            </>
-                          ):(
-                            <>
-                            {msg.text || "No message"}
-                            </>
+                   
+                    
+                    <div className="flex flex-col items-end  sm:mr-2 mr-1">
+                      <DynamicText className={`text-xs sm:text-sm ${dynamicTextClass}`} text={msg.requesterName}/>
+                      <div className='flex items-end'>
+                        <div className='flex flex-col items-end'>
+                          {/** 안 읽은 사람 수 표시 */}
+                          {unreadCount > 0 && (
+                            <div className="text-[10px] sm:text-xs text-customLightPurple">
+                              {unreadCount}
+                            </div>
                           )}
+                           <div className="text-[10px] sm:text-xs text-gray-400">{formattedDate}</div>
+                        </div>
+                          <span className={`ml-1 sm:ml-2 text-[10px] sm:text-xs text-gray-500 bg-${messageColor} rounded-custom-myChat max-w-[140px] sm:max-w-[300px] p-1 sm:p-2 flex-wrap`}>
+                          {msg.file? (
+                              <>
+                               {msg.file.type.startsWith("image/") ? (
+                                  // 이미지 파일
+                                  <img
+                                    src={msg.file.url}
+                                    alt={msg.file.name}
+                                    className="max-w-full rounded-lg"
+                                  />
+                                ) : (
+                                  // 일반 파일 (다운로드 링크 제공)
+                                  <a
+                                    href={msg.file.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-500 underline"
+                                  >
+                                    {msg.file.name}
+                                  </a>
+                                )}
+                              </>
+                            ):(
+                              <>
+                              {msg.text || "No message"}
+                              </>
+                            )}
+                          </span>
                           
-                        </div>
-                        <div className='flex flex-col ml-1 sm:ml-2'>
-                        {unreadCount > 0 && (
-                          <div className="text-[10px] sm:text-xs text-customLightPurple">
-                            {unreadCount}
-                          </div>
-                        )}
-                      <div className="text-[10px] sm:text-xs text-gray-400">{formattedDate}</div>
-                        </div>
+                      </div>
+                      
                     </div>
+                    <img
+                      src={msg.requesterImage || "/SVG/default-profile.svg"}
+                      alt="Profile"
+                      className={`sm:w-[30px] sm:h-[30px] w-[20px] h-[20px] object-cover rounded-full object-cover mr-1 sm:mr-2 border border-2 ${dynamicBorderClass}`}
+                    />
+                    {/* 채팅 끝에 위치한 더미 div */}
+                    <div ref={messagesEndRef}></div>
+  
                   </div>
-                  
-                  {/* 채팅 끝에 위치한 더미 div */}
-                  <div ref={messagesEndRef}></div>
+                  ):(
+                    <div key={msg.id} className={`flex mb-2 sm:mb-4 ${
+                      animatedMessageIndex === index ? "animate__animated animate__fadeInUp" : ""
+                    }`}>
+                    <img
+                      src={msg.requesterImage || "/SVG/default-profile.svg"}
+                      alt="Profile"
+                      className={`sm:w-[30px] sm:h-[30px] w-[20px] h-[20px] rounded-full object-cover mr-1 sm:mr-2 border border-2 ${dynamicBorderClass}`}
+                    />
+                    <div className="flex flex-col">
+                      <DynamicText className={`text-xs sm:text-sm ${dynamicTextClass}`} text={msg.requesterName}/>
+                      <div className='flex items-end'>
+                          <div className={`text-[10px] sm:text-xs text-gray-500 bg-${messageColor} max-w-[140px]  sm:max-w-[300px] p-1 sm:p-2 flex-wrap rounded-custom-otherChat`}>
+                            {msg.file? (
+                              <>
+                               {msg.file.type.startsWith("image/") ? (
+                                  // 이미지 파일
+                                  <img
+                                    src={msg.file.url}
+                                    alt={msg.file.name}
+                                    className="max-w-full rounded-lg"
+                                  />
+                                ) : (
+                                  // 일반 파일 (다운로드 링크 제공)
+                                  <a
+                                    href={msg.file.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-500 underline"
+                                  >
+                                    {msg.file.name}
+                                  </a>
+                                )}
+                              </>
+                            ):(
+                              <>
+                              {msg.text || "No message"}
+                              </>
+                            )}
+                            
+                          </div>
+                          <div className='flex flex-col ml-1 sm:ml-2'>
+                          {unreadCount > 0 && (
+                            <div className="text-[10px] sm:text-xs text-customLightPurple">
+                              {unreadCount}
+                            </div>
+                          )}
+                        <div className="text-[10px] sm:text-xs text-gray-400">{formattedDate}</div>
+                          </div>
+                      </div>
+                    </div>
+                    
+                    {/* 채팅 끝에 위치한 더미 div */}
+                    <div ref={messagesEndRef}></div>
+  
+                  </div>
+                  )}</div>
+                );
+  
+            });
+          })()}
 
-                </div>
-                )}</div>
-              );
-            })}
-          </div>
+          {/* 채팅 끝에 위치한 더미 div */}
+          <div ref={messagesEndRef}></div>
+        </div>
           
           {/** 전송 섹션 */}
           <div className="flex w-full items-center">
@@ -882,6 +895,8 @@ export default function Detail() {
        </div>
       )}
       
-    </div>
+      </div>
+    </Suspense>
+    
   );
 }

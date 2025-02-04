@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "next-auth/react";
 import socket from "@/socketIns"; // 위에서 만든 socket.ts 경로
@@ -16,6 +16,7 @@ export default function ColorContent() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language || "en");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
   const [sortOption, setSortOption] = useState<'en' | 'ko'| 'es'>('en'); // 정렬 옵션 상태
   const ThemeColors: Record<string, string> = {
     themePink: "#91034F",
@@ -35,8 +36,9 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
-    if (status === "unauthenticated") {
+    if (status === "unauthenticated"&& !redirecting) {
       alert(t('SessionCheck'));
+      setRedirecting(true); // 무한 루프 방지
       router.push('/'); // 세션이 없으면 홈으로 리디렉션
     }
   }, [status, router]);
@@ -46,7 +48,7 @@ useEffect(() => {
       setIsInitialized(true);
     }
   }, [status]);
-  
+
 // 언어 변경 핸들러
 const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
   const newLang = event.target.value;
@@ -149,7 +151,8 @@ const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
   }
 
   return (
-    <div className="mx-auto  md:p-8 p-4 rounded-lg h-full text-customBlue flex flex-col gap-6">
+    <Suspense>
+      <div className="mx-auto  md:p-8 p-4 rounded-lg h-full text-customBlue flex flex-col gap-6">
       <h2 className="md:text-2xl text-sm sm:text-xl font-bold ">
         <DynamicText text={t("Setting")} />
       </h2>
@@ -233,5 +236,6 @@ const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
       
 
     </div>
+    </Suspense>
   );
 }
