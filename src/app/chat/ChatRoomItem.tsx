@@ -245,7 +245,7 @@ export default function ChatRoomItem({
               </div>
 
               {/* 참여자 이름 or 방 제목 */}
-              <div className="sm:mt-8 mt-6 flex h-[20px] w-full max-w-[100%] text-sm text-customPurple 
+              <div className="sm:mt-8 mt-6 flex sm:h-[20px] h-[15px] w-full max-w-[100%] text-sm text-customPurple 
                               overflow-hidden whitespace-nowrap text-ellipsis"
               >
                 <div className="flex  max-w-[90%]">

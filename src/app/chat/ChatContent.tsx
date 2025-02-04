@@ -680,9 +680,15 @@ useEffect(() => {
   const disableContextMenu = (e: Event) => e.preventDefault();
   
   document.addEventListener("contextmenu", disableContextMenu);
+  const preventDefault = (e: Event) => e.preventDefault();
   
+  document.addEventListener("contextmenu", preventDefault); // ❗ 우클릭 기본 메뉴 차단
+  document.addEventListener("selectstart", preventDefault); // ❗ 텍스트 선택 방지
+
   return () => {
     document.removeEventListener("contextmenu", disableContextMenu);
+    document.removeEventListener("contextmenu", preventDefault);
+    document.removeEventListener("selectstart", preventDefault);
   };
 }, []);
 
