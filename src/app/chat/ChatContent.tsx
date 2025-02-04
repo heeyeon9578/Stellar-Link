@@ -671,6 +671,16 @@ const handleSortChange = (option:'latest' | 'name') => {
   dispatch(fetchFriends({ sortBy: option, order }));
   setIsMenuOpen(false); // 옵션 선택 후 메뉴 닫기
 };
+// (추가) 모든 화면에서 기본 컨텍스트 메뉴를 차단
+useEffect(() => {
+  const disableContextMenu = (e: Event) => e.preventDefault();
+  
+  document.addEventListener("contextmenu", disableContextMenu);
+  
+  return () => {
+    document.removeEventListener("contextmenu", disableContextMenu);
+  };
+}, []);
 
 useEffect(() => {
   if (i18n.isInitialized) {
