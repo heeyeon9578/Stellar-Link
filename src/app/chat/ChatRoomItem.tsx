@@ -147,7 +147,7 @@ export default function ChatRoomItem({
       </div>
 
       {/* 목록 내부 */}
-      <div className="flex justify-between relative ">
+      <div className="flex justify-between relative">
 
         {/** 사진, 이름, 방제목, 몇명인지, 마지막 메시지 */}
         <ul className="w-[70%]">
@@ -223,9 +223,9 @@ export default function ChatRoomItem({
             </li>
           ) : (
             // (2) 여러 명일 때
-            <div className="">
+            <div className="flex text-sm flex-col">
               {/* 참여자 프로필 이미지 표시 (겹침) */}
-              <div className="relative flex">
+              <div className=" ">
                 {chatRoom.participants.map((participant, index) => (
                   <div
                     key={participant.id}
