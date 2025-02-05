@@ -101,7 +101,8 @@
     "Setting":"Setting",
     "Language":"Language",
     "SessionCheck":"The session is not available. Redirecting to the login page.",
-    "LogoutMsg":"Are you sure you want to log out?"
+    "LogoutMsg":"Are you sure you want to log out?",
+    "Start":"Start"
    
 
 

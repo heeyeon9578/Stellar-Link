@@ -7,10 +7,12 @@ import { useTranslation } from 'react-i18next';
 import '../../../i18n'
 import 'animate.css'; // animate.css 불러오기
 import DynamicText from './DynamicText';
+import { useSession } from 'next-auth/react'; // 🔹 세션 가져오기
 
 const Header: React.FC = () => {
   const router = useRouter();
   const { t,i18n } = useTranslation('common');
+  const { data: session, status } = useSession(); // 🔹 세션 상태 가져오기
   const [isInitialized, setIsInitialized] = useState(false);
   useEffect(() => {
     if (i18n.isInitialized) {
@@ -49,7 +51,14 @@ const Header: React.FC = () => {
   const goToLogin = () => {
     router.push('/login'); // '/login' 페이지로 이동
   };
-
+// 🔹 세션 상태에 따라 버튼 텍스트 & 라우팅 변경
+const goToNextPage = () => {
+  if (session) {
+    router.push('/chat'); // 로그인 상태면 /chat으로 이동
+  } else {
+    router.push('/login'); // 로그인 안 되어 있으면 /login으로 이동
+  }
+};
   return (
     <header className="bg-transparent text-white py-2 sticky top-0 z-50">
       <div className="mx-2 flex justify-between items-center">
@@ -75,15 +84,15 @@ const Header: React.FC = () => {
           <Button variant="main" className="animate__animated animate__zoomIn">
             <DynamicText text={t('Skills')}/>
           </Button>
-          <Button variant="primary" className="animate__animated animate__zoomIn" onClick={goToLogin}>
-            <DynamicText text={t('Login')}/>
+          <Button variant="primary" className="animate__animated animate__zoomIn" onClick={goToNextPage}>
+          <DynamicText text={session ? t('Start') : t('Login')} />
           </Button>
         </nav>
 
         <div className='md:hidden flex'>
           {/* 로그인 버튼 (모바일 전용) */}
           <div className="md:hidden mr-4 ">
-            <Button size="sm" variant="primary" onClick={goToLogin}><DynamicText text={t('Login')}/></Button>
+            <Button size="sm" variant="primary" onClick={goToNextPage}> <DynamicText text={session ? t('Start') : t('Login')} /></Button>
           </div>
 
           {/* 모바일 메뉴 버튼 */}

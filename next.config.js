@@ -7,6 +7,7 @@ const nextConfig = {
   },
   experimental: {
     missingSuspenseWithCSRBailout: false,
+    optimizeCss: false,
   },
 
 };

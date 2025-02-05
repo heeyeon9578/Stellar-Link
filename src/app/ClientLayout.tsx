@@ -36,11 +36,13 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
  
   return (
     <div className={`text-white`}>
+      <ClientProvider>
       {!isChatPage && <Header />}
       <main className={` ${isChatPage ? 'chat-layout' : 'w-[90%] mx-auto py-4 '}`}>
-        <ClientProvider>{children}</ClientProvider>
+        {children}
       </main>
       {!isChatPage && <Footer />}
+      </ClientProvider>
     </div>
   );
 }

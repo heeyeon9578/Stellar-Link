@@ -101,5 +101,6 @@
     "Setting": "설정",
     "Language":"언어",
     "SessionCheck":"세션이 없습니다. 로그인 페이지로 이동합니다.",
-    "LogoutMsg":"정말 로그아웃하시겠습니까?"
+    "LogoutMsg":"정말 로그아웃하시겠습니까?",
+    "Start":"시작"
 }

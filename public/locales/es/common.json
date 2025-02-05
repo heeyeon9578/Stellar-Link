@@ -52,5 +52,6 @@
     "Setting": "Configuración",
     "Language":"Idioma",
     "SessionCheck":"La sesión no está disponible. Redirigiendo a la página de inicio de sesión.",
-    "LogoutMsg":"¿Estás seguro de que quieres cerrar sesión?"
+    "LogoutMsg":"¿Estás seguro de que quieres cerrar sesión?",
+    "Start":"Empezar"
 }

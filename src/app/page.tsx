@@ -108,7 +108,7 @@ export default function Home() {
             className="absolute inset-0  items-center justify-cente z-0 pointer-events-none bg-transparent"
           >
             <div
-              className={`text-lg sm:text-xl md:text-2xl lg:text-4xl font-bold text-white px-4 mt-4 sm:mt-0 animate__animated ${animation1}`}
+              className={`text-lg sm:text-xl md:text-2xl lg:text-4xl font-bold text-white bg-transparent px-4 mt-4 sm:mt-0 animate__animated ${animation1}`}
               style={{ animationDuration: '2s' }}
               onAnimationEnd={handleAnimationEnd1} // 애니메이션 종료 시 호출
             >
@@ -116,12 +116,12 @@ export default function Home() {
             </div>
 
             <div
-              className={`text-sm sm:text-base md:text-lg lg:text-2xl text-gray-300 px-4 mt-4 sm:mt-0 animate__animated ${animation2}`}
+              className={`text-sm sm:text-base md:text-lg lg:text-2xl bg-transparent text-gray-300 px-4 mt-4 sm:mt-0 animate__animated ${animation2}`}
               style={{ animationDuration: '4s' }}
               onAnimationEnd={handleAnimationEnd2} // 애니메이션 종료 시 호출
             >
               <DynamicText text={t('intro2')}/>
-      </div>
+            </div>
           </div>
 
 
