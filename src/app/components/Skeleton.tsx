@@ -19,7 +19,7 @@ export default function Skeleton({
         width,
         height,
         borderRadius,
-        animation: "pulse 1.5s infinite",
+        animation: "custPulse 1.5s infinite",
         ...style, // 추가된 스타일 병합
       }}
       className={`bg-customRectangle skeleton ${className}`}

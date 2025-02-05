@@ -81,7 +81,7 @@ body {
   height: 100vh;
 }
 /* global.css */
-@keyframes pulse {
+@keyframes custPulse {
   0% {
     background-color: #e0e0e0;
   }
