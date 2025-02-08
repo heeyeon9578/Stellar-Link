@@ -10,12 +10,12 @@ interface RectangleProps {
 
 const Rectangle: React.FC<RectangleProps> = ({ children, className,classNameBg }) => {
   return (
-    <div className={`relative ${className} flex `}>
+    <div className={`relative ${className}  flex `}>
       {/* 배경 */}
-      <div className={`absolute inset-0 bg-customRectangle  rounded-[60px] ${classNameBg}`}></div>
+      <div className={`absolute inset-0 bg-customRectangle rounded-[20px] sm:rounded-[40px] md:rounded-[60px] ${classNameBg}`}></div>
 
       {/* 내용물 */}
-      <div className="relative z-10">{children}</div>
+      <div className="relative z-10 w-full h-full flex">{children}</div>
     </div>
   );
 };

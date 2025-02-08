@@ -147,14 +147,28 @@ export default function Home() {
             inSection2 ? 'animate__animated animate__fadeIn' : ''
           }`}
         >
-         <Rectangle
-            className={`transition-all duration-700 ${
-              inSection2 ? 'opacity-30 scale-100' : 'opacity-0 scale-0'
-            }  w-[90%] h-[90%]`}
-            classNameBg="opacity-30"
-          >
-            <div>This is a rectangle!</div>
-          </Rectangle>
+        <Rectangle
+          className={`transition-all duration-700 w-[80%]${
+            inSection2 ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+          } `}
+          classNameBg="opacity-30"
+        >
+          {/* 부모 컨테이너 - 전체 크기 차지 */}
+          <div className="w-full h-full gap-4 flex flex-col-reverse lg:flex-row lg:px-16 lg:py-16 px-12 py-12 max-h-[700px] bg-red-500">
+            {/* 내부 60% 박스 */}
+            <div className=" flex-[6] flex items-center justify-center bg-green-500">
+              <video controls autoPlay loop muted width="700"  className="rounded-[20px] overflow-hidden">
+                <source src="/videos/intro1.mp4" type="video/mp4"/>
+                
+              </video>
+            </div>
+            {/* 내부 40% 박스 */}
+            <div className="flex-[4] max-w-[500px]  flex flex-col items-center mt-8 gap-16 bg-blue-500">
+              <DynamicText text={t('intro3')} className="text-[32px]"/>
+              <DynamicText text={t('intro4')} className="text-[20px]"/>
+            </div>
+          </div>
+        </Rectangle>
 
           <div
             className={`w-[30%] h-[30%] absolute bottom-0 right-0 transition-all duration-700 ${

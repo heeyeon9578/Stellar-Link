@@ -12,8 +12,16 @@
   @apply focus:outline-none focus:ring-2 focus:ring-customLightPurple focus:border-transparent;
 }
 
+.rectangle {
+  @apply w-[90%] h-[90%] flex items-center justify-center aspect-rectangle;
+}
+
 @layer utilities {
   .aspect-square {
     aspect-ratio: 1 / 1;
+  }
+
+  .aspect-rectangle{
+    aspect-ratio: 7 / 3;
   }
 }
