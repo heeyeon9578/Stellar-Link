@@ -143,7 +143,7 @@ export default function Home() {
         {/* 섹션2 */}
          <section
           id="section-2"
-          className={`h-screen flex items-center justify-center relative ${
+          className={`h-screen flex items-center justify-center relative bg-black ${
             inSection2 ? 'animate__animated animate__fadeIn' : ''
           }`}
         >
@@ -154,18 +154,18 @@ export default function Home() {
           classNameBg="opacity-30"
         >
           {/* 부모 컨테이너 - 전체 크기 차지 */}
-          <div className="w-full h-full gap-4 flex flex-col-reverse lg:flex-row lg:px-16 lg:py-16 px-12 py-12 max-h-[700px] bg-red-500">
+          <div className="w-full h-full gap-2 lg:gap-4 flex flex-col-reverse  items-center lg:items-start  lg:flex-row lg:px-16 lg:py-16 px-6 py-6 lg:max-h-[700px] bg-red-500">
             {/* 내부 60% 박스 */}
             <div className=" flex-[6] flex items-center justify-center bg-green-500">
-              <video controls autoPlay loop muted width="700"  className="rounded-[20px] overflow-hidden">
+              <video controls autoPlay loop muted width="700"  className="rounded-[20px] overflow-hidden max-h-[380px] lg:max-h-[1000px]">
                 <source src="/videos/intro1.mp4" type="video/mp4"/>
                 
               </video>
             </div>
             {/* 내부 40% 박스 */}
-            <div className="flex-[4] max-w-[500px]  flex flex-col items-center mt-8 gap-16 bg-blue-500">
-              <DynamicText text={t('intro3')} className="text-[32px]"/>
-              <DynamicText text={t('intro4')} className="text-[20px]"/>
+            <div className="flex-[4] max-w-[500px]  flex flex-col  mt-2 lg:mt-8 gap-4 lg:gap-16 bg-blue-500">
+              <DynamicText text={t('intro3')} className="text-[15px] sm:text-[20px] lg:text-[32px] bg-customPurple"/>
+              <DynamicText text={t('intro4')} className="text-[12px] sm:text-[15px] lg:text-[20px] bg-customLightPurple"/>
             </div>
           </div>
         </Rectangle>
