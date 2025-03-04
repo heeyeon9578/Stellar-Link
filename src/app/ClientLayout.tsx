@@ -33,12 +33,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       socket.off("disconnect");
     };
   }, []);
- 
+ //w-[90%] mx-auto py-4 
   return (
     <div className={`text-white`}>
       <ClientProvider>
       {!isChatPage && <Header />}
-      <main className={` ${isChatPage ? 'chat-layout' : 'w-[90%] mx-auto py-4 '}`}>
+      <main className={` ${isChatPage ? 'chat-layout' : ''}`}> 
         {children}
       </main>
       {!isChatPage && <Footer />}

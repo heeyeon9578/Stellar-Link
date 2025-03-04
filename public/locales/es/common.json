@@ -9,6 +9,12 @@
     "intro4": "Puedes categorizar los chats personales y grupales en la sala de chat.",   
     "intro5": "¡Cada sala de chat, a mi estilo!",
     "intro6": "Puedes personalizar tus apodos y los colores de las burbujas de chat en la sala de chat.",
+
+    "GroupChat": "Chat grupal",
+    "ThemeColor": "Color del tema",
+    "SpeechBubble": "Color del globo de chat",
+    "Trust": "Nivel de confianza",
+    
     "Email": "Correo electrónico",
     "Password": "Contraseña",
     "ForgetPassword": "¿Olvidaste tu contraseña?",

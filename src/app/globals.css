@@ -102,7 +102,44 @@ body {
   display: inline-block;
   animation: scroll-text 4s linear infinite;
 }
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+ 
+}
 
+.marquee__content {
+  display: flex;
+  animation: marquee-scroll 10s linear infinite;
+}
+
+.marquee__group {
+  display: flex;
+  align-items: center;
+  
+  flex-shrink: 0;
+  /* width: 40%; */
+}
+
+.marquee__text {
+  font-size: 1.5rem;
+  color: white;
+}
+
+.icon {
+  width: 40px;
+  height: 40px;
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
 @keyframes scroll-text {
   0% {
     transform: translateX(100%);

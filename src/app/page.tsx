@@ -112,10 +112,10 @@ export default function Home() {
 
   if (!isInitialized) return null;
   return (
-    <div >
+    <div className="">
      <main className="flex-1"> 
         {/* 섹션1 */}
-        <section className="h-screen w-full bg-transparent flex items-center justify-center relative">
+        <section className="h-[500px] sm:h-screen bg-transparent flex items-center justify-center relative">
 
 
           {/* Intro 텍스트 (뒤쪽 레이어) */}
@@ -158,7 +158,7 @@ export default function Home() {
         {/* 섹션2 */}
          <section
           id="section-2"
-          className={`h-screen flex items-center justify-center relative ${
+          className={`h-[500px] sm:h-[90%] w-[90%] mx-auto py-4  flex items-center justify-center relative ${
             inSection2 ? 'animate__animated animate__fadeIn' : ''
           }`}
         >
@@ -186,7 +186,7 @@ export default function Home() {
         </Rectangle>
 
           <div
-            className={`w-[30%] h-[30%] absolute bottom-0 right-0 transition-all duration-700 ${
+            className={`w-[30%] h-[30%] absolute bottom-[0px]  md:bottom-[60px] right-0 transition-all duration-700 ${
               inSection2 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
             }`}
           >
@@ -195,7 +195,7 @@ export default function Home() {
         </section>
         
         {/* 섹션3 */}
-        <section id="section-3" className={`h-screen flex items-center justify-center relative ${
+        <section id="section-3" className={`h-[500px] sm:h-[90%] w-[90%] mx-auto py-4  flex items-center justify-center relative ${
             inSection3 ? 'animate__animated animate__fadeIn' : ''
           }`}> 
         <Rectangle
@@ -222,7 +222,7 @@ export default function Home() {
         </Rectangle>
 
           <div
-            className={`w-[30%] h-[30%] absolute bottom-[60px] sm:bottom-[80px] lg:bottom-[120px] right-0 transition-all duration-700 ${
+            className={`w-[30%] h-[30%] absolute bottom-[0px] sm:bottom-[80px] lg:bottom-[120px] right-0 transition-all duration-700 ${
               inSection3 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
             }`}
           >
@@ -230,16 +230,34 @@ export default function Home() {
         </div>
         </section>
 
-        <section className="h-screen bg-gray-400 flex items-center justify-center ">
-          <h1 className="text-4xl font-bold">Section 4</h1>
+
+        {/* 섹션4 - 반응형 & 무한 좌우 흘러가는 애니메이션 */}
+        <section className="w-screen overflow-hidden relative bg-customPurple h-12 sm:h-16 lg:h-20 flex items-center">
+          <div className="marquee">
+            <div className="marquee__content">
+              {/* 한 세트의 요소 */}
+              {Array(5).fill(
+                <div className="marquee__group">
+                  <Image src="/SVG/star.svg" alt="star" width={80} height={80} priority className="icon" />
+                  <DynamicText text={t('GroupChat')} className="marquee__text" />
+                  <Image src="/SVG/star.svg" alt="star" width={80} height={80} priority className="icon" />
+                  <DynamicText text={t('ThemeColor')} className="marquee__text" />
+                  <Image src="/SVG/star.svg" alt="star" width={80} height={80} priority className="icon" />
+                  <DynamicText text={t('SpeechBubble')} className="marquee__text" />
+                  <Image src="/SVG/star.svg" alt="star" width={80} height={80} priority className="icon" />
+                  <DynamicText text={t('Trust')} className="marquee__text" />
+                </div>
+              )}
+            </div>
+          </div>
         </section>
-        <section className="h-screen bg-gray-500 flex items-center justify-center ">
+        <section className="h-[500px] sm:h-[90%] bg-gray-500  w-[90%] mx-auto py-4 flex items-center justify-center ">
           <h1 className="text-4xl font-bold">Section 5</h1>
         </section>
-        <section className="h-screen bg-gray-600 flex items-center justify-center ">
+        <section className="h-[500px] sm:h-[90%] bg-gray-600 w-[90%] mx-auto py-4 flex items-center justify-center ">
           <h1 className="text-4xl font-bold">Section 6</h1>
         </section>
-        <section className="h-screen bg-gray-600 flex items-center justify-center ">
+        <section className="h-[500px] sm:h-[90%] bg-gray-600 w-[90%] mx-auto py-4 flex items-center justify-center ">
           <h1 className="text-4xl font-bold">Section 7</h1>
         </section>
       </main>

@@ -9,6 +9,12 @@
     "intro4": "You can categorize personal and group chats in the chat room.",
     "intro5": "Every Chatroom, My Style!",
     "intro6": "You can customize your nicknames and chat bubble colors in the chat room.",
+
+    "GroupChat": "Group Chat",
+    "ThemeColor": "Theme Color",
+    "SpeechBubble": "Speech Bubble Color",
+    "Trust": "Trust Level",
+
     "Email":"Email",
     "Password":"Password",
     "ForgetPassword":"Forget Password?",
