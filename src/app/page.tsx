@@ -11,6 +11,7 @@ import 'animate.css'; // animate.css 불러오기
 import dynamic from 'next/dynamic';
 import chattingSVG from '../../public/json/chatting.json';
 import colorSVG from '../../public/json/color.json';
+import translationSVG from '../../public/json/translation.json';
 import Rectangle from "./components/Rectangle";
 import DynamicText from "./components/DynamicText";
 import { useSession } from "next-auth/react";
@@ -27,6 +28,10 @@ export default function Home() {
 
   const [inSection2, setInSection2] = useState(false); // 섹션 2 도달 여부 상태
   const [inSection3, setInSection3] = useState(false); // 섹션 3 도달 여부 상태
+  
+  const [inSection5, setInSection5] = useState(false); // 섹션 5 도달 여부 상태
+  const [inSection6, setInSection6] = useState(false); // 섹션 6 도달 여부 상태
+  const [inSection7, setInSection7] = useState(false); // 섹션 7 도달 여부 상태
   
   const { data: session } = useSession();
   const handleAnimationEnd1 = () => {
@@ -67,6 +72,34 @@ export default function Home() {
         } else {
           setInSection3(false); // 섹션 2 이전이면 상태 초기화
         }
+
+        const section5Top = document.getElementById('section-5')?.offsetTop || 0; // 섹션 2의 상단 위치
+        //console.log("Section3 offsetTop:", section3Top, "Scroll position:", window.scrollY + window.innerHeight / 2);
+        const scrollPosition5 = window.scrollY + window.innerHeight / 2; // 현재 스크롤 위치 + 화면의 절반
+        if (scrollPosition5 >= section5Top) {
+          setInSection5(true); // 섹션 2에 도달하면 상태 업데이트
+        } else {
+          setInSection5(false); // 섹션 2 이전이면 상태 초기화
+        }
+
+        const section6Top = document.getElementById('section-6')?.offsetTop || 0; // 섹션 2의 상단 위치
+        //console.log("Section3 offsetTop:", section3Top, "Scroll position:", window.scrollY + window.innerHeight / 2);
+        const scrollPosition6 = window.scrollY + window.innerHeight / 2; // 현재 스크롤 위치 + 화면의 절반
+        if (scrollPosition6 >= section6Top) {
+          setInSection6(true); // 섹션 2에 도달하면 상태 업데이트
+        } else {
+          setInSection6(false); // 섹션 2 이전이면 상태 초기화
+        }
+
+        const section7Top = document.getElementById('section-7')?.offsetTop || 0; // 섹션 2의 상단 위치
+        //console.log("Section3 offsetTop:", section3Top, "Scroll position:", window.scrollY + window.innerHeight / 2);
+        const scrollPosition7 = window.scrollY + window.innerHeight / 2; // 현재 스크롤 위치 + 화면의 절반
+        if (scrollPosition7 >= section7Top) {
+          setInSection7(true); // 섹션 2에 도달하면 상태 업데이트
+        } else {
+          setInSection7(false); // 섹션 2 이전이면 상태 초기화
+        }
+
       }else{
         console.log(`
           
@@ -115,7 +148,7 @@ export default function Home() {
     <div className="">
      <main className="flex-1"> 
         {/* 섹션1 */}
-        <section className="h-[500px] sm:h-screen bg-transparent flex items-center justify-center relative">
+        <section className="h-[500px] sm:h-screen  flex items-center justify-center relative">
 
 
           {/* Intro 텍스트 (뒤쪽 레이어) */}
@@ -158,7 +191,7 @@ export default function Home() {
         {/* 섹션2 */}
          <section
           id="section-2"
-          className={`h-[500px] sm:h-[90%] w-[90%] mx-auto py-4  flex items-center justify-center relative ${
+          className={`h-[500px] sm:h-[90vh] w-[90%] mx-auto py-4 flex items-center justify-center relative ${
             inSection2 ? 'animate__animated animate__fadeIn' : ''
           }`}
         >
@@ -195,12 +228,142 @@ export default function Home() {
         </section>
         
         {/* 섹션3 */}
-        <section id="section-3" className={`h-[500px] sm:h-[90%] w-[90%] mx-auto py-4  flex items-center justify-center relative ${
+        <section id="section-3" className={`h-[500px] sm:h-[90vh] w-[90%] mx-auto py-4 mt-20 mb-20 flex items-center justify-center relative ${
             inSection3 ? 'animate__animated animate__fadeIn' : ''
           }`}> 
         <Rectangle
           className={`transition-all duration-700 w-[80%]${
             inSection3 ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+          } `}
+          classNameBg="opacity-30"
+        >
+         
+          <div className="w-full h-full gap-2 lg:gap-4 flex flex-col-reverse  items-center lg:items-start  lg:flex-row lg:px-16 lg:py-16 px-6 py-6 lg:max-h-[700px]">
+            <div className="flex-[4] max-w-[500px]  flex flex-col  mt-2 lg:mt-8 gap-4 lg:gap-16 ">
+              <DynamicText text={t('intro5')} className="text-[15px] sm:text-[20px] lg:text-[32px] "/>
+              <DynamicText text={t('intro6')} className="text-[12px] sm:text-[15px] lg:text-[20px] "/>
+            </div>
+            <div className=" flex-[6] flex items-center justify-center">
+              <video controls autoPlay loop muted width="700"  className="rounded-[20px] overflow-hidden max-h-[380px] lg:max-h-[1000px]">
+                <source src="/videos/intro2.mp4" type="video/mp4"/>
+                
+              </video>
+            </div>
+          
+            
+          </div>
+        </Rectangle>
+
+          <div
+            className={`w-[30%] h-[30%] absolute bottom-[0px] sm:bottom-[80px] lg:bottom-[120px] left-0 transition-all duration-700 ${
+              inSection3 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+            }`}
+          >
+          <Lottie animationData={colorSVG} loop autoplay />
+        </div>
+        </section>
+
+
+        {/* 섹션4 - 반응형 & 무한 좌우 흘러가는 애니메이션 */}
+        <section className="w-screen overflow-hidden mt-20 mb-20 relative bg-customPurple h-12 sm:h-16 lg:h-20 flex items-center">
+          <div className="marquee">
+            <div className="marquee__content">
+              {/* 한 세트의 요소 */}
+              {Array(5).fill(
+                <div className="marquee__group">
+                  <Image src="/SVG/star.svg" alt="star" width={80} height={80} priority className="icon" />
+                  <DynamicText text={t('GroupChat')} className="marquee__text" />
+                  <Image src="/SVG/star.svg" alt="star" width={80} height={80} priority className="icon" />
+                  <DynamicText text={t('ThemeColor')} className="marquee__text" />
+                  <Image src="/SVG/star.svg" alt="star" width={80} height={80} priority className="icon" />
+                  <DynamicText text={t('SpeechBubble')} className="marquee__text" />
+                  <Image src="/SVG/star.svg" alt="star" width={80} height={80} priority className="icon" />
+                  <DynamicText text={t('Trust')} className="marquee__text" />
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* 섹션5 */}
+        <section id="section-5" className={`h-[500px] sm:h-[90vh] w-[90%]  mt-20 mb-20 mx-auto py-4  flex items-center justify-center relative ${
+            inSection5 ? 'animate__animated animate__fadeIn' : ''
+          }`}> 
+        <Rectangle
+          className={`transition-all duration-700 w-[80%]${
+            inSection5 ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+          } `}
+          classNameBg="opacity-30"
+        >
+         
+          <div className="w-full h-full gap-2 lg:gap-4 flex flex-col-reverse  items-center lg:items-start  lg:flex-row lg:px-16 lg:py-16 px-6 py-6 lg:max-h-[700px]">
+        
+            <div className=" flex-[6] flex items-center justify-center">
+              <video controls autoPlay loop muted width="700"  className="rounded-[20px] overflow-hidden max-h-[380px] lg:max-h-[1000px]">
+                <source src="/videos/intro3.mp4" type="video/mp4"/>
+                
+              </video>
+            </div>
+          
+            <div className="flex-[4] max-w-[500px]  flex flex-col  mt-2 lg:mt-8 gap-4 lg:gap-16 ">
+              <DynamicText text={t('intro7')} className="text-[15px] sm:text-[20px] lg:text-[32px] "/>
+              <DynamicText text={t('intro8')} className="text-[12px] sm:text-[15px] lg:text-[20px] "/>
+            </div>
+          </div>
+        </Rectangle>
+
+          <div
+            className={`w-[30%] h-[30%] absolute bottom-[0px] sm:bottom-[80px] lg:bottom-[120px] right-0 transition-all duration-700 ${
+              inSection5 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+            }`}
+          >
+          <Lottie animationData={translationSVG} loop autoplay />
+        </div>
+        </section>
+
+       {/* 섹션6 */}
+        <section id="section-6" className={`h-[500px] sm:h-[90vh] w-[90%] mt-20 mb-20 mx-auto py-4  flex items-center justify-center relative ${
+            inSection6 ? 'animate__animated animate__fadeIn' : ''
+          }`}> 
+        <Rectangle
+          className={`transition-all duration-700 w-[80%]${
+            inSection6? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+          } `}
+          classNameBg="opacity-30"
+        >
+         
+          <div className="w-full h-full gap-2 lg:gap-4 flex flex-col-reverse  items-center lg:items-start  lg:flex-row lg:px-16 lg:py-16 px-6 py-6 lg:max-h-[700px]">
+            <div className="flex-[4] max-w-[500px]  flex flex-col  mt-2 lg:mt-8 gap-4 lg:gap-16 ">
+              <DynamicText text={t('intro9')} className="text-[15px] sm:text-[20px] lg:text-[32px] "/>
+              <DynamicText text={t('intro10')} className="text-[12px] sm:text-[15px] lg:text-[20px] "/>
+            </div>
+            <div className=" flex-[6] flex items-center justify-center">
+              <video controls autoPlay loop muted width="700"  className="rounded-[20px] overflow-hidden max-h-[380px] lg:max-h-[1000px]">
+                <source src="/videos/intro4.mp4" type="video/mp4"/>
+                
+              </video>
+            </div>
+          
+            
+          </div>
+        </Rectangle>
+
+          <div
+            className={`w-[30%] h-[30%] absolute bottom-[0px] sm:bottom-[80px] lg:bottom-[120px] left-0 transition-all duration-700 ${
+              inSection6 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+            }`}
+          >
+          <Lottie animationData={colorSVG} loop autoplay />
+        </div>
+        </section>
+
+        {/* 섹션7 */}
+        <section id="section-7" className={`h-[500px] sm:h-[90vh] w-[90%] mt-20 mb-20 mx-auto py-4  flex items-center justify-center relative ${
+            inSection7 ? 'animate__animated animate__fadeIn' : ''
+          }`}> 
+        <Rectangle
+          className={`transition-all duration-700 w-[80%]${
+            inSection7 ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
           } `}
           classNameBg="opacity-30"
         >
@@ -223,42 +386,11 @@ export default function Home() {
 
           <div
             className={`w-[30%] h-[30%] absolute bottom-[0px] sm:bottom-[80px] lg:bottom-[120px] right-0 transition-all duration-700 ${
-              inSection3 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
+              inSection7 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
             }`}
           >
           <Lottie animationData={colorSVG} loop autoplay />
         </div>
-        </section>
-
-
-        {/* 섹션4 - 반응형 & 무한 좌우 흘러가는 애니메이션 */}
-        <section className="w-screen overflow-hidden relative bg-customPurple h-12 sm:h-16 lg:h-20 flex items-center">
-          <div className="marquee">
-            <div className="marquee__content">
-              {/* 한 세트의 요소 */}
-              {Array(5).fill(
-                <div className="marquee__group">
-                  <Image src="/SVG/star.svg" alt="star" width={80} height={80} priority className="icon" />
-                  <DynamicText text={t('GroupChat')} className="marquee__text" />
-                  <Image src="/SVG/star.svg" alt="star" width={80} height={80} priority className="icon" />
-                  <DynamicText text={t('ThemeColor')} className="marquee__text" />
-                  <Image src="/SVG/star.svg" alt="star" width={80} height={80} priority className="icon" />
-                  <DynamicText text={t('SpeechBubble')} className="marquee__text" />
-                  <Image src="/SVG/star.svg" alt="star" width={80} height={80} priority className="icon" />
-                  <DynamicText text={t('Trust')} className="marquee__text" />
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-        <section className="h-[500px] sm:h-[90%] bg-gray-500  w-[90%] mx-auto py-4 flex items-center justify-center ">
-          <h1 className="text-4xl font-bold">Section 5</h1>
-        </section>
-        <section className="h-[500px] sm:h-[90%] bg-gray-600 w-[90%] mx-auto py-4 flex items-center justify-center ">
-          <h1 className="text-4xl font-bold">Section 6</h1>
-        </section>
-        <section className="h-[500px] sm:h-[90%] bg-gray-600 w-[90%] mx-auto py-4 flex items-center justify-center ">
-          <h1 className="text-4xl font-bold">Section 7</h1>
         </section>
       </main>
 
