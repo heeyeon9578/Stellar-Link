@@ -3,6 +3,7 @@
     "Quests":"Quests",
     "Skills":"Skills",
     "Login":"Login",
+
     "intro1":"A connection as brilliant as a star",
     "intro2":"Real-Time Chatting: Personal and Group",
     "intro3": "Easily distinguish between personal and group chats!",
@@ -13,6 +14,9 @@
     "intro8": "Seamlessly chat in multiple languages with built-in translation support.",
     "intro9": "Easy Theme Customization!",
     "intro10": "Choose three colors for the top, middle, and bottom to enjoy a beautiful gradient theme.",
+    "intro11": "Trusted Friends!",
+    "intro12": "Only friends who have sent and accepted friend requests will be in your friend list, ensuring reliability.",
+
     "GroupChat": "Group Chat",
     "ThemeColor": "Theme Color",
     "SpeechBubble": "Speech Bubble Color",

@@ -3,6 +3,7 @@
     "Quests": "Misiones",
     "Skills": "Habilidades",
     "Login": "Iniciar sesión",
+
     "intro1": "Una conexión tan brillante como una estrella",
     "intro2": "Chat en tiempo real: Personal y grupal",
     "intro3": "¡Distingue fácilmente entre chats personales y grupales!",
@@ -13,6 +14,9 @@
     "intro8": "Chatea sin problemas en varios idiomas con soporte de traducción integrado.",
     "intro9": "¡Personalización de temas fácil!",
     "intro10": "Elige tres colores para la parte superior, media e inferior y disfruta de un hermoso tema degradado.",
+    "intro11": "¡Amigos de confianza!",
+    "intro12": "Solo los amigos que hayan enviado y aceptado solicitudes de amistad estarán en tu lista de amigos, garantizando confianza.",
+
     "GroupChat": "Chat grupal",
     "ThemeColor": "Color del tema",
     "SpeechBubble": "Color del globo de chat",

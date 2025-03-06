@@ -12,6 +12,8 @@ import dynamic from 'next/dynamic';
 import chattingSVG from '../../public/json/chatting.json';
 import colorSVG from '../../public/json/color.json';
 import translationSVG from '../../public/json/translation.json';
+import themeSVG from '../../public/json/theme.json';
+import peopleSVG from '../../public/json/people.json';
 import Rectangle from "./components/Rectangle";
 import DynamicText from "./components/DynamicText";
 import { useSession } from "next-auth/react";
@@ -326,14 +328,14 @@ export default function Home() {
             inSection6 ? 'animate__animated animate__fadeIn' : ''
           }`}> 
         <Rectangle
-          className={`transition-all duration-700 w-[80%]${
+          className={`transition-all h-[100%] duration-700 w-[80%]${
             inSection6? 'opacity-100 scale-100' : 'opacity-0 scale-0'
           } `}
           classNameBg="opacity-30"
         >
          
-          <div className="w-full h-full gap-2 lg:gap-4 flex flex-col-reverse  items-center lg:items-start  lg:flex-row lg:px-16 lg:py-16 px-6 py-6 lg:max-h-[700px]">
-            <div className="flex-[4] max-w-[500px]  flex flex-col  mt-2 lg:mt-8 gap-4 lg:gap-16 ">
+          <div className="w-full h-full gap-2 lg:gap-4 flex flex-col-reverse  items-center lg:items-center lg:flex-row lg:px-16 lg:py-16 px-6 py-6 lg:max-h-[700px]">
+            <div className="flex-[4] max-w-[500px] h-[80%] flex flex-col  mt-2 lg:mt-8 gap-4 lg:gap-16">
               <DynamicText text={t('intro9')} className="text-[15px] sm:text-[20px] lg:text-[32px] "/>
               <DynamicText text={t('intro10')} className="text-[12px] sm:text-[15px] lg:text-[20px] "/>
             </div>
@@ -353,7 +355,7 @@ export default function Home() {
               inSection6 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
             }`}
           >
-          <Lottie animationData={colorSVG} loop autoplay />
+          <Lottie animationData={themeSVG} loop autoplay />
         </div>
         </section>
 
@@ -372,14 +374,14 @@ export default function Home() {
         
             <div className=" flex-[6] flex items-center justify-center">
               <video controls autoPlay loop muted width="700"  className="rounded-[20px] overflow-hidden max-h-[380px] lg:max-h-[1000px]">
-                <source src="/videos/intro2.mp4" type="video/mp4"/>
+                <source src="/videos/intro5.mp4" type="video/mp4"/>
                 
               </video>
             </div>
           
             <div className="flex-[4] max-w-[500px]  flex flex-col  mt-2 lg:mt-8 gap-4 lg:gap-16 ">
-              <DynamicText text={t('intro5')} className="text-[15px] sm:text-[20px] lg:text-[32px] "/>
-              <DynamicText text={t('intro6')} className="text-[12px] sm:text-[15px] lg:text-[20px] "/>
+              <DynamicText text={t('intro11')} className="text-[15px] sm:text-[20px] lg:text-[32px] "/>
+              <DynamicText text={t('intro12')} className="text-[12px] sm:text-[15px] lg:text-[20px] "/>
             </div>
           </div>
         </Rectangle>
@@ -389,7 +391,7 @@ export default function Home() {
               inSection7 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
             }`}
           >
-          <Lottie animationData={colorSVG} loop autoplay />
+          <Lottie animationData={peopleSVG} loop autoplay />
         </div>
         </section>
       </main>
