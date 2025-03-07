@@ -75,16 +75,13 @@ const goToNextPage = () => {
 
         {/* 네비게이션 바 */}
         <nav className="hidden md:flex space-x-5">
-          <Button variant="main" className="animate__animated animate__zoomIn" >
+          <Button variant="main" className="animate__animated animate__zoomIn" onClick={() => window.open('https://heeyeonportfolio.vercel.app/')} >
             <DynamicText text={t('AboutMe')}/>
           </Button>
-          <Button variant="main" className="animate__animated animate__zoomIn">
-            <DynamicText text= {t('Quests')}/>
-          </Button>
-          <Button variant="main" className="animate__animated animate__zoomIn">
+          <Button variant="main" className="animate__animated animate__zoomIn" onClick={() => window.open('https://heeyeon9578.notion.site/StellarLink-24-11-29-14caccb87c2b80bba05bf00fa9a970f4')} >
             <DynamicText text={t('Skills')}/>
           </Button>
-          <Button variant="primary" className="animate__animated animate__zoomIn" onClick={goToNextPage}>
+          <Button variant="primary" className="animate__animated animate__zoomIn" onClick={goToNextPage} >
           <DynamicText text={session ? t('Start') : t('Login')} />
           </Button>
         </nav>
@@ -126,13 +123,10 @@ const goToNextPage = () => {
         id="mobile-menu"
         className="hidden flex flex-col space-y-3 mt-3 px-2 md:hidden"
       >
-        <Button size="sm" variant="main" className="animate__animated">
+        <Button size="sm" variant="main" className="animate__animated" onClick={() => window.open('https://heeyeonportfolio.vercel.app/')}>
           <DynamicText text={t('AboutMe')}/>
         </Button>
-        <Button size="sm" variant="main" className="animate__animated">
-          <DynamicText text={t('Quests')}/>
-        </Button>
-        <Button size="sm" variant="main" className="animate__animated">
+        <Button size="sm" variant="main" className="animate__animated" onClick={() => window.open('https://heeyeon9578.notion.site/StellarLink-24-11-29-14caccb87c2b80bba05bf00fa9a970f4')} >
           <DynamicText text={t('Skills')}/>
         </Button>
         

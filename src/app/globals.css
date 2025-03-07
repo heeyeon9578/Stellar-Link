@@ -80,6 +80,11 @@ body {
   color: white; /* 텍스트 색상 */
   height: 100vh;
 }
+.footer{
+  background-image: 
+    linear-gradient(to left, #01012B, #02025B, #030391); /* 두 번째 레이어: 그라데이션 */
+  height: 340px;
+}
 /* global.css */
 @keyframes custPulse {
   0% {

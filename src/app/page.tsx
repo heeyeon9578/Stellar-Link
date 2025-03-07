@@ -394,6 +394,20 @@ export default function Home() {
           <Lottie animationData={peopleSVG} loop autoplay />
         </div>
         </section>
+
+        {/* 섹션8 - 로고 */}
+        <section className={`h-[500px] sm:h-[90vh] w-[90%] mt-20 mb-20 mx-auto py-4  flex items-center justify-center relative`}> 
+        {/* 로고 */}
+        <Image
+                    src="/SVG/Logo.svg"
+                    alt="Logo"
+                    width={300}
+                    height={50}
+                    priority
+                    className="cursor-pointer"
+                  />
+        </section>
+         
       </main>
 
     </div>
