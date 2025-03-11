@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation'; // 라우팅용
 import { useTranslation } from 'react-i18next';
@@ -10,8 +11,9 @@ import { signIn } from 'next-auth/react'; // next-auth signIn 함수
 import Button from '../components/Button';
 import DynamicText from '../components/DynamicText';
 
-export default function SignupPage() {
+function SignupPage() {
   const { t, i18n } = useTranslation('common');
+  const [isClient, setIsClient] = useState(false); // ✅ 클라이언트 렌더링 확인 변수
   const [isInitialized, setIsInitialized] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [passwordConfirmVisible, setPasswordConfirmVisible] = useState(false);
@@ -45,7 +47,10 @@ export default function SignupPage() {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^])[A-Za-z\d@$!%*?&#^]{8,}$/;
     return passwordRegex.test(password);
   };
-  
+   // ✅ Next.js SSR을 방지하고 클라이언트에서만 렌더링
+   useEffect(() => {
+    setIsClient(true);
+  }, []);
   
   useEffect(() => {
     validateForm();
@@ -186,7 +191,10 @@ export default function SignupPage() {
       };
     }
   }, [i18n]);
-
+// ✅ 서버에서 렌더링을 방지하기 위해 클라이언트가 아니면 빈 화면을 반환
+if (!isClient) {
+  return <div data-testid="loading">Loading...</div>;
+}
   if (!isInitialized) return null;
 
   return (
@@ -202,7 +210,9 @@ export default function SignupPage() {
        
         <div className="flex-1 flex flex-col justify-center items-center md:m-16 m-4">
           
-          <h2 className="text-2xl md:text-4xl font-bold mb-6 text-white mb-12"><DynamicText text={t('Signup')}/></h2>
+          <h2 className="text-2xl md:text-4xl font-bold mb-6 text-white mb-12" data-testid="signup-title">
+            <DynamicText text={t('Signup')}/>
+          </h2>
 
           {/* 이메일 입력란 */} 
           <div className='w-full mb-4'>
@@ -210,6 +220,7 @@ export default function SignupPage() {
             
             <div className='flex space-x-4'>
             <input
+              data-testid="email-input"
               disabled={isCodeSend}
               type="email"
               placeholder=""
@@ -298,6 +309,7 @@ export default function SignupPage() {
                 <div className='text-sm mb-1'><DynamicText text={t('Password')}/></div>
                 <div className="w-full relative mb-1">
                   <input
+                    data-testid="password-input"
                     type={passwordVisible ? 'text' : 'password'}
                     placeholder=""
                     value={password}
@@ -334,6 +346,7 @@ export default function SignupPage() {
                 <div className='text-sm mb-1'><DynamicText text={t('PasswordConfirm')}/></div>
                 <div className="w-full relative mb-1">
                   <input
+                    data-testid="password-confirm-input"
                     type={passwordConfirmVisible ? 'text' : 'password'}
                     placeholder=""
                     value={passwordConfirm}
@@ -343,6 +356,7 @@ export default function SignupPage() {
 
 
                   <button
+                    data-testid="signup-button"
                     onClick={() => setPasswordConfirmVisible(!passwordConfirmVisible)}
                     className={`absolute inset-y-0 right-4 flex items-center text-customPurple
                   text-xs md:text-sm
@@ -443,3 +457,5 @@ export default function SignupPage() {
     </div>
   );
 }
+// dynamic으로 감싸서 클라이언트 전용 컴포넌트로 export (SSR 비활성화)
+export default dynamic(() => Promise.resolve(SignupPage), { ssr: false });

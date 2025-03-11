@@ -1,5 +1,5 @@
 'use client';
-import React,{useState} from 'react';
+import React,{useState,useEffect} from 'react';
 import { useTranslation } from "react-i18next";
 import DynamicText from './DynamicText';
 import Image from 'next/image';
@@ -19,6 +19,18 @@ const Footer: React.FC = () => {
     setSelectedLanguage(newLang);
     localStorage.setItem("language", newLang); // 선택된 언어 저장
   };
+  useEffect(() => {
+      if (i18n.isInitialized) {
+        setIsInitialized(true);
+      } else {
+        const handleInitialized = () => setIsInitialized(true);
+        i18n.on('initialized', handleInitialized);
+        return () => {
+          i18n.off('initialized', handleInitialized);
+        };
+      }
+    }, [i18n]);
+    if (!isInitialized) return null;
   return (
     <footer className="footer">
       <div className="w-full h-full sm:px-[120px] py-[50px] px-[50px] flex flex-col justify-between"> 

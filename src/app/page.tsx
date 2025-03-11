@@ -145,7 +145,9 @@ export default function Home() {
     
   };
 
-  if (!isInitialized) return null;
+  if (!isInitialized) {
+    return <div data-testid="loading-state">Loading...</div>;
+  }
   return (
     <div className="">
      <main className="flex-1"> 
@@ -193,6 +195,7 @@ export default function Home() {
         {/* 섹션2 */}
          <section
           id="section-2"
+          data-testid='section-2'
           className={`h-[500px] sm:h-[90vh] w-[90%] mx-auto py-4 flex items-center justify-center relative ${
             inSection2 ? 'animate__animated animate__fadeIn' : ''
           }`}
@@ -207,7 +210,7 @@ export default function Home() {
           <div className="w-full h-full gap-2 lg:gap-4 flex flex-col-reverse  items-center lg:items-start  lg:flex-row lg:px-16 lg:py-16 px-6 py-6 lg:max-h-[700px]">
            
             <div className=" flex-[6] flex items-center justify-center">
-              <video controls autoPlay loop muted width="700"  className="rounded-[20px] overflow-hidden max-h-[380px] lg:max-h-[1000px]">
+              <video data-testid="intro-video-0" controls autoPlay loop muted width="700"  className="rounded-[20px] overflow-hidden max-h-[380px] lg:max-h-[1000px]">
                 <source src="/videos/intro1.mp4" type="video/mp4"/>
                 
               </video>
@@ -225,12 +228,12 @@ export default function Home() {
               inSection2 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
             }`}
           >
-          <Lottie animationData={chattingSVG} loop autoplay />
+          <Lottie data-testid="lottie-animation-0" animationData={chattingSVG} loop autoplay />
         </div>
         </section>
         
         {/* 섹션3 */}
-        <section id="section-3" className={`h-[500px] sm:h-[90vh] w-[90%] mx-auto py-4 mt-20 mb-20 flex items-center justify-center relative ${
+        <section id="section-3"  data-testid="section-3" className={`h-[500px] sm:h-[90vh] w-[90%] mx-auto py-4 mt-20 mb-20 flex items-center justify-center relative ${
             inSection3 ? 'animate__animated animate__fadeIn' : ''
           }`}> 
         <Rectangle
@@ -246,7 +249,7 @@ export default function Home() {
               <DynamicText text={t('intro6')} className="text-[12px] sm:text-[15px] lg:text-[20px] "/>
             </div>
             <div className=" flex-[6] flex items-center justify-center">
-              <video controls autoPlay loop muted width="700"  className="rounded-[20px] overflow-hidden max-h-[380px] lg:max-h-[1000px]">
+              <video data-testid="intro-video-1" controls autoPlay loop muted width="700"  className="rounded-[20px] overflow-hidden max-h-[380px] lg:max-h-[1000px]">
                 <source src="/videos/intro2.mp4" type="video/mp4"/>
                 
               </video>
@@ -261,7 +264,7 @@ export default function Home() {
               inSection3 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
             }`}
           >
-          <Lottie animationData={colorSVG} loop autoplay />
+          <Lottie data-testid="lottie-animation-1" animationData={colorSVG} loop autoplay />
         </div>
         </section>
 
@@ -271,8 +274,8 @@ export default function Home() {
           <div className="marquee">
             <div className="marquee__content">
               {/* 한 세트의 요소 */}
-              {Array(5).fill(
-                <div className="marquee__group">
+              {Array(5).fill(null).map((_, index) => (
+                <div key={index} className="marquee__group">
                   <Image src="/SVG/star.svg" alt="star" width={80} height={80} priority className="icon" />
                   <DynamicText text={t('GroupChat')} className="marquee__text" />
                   <Image src="/SVG/star.svg" alt="star" width={80} height={80} priority className="icon" />
@@ -282,13 +285,13 @@ export default function Home() {
                   <Image src="/SVG/star.svg" alt="star" width={80} height={80} priority className="icon" />
                   <DynamicText text={t('Trust')} className="marquee__text" />
                 </div>
-              )}
+              ))}
             </div>
           </div>
         </section>
 
         {/* 섹션5 */}
-        <section id="section-5" className={`h-[500px] sm:h-[90vh] w-[90%]  mt-20 mb-20 mx-auto py-4  flex items-center justify-center relative ${
+        <section id="section-5" data-testid="section-5" className={`h-[500px] sm:h-[90vh] w-[90%]  mt-20 mb-20 mx-auto py-4  flex items-center justify-center relative ${
             inSection5 ? 'animate__animated animate__fadeIn' : ''
           }`}> 
         <Rectangle
@@ -301,7 +304,7 @@ export default function Home() {
           <div className="w-full h-full gap-2 lg:gap-4 flex flex-col-reverse  items-center lg:items-start  lg:flex-row lg:px-16 lg:py-16 px-6 py-6 lg:max-h-[700px]">
         
             <div className=" flex-[6] flex items-center justify-center">
-              <video controls autoPlay loop muted width="700"  className="rounded-[20px] overflow-hidden max-h-[380px] lg:max-h-[1000px]">
+              <video data-testid="intro-video-2" controls autoPlay loop muted width="700"  className="rounded-[20px] overflow-hidden max-h-[380px] lg:max-h-[1000px]">
                 <source src="/videos/intro3.mp4" type="video/mp4"/>
                 
               </video>
@@ -319,12 +322,12 @@ export default function Home() {
               inSection5 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
             }`}
           >
-          <Lottie animationData={translationSVG} loop autoplay />
+          <Lottie data-testid="lottie-animation-2" animationData={translationSVG} loop autoplay />
         </div>
         </section>
 
        {/* 섹션6 */}
-        <section id="section-6" className={`h-[500px] sm:h-[90vh] w-[90%] mt-20 mb-20 mx-auto py-4  flex items-center justify-center relative ${
+        <section id="section-6" data-testid="section-6" className={`h-[500px] sm:h-[90vh] w-[90%] mt-20 mb-20 mx-auto py-4  flex items-center justify-center relative ${
             inSection6 ? 'animate__animated animate__fadeIn' : ''
           }`}> 
         <Rectangle
@@ -340,7 +343,7 @@ export default function Home() {
               <DynamicText text={t('intro10')} className="text-[12px] sm:text-[15px] lg:text-[20px] "/>
             </div>
             <div className=" flex-[6] flex items-center justify-center">
-              <video controls autoPlay loop muted width="700"  className="rounded-[20px] overflow-hidden max-h-[380px] lg:max-h-[1000px]">
+              <video data-testid="intro-video-3" controls autoPlay loop muted width="700"  className="rounded-[20px] overflow-hidden max-h-[380px] lg:max-h-[1000px]">
                 <source src="/videos/intro4.mp4" type="video/mp4"/>
                 
               </video>
@@ -355,12 +358,12 @@ export default function Home() {
               inSection6 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
             }`}
           >
-          <Lottie animationData={themeSVG} loop autoplay />
+          <Lottie data-testid="lottie-animation-3" animationData={themeSVG} loop autoplay />
         </div>
         </section>
 
         {/* 섹션7 */}
-        <section id="section-7" className={`h-[500px] sm:h-[90vh] w-[90%] mt-20 mb-20 mx-auto py-4  flex items-center justify-center relative ${
+        <section id="section-7" data-testid="section-7" className={`h-[500px] sm:h-[90vh] w-[90%] mt-20 mb-20 mx-auto py-4  flex items-center justify-center relative ${
             inSection7 ? 'animate__animated animate__fadeIn' : ''
           }`}> 
         <Rectangle
@@ -373,7 +376,7 @@ export default function Home() {
           <div className="w-full h-full gap-2 lg:gap-4 flex flex-col-reverse  items-center lg:items-start  lg:flex-row lg:px-16 lg:py-16 px-6 py-6 lg:max-h-[700px]">
         
             <div className=" flex-[6] flex items-center justify-center">
-              <video controls autoPlay loop muted width="700"  className="rounded-[20px] overflow-hidden max-h-[380px] lg:max-h-[1000px]">
+              <video data-testid="intro-video-4" controls autoPlay loop muted width="700"  className="rounded-[20px] overflow-hidden max-h-[380px] lg:max-h-[1000px]">
                 <source src="/videos/intro5.mp4" type="video/mp4"/>
                 
               </video>
@@ -391,7 +394,7 @@ export default function Home() {
               inSection7 ? 'opacity-100 scale-100' : 'opacity-0 scale-50'
             }`}
           >
-          <Lottie animationData={peopleSVG} loop autoplay />
+          <Lottie data-testid="lottie-animation-4" animationData={peopleSVG} loop autoplay />
         </div>
         </section>
 
@@ -405,6 +408,7 @@ export default function Home() {
                     height={50}
                     priority
                     className="cursor-pointer"
+                    data-testid="site-logo"
                   />
         </section>
          
