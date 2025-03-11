@@ -193,7 +193,7 @@ function SignupPage() {
   }, [i18n]);
 // ✅ 서버에서 렌더링을 방지하기 위해 클라이언트가 아니면 빈 화면을 반환
 if (!isClient) {
-  return <div data-testid="loading">Loading...</div>;
+  return null;
 }
   if (!isInitialized) return null;
 

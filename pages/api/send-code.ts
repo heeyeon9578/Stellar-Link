@@ -18,10 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const db = client.db('StellarLink');
       const collection = db.collection('verificationCodes');
       const user = await db.collection('user_cred').findOne({ email });
-      const session = await getServerSession(req, res, authOptions);
-      if (!session) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+
   
       if (user) {
         return res.status(404).json({ message: 'Email is already registered.' });

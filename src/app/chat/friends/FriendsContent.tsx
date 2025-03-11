@@ -90,11 +90,13 @@ export default function FriendsContent() {
   //    (blocked 상태도 함께 필터링 하거나, 탭 별로 로직이 달라질 수 있으니
   //     상황에 맞게 필터링 조건을 다르게 적용 가능합니다.)
   const filteredFriends = friends.filter((friend) => {
-    // 상태가 'block'인지 여부는 탭에서 구분 처리
+    if (!friend) return false;
     const nameMatch = friend.name?.toLowerCase().includes(debouncedSearch.toLowerCase());
     const emailMatch = friend.email?.toLowerCase().includes(debouncedSearch.toLowerCase());
     return nameMatch || emailMatch;
   });
+  
+  
 
   // 2) Request 탭(보낸 요청)에서 사용할 필터
   const filteredSentRequests = sentRequests.filter((request) => {

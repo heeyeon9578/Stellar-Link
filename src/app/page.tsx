@@ -146,7 +146,7 @@ export default function Home() {
   };
 
   if (!isInitialized) {
-    return <div data-testid="loading-state">Loading...</div>;
+    return null;
   }
   return (
     <div className="">
