@@ -14,6 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="icon" href="/favicon.ico.png" />
         <link
           href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@700&display=swap"
           rel="stylesheet"
