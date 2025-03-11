@@ -2,7 +2,7 @@
 
 > 
 
-![Stellar Link 메인 페이지 사진](captures/screencapture-stellar-link-org-2025-03-11-16_03_14.png)
+![Stellar Link 메인 페이지 사진](public/captures/screencapture-stellar-link-org-2025-03-11-16_03_14.png)
 
 ---
 
@@ -28,13 +28,13 @@
 
 ## 🖥 서버 구조
 
-![서버 구조](captures/serverArchitect.png)
+![서버 구조](public/captures/serverArchitect.png)
 
 ---
 
 ## 💻 화면 설계
 
- ![Figma 디자인 미리보기](captures/figma.png)(https://www.figma.com/design/9l0M6L7W45mJAw1C6BejRn/Stellar-Link?node-id=0-1&t=jgyi0UeeH89CYrTy-1)
+ ![Figma 디자인 미리보기](public/captures/figma.png)(https://www.figma.com/design/9l0M6L7W45mJAw1C6BejRn/Stellar-Link?node-id=0-1&t=jgyi0UeeH89CYrTy-1)
 
 
 ---
