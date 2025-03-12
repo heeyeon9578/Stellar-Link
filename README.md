@@ -331,6 +331,8 @@ https://stellar-link.org/
     ![테마 설정하기](public/captures/setting_theme.png)
 
     > 상단, 중간, 하단 색상을 자유롭게 선택하여 그라데이션을 구성할 수 있습니다.
+
+    ![테마 설정하기](public/captures/colors.png)
     
   </details>
 
