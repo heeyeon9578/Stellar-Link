@@ -19,13 +19,7 @@ https://stellar-link.org/
   > [화면 0: 메인 화면](#화면-0-메인-화면)  
   > [화면 1: 회원가입 / 로그인 / 비밀번호 찾기 / 로그아웃 / 회원탈퇴](#화면-1-회원가입--로그인--비밀번호-찾기)  
   > [화면 2: 채팅 메인 페이지](#화면-2-채팅-메인-페이지)  
-  > [화면 3: 게시글 작성 / 임시저장 / 수정](#화면-3-게시글-작성--임시저장--수정)  
-  > [화면 4: 게시글 상세](#화면-4-게시글-상세)  
-  > [화면 5: 인기글 / 최신글 / 태그 별 게시글 전체보기](#화면-5-인기글--최신글--태그-별-게시글-전체보기)  
-  > [화면 6: 팔로우 / 팔로워](#화면-6-팔로우--팔로워)  
-  > [화면 7: 실시간 알림 / 헤더에 알림 5개보기 / 알림 전체보기](#화면-7-실시간-알림--헤더에-알림-5개보기--알림-전체보기)  
-  > [화면 8: 프로필 설정](#화면-8-프로필-설정)  
-  
+
 
 ---
 
@@ -223,18 +217,20 @@ https://stellar-link.org/
    <details>
     <summary>친구 전체목록</summary>
     
-    ![친구 전체목록](public/captures/.png)
+    ![친구 전체목록](public/captures/all.png)
 
-    - 
+    - '친구 요청(친구 추가)'후, '상대방이 수락'하면 친구 전체목록에 나타납니다.
+    - 친구를 클릭하면, 채팅방으로 바로 넘어가며 채팅방 목록에 생성됩니다.
      
    </details>
 
    <details>
     <summary>친구 요청한 목록</summary>
     
-    ![친구 요청한 목록](public/captures/.png)
+    ![친구 요청한 목록](public/captures/request.png)
 
-    - 
+    - 사용자가 '친구 추가하기'를 통해 요청한 목록을 보여줍니다.
+    - 상대방이 '수락/거절'하면 목록에서 사라집니다.
      
    </details>
 
@@ -252,31 +248,89 @@ https://stellar-link.org/
    <details>
     <summary>친구 차단한 목록</summary>
     
-    ![친구 차단한 목록](public/captures/.png)
+    ![친구 차단하기](public/captures/friend_block.png)
 
-    - 
+    ![친구 차단한 목록](public/captures/block.png)
+
+    - 전체 목록에서 친구 차단하면, 차단한 목록에 나타납니다.
+    - 차단해제를 통해 원상복구 혹은 친구 삭제를 통해 아예 삭제할 수 있습니다.
      
    </details>
 
-- **채팅**: 사용자가 서비스에서 로그아웃 버튼을 클릭하여 로그아웃합니다.
+- **채팅**: 채팅방 생성, 개인채팅 목록 보기, 단체채팅 목록 보기, 채팅방 입장하기 등을 할 수 있습니다.
   
   <details>
-    <summary>로그아웃 페이지</summary>
+    <summary>채팅방 생성하기</summary>
 
-    ![로컬 회원 탈퇴](public/captures/user_delete.png)
+    ![채팅방 생성하기](public/captures/chat_empty.png)
 
-    > 로그인할 때 사용한 이메일과 비밀번호 및 비밀번호 확인란을 조건에 맞게 채우면 회원 탈퇴하기 버튼이 활성화됩니다.
+    > 상단의 '+' 버튼을 클릭합니다.
+
+    ![채팅방 생성하기](public/captures/chat_add.png)
+
+    > 채팅방에 함께할 참여자들을 선택(한 명 이상이면 가능)합니다.
+    > 채팅방 생성하기 버튼을 클릭합니다.
+
+    ![채팅방 생성하기](public/captures/chat_add_success.png)
+
+    > 채팅방 생성이 완료되면 목록에 생성되며, 바로 채팅방에 입장합니다.
+    
+  </details>
+
+  <details>
+    <summary>채팅하기</summary>
+
+    ![채팅하기](public/captures/chat_chatting.png)
+
+    > 하단의 입력창에 입력 후, 엔터 혹은 보내기 버튼을 클릭하면 채팅이 전송됩니다.
+    > 첨부 파일도 전송 가능합니다.
+
+    ![채팅하기](public/captures/chat_chatting2.png)
+
+    > 실시간 양방향 통신으로, 참여자가 읽을때마다 읽지 않은 참여자 수가 실시간으로 검사됩니다.
+    > 채팅방에 입장하지 않았을 경우, 채팅방 목록에 읽지 않은 메세지 수가 카운팅됩니다.
+
+    ![채팅하기](public/captures/chat_change.png)
+
+    > 자신의 말풍선 색상 및 이름 색상을 채팅방 마다 다르게 설정할 수 있으며, 설정하자마자 다른 사용자들에게도 실시간으로 변경됩니다.
+    > 서버에 저장되므로, 다시 채팅방에 입장해도 해당 컬러가 적용됩니다.
+    
+  </details>
+
+  <details>
+    <summary>채팅방 목록 보기</summary>
+
+    ![채팅방 생성하기](public/captures/chat_all.png)
+
+    > 전체채팅 목록입니다.
+
+    ![채팅방 생성하기](public/captures/chat_personal.png)
+
+    > 개인채팅 목록입니다.
+
+    ![채팅방 생성하기](public/captures/chat_teams.png)
+
+    > 단체채팅 목록입니다.
     
   </details>
 
 - **설정**: 사용자가 서비스에서 로그아웃 버튼을 클릭하여 로그아웃합니다.
   
   <details>
-    <summary>로그아웃 페이지</summary>
+    <summary>언어 설정하기</summary>
 
-    ![로컬 회원 탈퇴](public/captures/user_delete.png)
+    ![언어 설정하기](public/captures/setting_lang.png)
 
-    > 로그인할 때 사용한 이메일과 비밀번호 및 비밀번호 확인란을 조건에 맞게 채우면 회원 탈퇴하기 버튼이 활성화됩니다.
+    > 영어, 한국어, 스페인어 중에 선택하여 설정할 수 있습니다.
+    
+  </details>
+
+  <details>
+    <summary>테마 설정하기</summary>
+
+    ![테마 설정하기](public/captures/setting_theme.png)
+
+    > 상단, 중간, 하단 색상을 자유롭게 선택하여 그라데이션을 구성할 수 있습니다.
     
   </details>
 
@@ -285,9 +339,9 @@ https://stellar-link.org/
   <details>
     <summary>로그아웃 페이지</summary>
 
-    ![로컬 회원 탈퇴](public/captures/user_delete.png)
+    ![로컬 회원 탈퇴](public/captures/logout.png)
 
-    > 로그인할 때 사용한 이메일과 비밀번호 및 비밀번호 확인란을 조건에 맞게 채우면 회원 탈퇴하기 버튼이 활성화됩니다.
+    > 로그아웃 후, 메인화면으로 돌아갑니다.
     
   </details>
 
